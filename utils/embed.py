@@ -8,7 +8,7 @@ async def brand_embed(e: discord.Embed, bot: commands.Bot, ctx: discord.Interact
         "footer": "Server Eggs by Flamey"
     }
 
-    icon = ""
+    icon = "https://github.com/ActuallyFlamey/ServerEggs/blob/main/icon.png?raw=true"
 
     e.set_author(name=lines["author"], icon_url=icon)
     e.set_footer(text=lines["footer"], icon_url=icon)
