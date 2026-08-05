@@ -1,0 +1,35 @@
+{
+    "lines": {
+        "config": {
+            "lang": {
+                "no_permissions": "È necessario il permesso **Gestisci Server** per eseguire questo comando qui.\n\n-# Se intendevi impostare la **tua lingua di risposta personale**, esegui `/configura lingua` nei [miei DM](https://discord.com/users/886686500845138041).\n-# **Non tutti i server permettono** l'uso delle lingue personali, ma **nei DM funzionerà sempre**.",
+                "success": "Impostata la lingua \"**Italiano**\" con successo!"
+            },
+            "allow-user-lang": {
+                "already": "L'impostazione è già giusta!",
+                "success": "Modificato il permesso di utilizzare le lingue personali con successo (`{0}`)!"
+            }
+        },
+        "utility": {
+            "ping": {
+                "latency": "Ritardo"
+            }
+        }
+    },
+    
+    "ping": "ping",
+    "ping_description": "Ottiene il ritardo di connessione di Server Eggs.",
+
+    "config": "configura",
+    "config_description": "Comandi di configurazione.",
+
+    "lang": "lingua",
+    "lang_description": "Imposta la lingua delle risposte. Nei server occorre il permesso Gestisci Server.",
+    "lang_language": "lingua",
+    "lang_language_description": "La lingua da impostare.",
+
+    "allow-user-lang": "permetti-lingua-personale",
+    "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
+    "allow-user-lang_allow": "permetti",
+    "allow-user-lang_allow_description": "Permettere l'utilizzo delle lingue personali in questo server?"
+}

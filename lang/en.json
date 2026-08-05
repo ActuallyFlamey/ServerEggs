@@ -1,0 +1,35 @@
+{
+    "lines": {
+        "config": {
+            "lang": {
+                "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](https://discord.com/users/886686500845138041).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
+                "success": "Successfully switched language to \"**English**\"!"
+            },
+            "allow-user-lang": {
+                "already": "The setting is already correct!",
+                "success": "Successfully modified the setting regarding usage of user languages (`{0}`)!"
+            }
+        },
+        "utility": {
+            "ping": {
+                "latency": "Latency"
+            }
+        }
+    },
+
+    "ping": "ping",
+    "ping_description": "Gets Server Eggs's latency.",
+
+    "config": "config",
+    "config_description": "Configuration commands.",
+    
+    "lang": "lang",
+    "lang_description": "Sets the response language. In servers, you must have the Manage Server permission.",
+    "lang_language": "language",
+    "lang_language_description": "The language to set.",
+
+    "allow-user-lang": "allow-user-lang",
+    "allow-user-lang_description": "Changes the setting on allowing user languages in this server.",
+    "allow-user-lang_allow": "allow",
+    "allow-user-lang_allow_description": "Allow the usage of user languages in this server?"
+}

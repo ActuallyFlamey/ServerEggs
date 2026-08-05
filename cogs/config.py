@@ -1,0 +1,61 @@
+import discord
+from discord import app_commands as app
+from discord.ext import commands
+
+from schema import Guild, User
+
+
+class Config(commands.GroupCog, group_name="config", group_description="config_description"):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+    
+    @app.command(name="lang", description="lang_description")
+    @app.rename(code="lang_language")
+    @app.describe(code="lang_language_description")
+    @app.choices(code=[
+        app.Choice(name="English", value="en"),
+        app.Choice(name="Italiano", value="it"),
+    ])
+    async def lang(self, ctx: discord.Interaction, code: str):
+        await ctx.response.defer(ephemeral=True)
+
+        if ctx.guild:
+            if not ctx.permissions.manage_guild:
+                lines = await self.bot.get_line("config/lang", ctx)
+
+                await ctx.followup.send(lines["no_permissions"], ephemeral=True)
+                return
+            else:
+                await Guild.update_or_create(defaults={ "lang": code }, id=ctx.guild.id)
+                self.bot.lang_cache[f"guild_{ctx.guild.id}"] = code
+        else:
+            await User.update_or_create(defaults={ "lang": code }, id=ctx.user.id)
+            self.bot.lang_cache[f"user_{ctx.user.id}"] = code
+        
+        lines = await self.bot.get_line("config/lang", ctx)
+
+        await ctx.followup.send(lines["success"], ephemeral=True)
+    
+    @app.command(name="allow-user-lang", description="allow-user-lang_description")
+    @app.rename(allow="allow-user-lang_allow")
+    @app.describe(allow="allow-user-lang_allow_description")
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=True)
+    @app.checks.has_permissions(manage_guild=True)
+    async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
+        await ctx.response.defer(ephemeral=True)
+
+        lines = await self.bot.get_line("config/allow-user-lang", ctx)
+
+        cache_key = f"guild_{ctx.guild.id}_allowuserlang"
+
+        if self.bot.lang_cache[cache_key] == allow:
+            await ctx.followup.send(lines["already"], ephemeral=True)
+            return
+
+        guild, _ = await Guild.update_or_create(defaults={ "allow_user_lang": allow }, id=ctx.guild.id)
+        self.bot.lang_cache[cache_key] = guild.allow_user_lang
+
+        await ctx.followup.send(lines["success"].format(allow), ephemeral=True)
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Config(bot))
