@@ -1,8 +1,8 @@
 import os
 
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv()
+dotenv.load_dotenv()
 
 TORTOISE_ORM = {
     "connections": {"default": os.getenv("DATABASE_URL")},

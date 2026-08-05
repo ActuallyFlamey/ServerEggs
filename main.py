@@ -93,4 +93,39 @@ async def on_ready():
     TESTING_CHANNEL = bot.get_channel(858733195768234035)
     await TESTING_CHANNEL.send(f"**Server Eggs** is **REBORN** on **discord.py {discord.__version__}**")
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    invite = await guild.rules_channel.create_invite() if guild.rules_channel else await guild.text_channels[0].create_invite()
+
+    await Guild.update_or_create(defaults={ "invite": invite.url }, id=guild.id)
+
+    e = discord.Embed(
+        title="Server Eggs",
+        color=discord.Color.blurple(),
+        description=f"**Server Eggs** has joined **{guild.name}**!"
+    )
+    e.add_field(
+        name="What to do now",
+        value="""
+            - Set your **language** with `/config lang`, if it's **not English**.\n
+            - Set an **inviting description** for your server with `/config server-description`.
+        """
+    )
+    await utils.brand_embed(e, bot)
+    
+    for channel in guild.text_channels:
+        if channel.permissions_for(guild.me).send_messages:
+            try:
+                await channel.send(embed=e)
+                break
+            except (discord.Forbidden, discord.HTTPException):
+                continue
+
+@bot.event
+async def on_guild_remove(guild: discord.Guild):
+    record = await Guild.get_or_none(id=guild.id)
+
+    if record is not None: await record.delete()
+
+if __name__ == "__main__":
+    bot.run(os.getenv("DISCORD_TOKEN"))

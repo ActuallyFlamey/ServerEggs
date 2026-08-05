@@ -8,7 +8,41 @@
             "allow-user-lang": {
                 "already": "The setting is already correct!",
                 "success": "Successfully modified the setting regarding usage of user languages (`{0}`)!"
+            },
+            "server-description": {
+                "success": "Successfully set server description to:\n{0}"
             }
+        },
+        "eggs": {
+            "create": {
+                "empty": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
+                "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
+                "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
+                "banned": "You are **banned** from creating **Eggs**.\nAppealing is not possible *at this time*.",
+                "success": {
+                    "title": "Egg created!",
+                    "content": "Content"
+                }
+            },
+            "get": {
+                "not_found": "**Egg** ID `{0}` was not found.",
+                "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
+                "nsfw_in_sfw": "You may not search for NSFW **Egg**s in a SFW channel.",
+                "no_egg": "Could not find any **Egg**s.",
+                "eggn": "Egg #{0}",
+                "creator": "Created by",
+                "unknown_creator": "Unknown User {0}",
+                "origin": "In server",
+                "unknown_origin": "Unknown Server {0}",
+                "button": {
+                    "origin": "Join Origin Server",
+                    "creator": "View Creator Profile"
+                }
+            }
+        },
+        "embed": {
+            "author": "Server Eggs",
+            "footer": "Server Eggs by Flamey"
         },
         "utility": {
             "ping": {
@@ -16,9 +50,6 @@
             }
         }
     },
-
-    "ping": "ping",
-    "ping_description": "Gets Server Eggs's latency.",
 
     "config": "config",
     "config_description": "Configuration commands.",
@@ -31,5 +62,29 @@
     "allow-user-lang": "allow-user-lang",
     "allow-user-lang_description": "Changes the setting on allowing user languages in this server.",
     "allow-user-lang_allow": "allow",
-    "allow-user-lang_allow_description": "Allow the usage of user languages in this server?"
+    "allow-user-lang_allow_description": "Allow the usage of user languages in this server?",
+
+    "server-description": "server-description",
+    "server-description_description": "Set an enticing server description to convince people to join.",
+    "server-description_desc": "desc",
+    "server-description_desc_description": "The new description.",
+
+    "create": "create",
+    "create_description": "Create an Egg",
+    "create_text": "text",
+    "create_text_description": "The text included with the Egg.",
+    "create_attachment": "attachment",
+    "create_attachment_description": "The attachment included with the Egg.",
+    "create_nsfw": "nsfw",
+    "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
+
+    "get": "get",
+    "get_description": "Get an Egg.",
+    "get_id": "id",
+    "get_id_description": "The ID of a specific Egg you're searching for. If blank, get a random Egg.",
+    "get_only-nsfw": "only-nsfw",
+    "get_only-nsfw_description": "Only search for NSFW Eggs. Can only be done in a NSFW channel.",
+
+    "ping": "ping",
+    "ping_description": "Gets Server Eggs's latency."
 }

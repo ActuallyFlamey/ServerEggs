@@ -8,7 +8,41 @@
             "allow-user-lang": {
                 "already": "L'impostazione è già giusta!",
                 "success": "Modificato il permesso di utilizzare le lingue personali con successo (`{0}`)!"
+            },
+            "server-description": {
+                "success": "Impostata la descrizione del server:\n{0}"
             }
+        },
+        "eggs": {
+            "create": {
+                "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
+                "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
+                "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
+                "banned": "Ti è stato **tolto il permesso** di creare **Uova**.\n*Al momento* non è possibile fare ricorso.",
+                "success": {
+                    "title": "Uovo creato!",
+                    "content": "Contenuto"
+                }
+            },
+            "get": {
+                "not_found": "**Uovo** con ID `{0}` non trovato.",
+                "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
+                "nsfw_in_sfw": "Non puoi cercare le **Uova** vietate ai minori in un canale per tutte le età.",
+                "no_egg": "Non è stato trovato nessun **Uovo**.",
+                "eggn": "Uovo n. {0}",
+                "creator": "Creato da",
+                "unknown_creator": "Utente Sconosciuto {0}",
+                "origin": "Nel server",
+                "unknown_origin": "Server Sconosciuto {0}",
+                "button": {
+                    "origin": "Unisciti al Server d'Origine",
+                    "creator": "Visualizza il Profilo del Creatore"
+                }
+            }
+        },
+        "embed": {
+            "author": "Server Eggs",
+            "footer": "Server Eggs di Flamey"
         },
         "utility": {
             "ping": {
@@ -16,9 +50,6 @@
             }
         }
     },
-    
-    "ping": "ping",
-    "ping_description": "Ottiene il ritardo di connessione di Server Eggs.",
 
     "config": "configura",
     "config_description": "Comandi di configurazione.",
@@ -31,5 +62,29 @@
     "allow-user-lang": "permetti-lingua-personale",
     "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
     "allow-user-lang_allow": "permetti",
-    "allow-user-lang_allow_description": "Permettere l'utilizzo delle lingue personali in questo server?"
+    "allow-user-lang_allow_description": "Permettere l'utilizzo delle lingue personali in questo server?",
+
+    "server-description": "descrizione-server",
+    "server-description_description": "Imposta una descrizione accattivante del server che convinca la gente a unirsi.",
+    "server-description_desc": "desc",
+    "server-description_desc_description": "La nuova descrizione.",
+
+    "create": "crea",
+    "create_description": "Crea un Uovo",
+    "create_text": "testo",
+    "create_text_description": "Il testo da includere con l'Uovo.",
+    "create_attachment": "allegato",
+    "create_attachment_description": "L'allegato da includere con l'Uovo.",
+    "create_nsfw": "nsfw",
+    "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
+
+    "get": "ricevi",
+    "get_description": "Ricevi un Uovo.",
+    "get_id": "id",
+    "get_id_description": "L'ID di un Uovo specifico che stai cercando. Se lasciato vuoto, l'Uovo sarà random.",
+    "get_only-nsfw": "solo-vm18",
+    "get_only-nsfw_description": "Cerca solo Uova vietate ai minori. Disponibile solo nei canali per maggiorenni.",
+
+    "ping": "ping",
+    "ping_description": "Ottiene il ritardo di connessione di Server Eggs."
 }

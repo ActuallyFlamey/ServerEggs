@@ -57,5 +57,19 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
 
         await ctx.followup.send(lines["success"].format(allow), ephemeral=True)
 
+    @app.command(name="server-description", description="server-description_description")
+    @app.rename(desc="server-description_desc")
+    @app.describe(desc="server-description_desc_description")
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=True)
+    @app.checks.has_permissions(manage_guild=True)
+    async def server_description(self, ctx: discord.Interaction, desc: str):
+        await ctx.response.defer(ephemeral=True)
+
+        lines = await self.bot.get_line("config/server-description", ctx)
+
+        guild, _ = await Guild.update_or_create({ "description": desc }, id=ctx.guild.id)
+
+        await ctx.followup.send(content=lines["success"].format(guild.description), ephemeral=True)
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(Config(bot))

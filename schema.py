@@ -7,6 +7,7 @@ class Egg(Model):
 
     text = fields.TextField(null=True)
     attach_path = fields.TextField(null=True)
+    attach_hash = fields.CharField(64, null=True, index=True)
 
     nsfw = fields.BooleanField(default=False)
 
@@ -18,6 +19,9 @@ class Egg(Model):
 
 class Guild(Model):
     id = fields.BigIntField(primary_key=True, generated=False)
+
+    description = fields.TextField(null=True)
+    invite = fields.TextField(null=True)
 
     lang = fields.CharField(5, default="en")
     allow_user_lang = fields.BooleanField(default=True)
