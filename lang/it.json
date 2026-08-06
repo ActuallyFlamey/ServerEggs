@@ -20,6 +20,7 @@
         "eggs": {
             "create": {
                 "no_nsfw": "Non è possibile creare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
+                "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
@@ -38,9 +39,12 @@
                 "unknown_creator": "Utente Sconosciuto {0}",
                 "origin": "Nel server",
                 "unknown_origin": "Server Sconosciuto {0}",
+                "origin_name": "Nome",
+                "origin_desc": "Descrizione",
                 "button": {
                     "origin": "Unisciti al Server d'Origine",
-                    "creator": "Visualizza il Profilo del Creatore"
+                    "creator": "Visualizza il Profilo del Creatore",
+                    "report": "Segnala"
                 }
             },
             "delete": {
@@ -55,6 +59,9 @@
                 "confirm": "Conferma Eliminazione",
                 "success": "L'**Uovo** n. {0} è stato eliminato con successo."
             }
+        },
+        "error": {
+            "title": "Si è verificato un errore"
         },
         "embed": {
             "author": "Server Eggs",
@@ -94,8 +101,10 @@
     "create_description": "Crea un Uovo.",
     "create_text": "testo",
     "create_text_description": "Il testo da includere con l'Uovo.",
-    "create_attachment": "allegato",
-    "create_attachment_description": "L'allegato da includere con l'Uovo.",
+    "create_file": "file",
+    "create_file_description": "L'allegato da includere con l'Uovo in forma di file.",
+    "create_link": "link",
+    "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
     "create_nsfw": "nsfw",
     "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
 

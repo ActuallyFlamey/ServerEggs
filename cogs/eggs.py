@@ -13,84 +13,93 @@ from schema import Egg, Guild, User
 class Eggs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
+
     @app.command(name="create", description="create_description")
-    @app.rename(text="create_text", attachment="create_attachment", nsfw="create_nsfw")
-    @app.describe(text="create_text_description", attachment="create_attachment_description", nsfw="create_nsfw_description")
+    @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
+    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    async def create(self, ctx: discord.Interaction, text: str | None, attachment: discord.Attachment | None, nsfw: bool=False):
+    async def create(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None = False):
         await ctx.response.defer()
 
-        lines = await self.bot.get_line("eggs/create", ctx)
+        lines = await self.bot.get_lines(ctx)
+        myloc = self.bot.get_line("eggs/create", lines)
 
         is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
         if nsfw and not is_channel_nsfw:
-            await ctx.followup.send(lines["no_nsfw"])
+            await ctx.followup.send(myloc["no_nsfw"])
+            return
+        
+        if file and link:
+            await ctx.followup.send(myloc["toomanyattach"])
             return
 
         user, _ = await User.get_or_create(id=ctx.user.id)
 
         if user.banned:
-            await ctx.followup.send(lines["banned"])
+            await ctx.followup.send(myloc["banned"])
             return
 
-        if text is None and attachment is None:
-            await ctx.followup.send(lines["empty"])
+        if text is None and file is None and link is None:
+            await ctx.followup.send(myloc["empty"])
             return
 
         if text:
             text = text.strip()
             if text == "": text = None
 
+        trimtext = text[:4095] + ("…" if len(text) > 4095 else "") if text else None
+
         attach_path = None
         attach_hash = None
 
-        if attachment:
-            if attachment.content_type and attachment.content_type.startswith("image/"):
-                attach_path, attach_hash = await utils.process_attachment(attachment)
+        if file:
+            if file.content_type and file.content_type.startswith("image/"):
+                attach_path, attach_hash = await utils.process_attachment(file)
             else:
-                await ctx.followup.send(lines["images_only"])
+                await ctx.followup.send(myloc["images_only"])
                 return
-        
-        existing = await Egg.filter(text=text, attach_hash=attach_hash).first()
+
+        existing = await Egg.filter(text=trimtext, attach_hash=attach_hash, attach_link=link).first()
 
         if existing:
             if attach_path and os.path.exists(attach_path):
                 os.remove(attach_path)
-            
-            await ctx.followup.send(lines["duplicate"].format(existing.id))
+
+            await ctx.followup.send(myloc["duplicate"].format(existing.id))
             return
-        
+
         guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
         egg = await Egg.create(
-            text=text,
+            text=trimtext,
             attach_path=attach_path,
             attach_hash=attach_hash,
+            attach_link=link,
             nsfw=nsfw,
             creator=user,
             origin=guild
         )
-        
+
         e = discord.Embed(
-            title=lines["success"]["title"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
+            title=myloc["success"]["title"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
             color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
             description=egg.text
         )
-        await utils.brand_embed(e, self.bot, ctx)
+        await utils.brand_embed(e, lines)
 
-        file = utils.show_attachment(egg, e)
-        
-        await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING)
-    
+        file = await utils.show_attachment(egg, e)
+
+        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING)
+
     @app.command(name="get", description="get_description")
     @app.rename(id="get_id", only_nsfw="get_only-nsfw")
     @app.describe(id="get_id_description", only_nsfw="get_only-nsfw_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def get(self, ctx: discord.Interaction, id: int | None=None, only_nsfw: bool | None=None):
+    async def get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool | None = False):
         await ctx.response.defer()
 
-        lines = await self.bot.get_line("eggs/get", ctx)
+        lines = await self.bot.get_lines(ctx)
+        myloc = self.bot.get_line("eggs/get", lines)
 
         is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
 
@@ -98,28 +107,28 @@ class Eggs(commands.Cog):
             egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
 
             if not egg:
-                await ctx.followup.send(lines["not_found"].format(id))
+                await ctx.followup.send(myloc["not_found"].format(id))
                 return
-            
+
             if egg.nsfw and not is_channel_nsfw:
-                await ctx.followup.send(lines["nsfw_id_in_sfw"])
+                await ctx.followup.send(myloc["nsfw_id_in_sfw"])
                 return
         else:
             eggs = Egg.all()
 
             if only_nsfw:
                 if not is_channel_nsfw:
-                    await ctx.followup.send(lines["nsfw_in_sfw"])
+                    await ctx.followup.send(myloc["nsfw_in_sfw"])
                     return
-                
+
                 eggs = eggs.filter(nsfw=True)
             elif not is_channel_nsfw:
                 eggs = eggs.filter(nsfw=False)
-        
+
             count = await eggs.count()
 
             if count == 0:
-                await ctx.followup.send(lines["no_egg"])
+                await ctx.followup.send(myloc["no_egg"])
                 return
 
             randegg = random.randint(0, count - 1)
@@ -134,31 +143,31 @@ class Eggs(commands.Cog):
                 creator = None
 
         origin = self.bot.get_guild(egg.origin.id)
-        
+
         e = discord.Embed(
-            title=lines["eggn"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
+            title=myloc["eggn"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
             color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
             description=egg.text
         )
         e.add_field(
-            name=lines["creator"],
-            value=f"**{creator.display_name}** ({creator.name})" if creator is not None else lines["unknown_creator"].format(egg.creator.id),
+            name=myloc["creator"],
+            value=f"**{creator.display_name}** ({creator.name})" if creator is not None else myloc["unknown_creator"].format(egg.creator.id),
             inline=False
         )
         e.add_field(
-            name=lines["origin"],
+            name=myloc["origin"],
             value=f"""
-                **Name**: {origin.name}
-                {f"**Description**: {egg.origin.description}" if egg.origin.description is not None else ""}
-            """ if origin is not None else lines["unknown_origin"].format(egg.origin.id),
+                **{myloc["origin_name"]}**: {origin.name}
+                {f"**{myloc["origin_desc"]}**: {egg.origin.description}" if egg.origin.description is not None else ""}
+            """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id),
             inline=False
         )
-        await utils.brand_embed(e, self.bot, ctx)
+        await utils.brand_embed(e, lines)
 
-        file = utils.show_attachment(egg, e)
-        
-        await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING, view=views.GetEgg(lines, creator, egg.origin))
-    
+        file = await utils.show_attachment(egg, e)
+
+        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.GetEgg(self.bot, lines, egg, creator))
+
     @app.command(name="delete", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
@@ -166,28 +175,31 @@ class Eggs(commands.Cog):
     async def delete(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.get_line("eggs/delete", ctx)
+        lines = await self.bot.get_lines(ctx)
+        myloc = self.bot.get_line("eggs/delete", lines)
 
         egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
 
         if not egg:
-            await ctx.followup.send(content=lines["not_found"].format(id), ephemeral=True)
+            await ctx.followup.send(content=myloc["not_found"].format(id), ephemeral=True)
             return
-        
+
         creatorchk = ctx.user.id == egg.creator.id
         modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
 
         if not (creatorchk or modchk):
-            await ctx.followup.send(content=lines["cannot"], ephemeral=True)
+            await ctx.followup.send(content=myloc["cannot"], ephemeral=True)
             return
-        
-        e = discord.Embed(title=lines["ready"]["title"].format(egg.id), color=discord.Color.blurple(), description=lines["ready"]["question"])
-        e.add_field(name=lines["ready"]["content"], value=egg.text if egg.text is not None else lines["ready"]["no_content"], inline=False)
-        await utils.brand_embed(e, self.bot, ctx)
 
-        file = utils.show_attachment(egg, e)
+        text = egg.text[:1023] + ("…" if len(egg.text) > 1023 else "") if egg.text else None
 
-        await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING, view=views.DeleteEgg(lines, egg), ephemeral=True)
+        e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=discord.Color.blurple(), description=myloc["ready"]["question"])
+        e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
+        await utils.brand_embed(e, lines)
+
+        file = await utils.show_attachment(egg, e)
+
+        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.DeleteEgg(self.bot, lines, egg), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

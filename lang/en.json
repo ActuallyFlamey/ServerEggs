@@ -20,6 +20,7 @@
         "eggs": {
             "create": {
                 "no_nsfw": "Cannot create a **NSFW Egg** in a **SFW channel**.",
+                "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "empty": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
@@ -38,9 +39,15 @@
                 "unknown_creator": "Unknown User {0}",
                 "origin": "In server",
                 "unknown_origin": "Unknown Server {0}",
+                "origin_name": "Name",
+                "origin_desc": "Description",
                 "button": {
                     "origin": "Join Origin Server",
-                    "creator": "View Creator Profile"
+                    "creator": "View Creator Profile",
+                    "report": "Report"
+                },
+                "report": {
+                    "confirm": ""
                 }
             },
             "delete": {
@@ -55,6 +62,9 @@
                 "confirm": "Confirm Deletion",
                 "success": "**Egg** #{0} was deleted successfully."
             }
+        },
+        "error": {
+            "title": "An error occurred"
         },
         "embed": {
             "author": "Server Eggs",
@@ -94,8 +104,10 @@
     "create_description": "Create an Egg.",
     "create_text": "text",
     "create_text_description": "The text included with the Egg.",
-    "create_attachment": "attachment",
-    "create_attachment_description": "The attachment included with the Egg.",
+    "create_file": "file",
+    "create_file_description": "The attachment included with the Egg as a file.",
+    "create_link": "link",
+    "create_link_description": "The attachment included with the Egg as a URL.",
     "create_nsfw": "nsfw",
     "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
 

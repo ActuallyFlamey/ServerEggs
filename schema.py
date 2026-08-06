@@ -8,6 +8,7 @@ class Egg(Model):
     text = fields.TextField(null=True)
     attach_path = fields.TextField(null=True)
     attach_hash = fields.CharField(64, null=True, index=True)
+    attach_link = fields.TextField(null=True)
 
     nsfw = fields.BooleanField(default=False)
 
