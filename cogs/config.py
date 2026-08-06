@@ -16,6 +16,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         app.Choice(name="English", value="en"),
         app.Choice(name="Italiano", value="it"),
     ])
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def lang(self, ctx: discord.Interaction, code: str):
         await ctx.response.defer(ephemeral=True)
 
@@ -39,7 +40,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.command(name="allow-user-lang", description="allow-user-lang_description")
     @app.rename(allow="allow-user-lang_allow")
     @app.describe(allow="allow-user-lang_allow_description")
-    @app.allowed_contexts(guilds=True, dms=False, private_channels=True)
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
         await ctx.response.defer(ephemeral=True)
@@ -60,7 +61,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.command(name="server-description", description="server-description_description")
     @app.rename(desc="server-description_desc")
     @app.describe(desc="server-description_desc_description")
-    @app.allowed_contexts(guilds=True, dms=False, private_channels=True)
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def server_description(self, ctx: discord.Interaction, desc: str):
         await ctx.response.defer(ephemeral=True)
@@ -70,6 +71,33 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         guild, _ = await Guild.update_or_create({ "description": desc }, id=ctx.guild.id)
 
         await ctx.followup.send(content=lines["success"].format(guild.description), ephemeral=True)
+
+    @app.command(name="privacy", description="privacy_description")
+    @app.rename(private="privacy_private")
+    @app.describe(private="privacy_private_description")
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
+    @app.checks.has_permissions(manage_guild=True)
+    async def privacy(self, ctx: discord.Interaction, private: bool):
+        await ctx.response.defer(ephemeral=True)
+
+        lines = await self.bot.get_line("config/privacy", ctx)
+
+        guild = await Guild.get_or_none(id=ctx.guild.id)
+        has_invite = bool(guild.invite)
+
+        if (has_invite and not private) or (not has_invite and private):
+            await ctx.followup.send(content=lines["already"], ephemeral=True)
+            return
+        
+        invite = None
+        if not private:
+            inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
+            invite = inviteobj.url
+        
+        guild.invite = invite
+        await guild.save(update_fields=["invite"])
+
+        await ctx.followup.send(content=lines["success"].format(private), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Config(bot))

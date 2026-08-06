@@ -8,6 +8,7 @@ class Utility(commands.Cog):
         self.bot = bot
     
     @app.command(name="ping", description="ping_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def ping(self, ctx: discord.Interaction):
         lines = await self.bot.get_line("utility/ping", ctx)
 

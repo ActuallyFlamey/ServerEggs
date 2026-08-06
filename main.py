@@ -15,7 +15,7 @@ from tortoise_config import TORTOISE_ORM
 
 dotenv.load_dotenv()
 
-TESTING_GUILD = discord.Object(id=838718002412912661)
+TESTING_GUILD = discord.Object(id=os.getenv("TESTING_GUILD_ID"))
 
 class ServerEggs(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
@@ -107,8 +107,10 @@ async def on_guild_join(guild: discord.Guild):
     e.add_field(
         name="What to do now",
         value="""
-            - Set your **language** with `/config lang`, if it's **not English**.\n
             - Set an **inviting description** for your server with `/config server-description`.
+            - If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:False`.
+            - Set your **language** with `/config lang`, if it's **not English**.
+            - If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.
         """
     )
     await utils.brand_embed(e, bot)

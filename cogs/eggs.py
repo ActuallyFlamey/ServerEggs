@@ -17,11 +17,16 @@ class Eggs(commands.Cog):
     @app.command(name="create", description="create_description")
     @app.rename(text="create_text", attachment="create_attachment", nsfw="create_nsfw")
     @app.describe(text="create_text_description", attachment="create_attachment_description", nsfw="create_nsfw_description")
-    @app.allowed_contexts(guilds=True, dms=False, private_channels=True)
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def create(self, ctx: discord.Interaction, text: str | None, attachment: discord.Attachment | None, nsfw: bool=False):
         await ctx.response.defer()
 
         lines = await self.bot.get_line("eggs/create", ctx)
+
+        is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
+        if nsfw and not is_channel_nsfw:
+            await ctx.followup.send(lines["no_nsfw"])
+            return
 
         user, _ = await User.get_or_create(id=ctx.user.id)
 
@@ -30,7 +35,7 @@ class Eggs(commands.Cog):
             return
 
         if text is None and attachment is None:
-            await ctx.followup.send(lines["empty"], ephemeral=True)
+            await ctx.followup.send(lines["empty"])
             return
 
         if text:
@@ -44,7 +49,7 @@ class Eggs(commands.Cog):
             if attachment.content_type and attachment.content_type.startswith("image/"):
                 attach_path, attach_hash = await utils.process_attachment(attachment)
             else:
-                await ctx.followup.send(lines["images_only"], ephemeral=True)
+                await ctx.followup.send(lines["images_only"])
                 return
         
         existing = await Egg.filter(text=text, attach_hash=attach_hash).first()
@@ -53,7 +58,7 @@ class Eggs(commands.Cog):
             if attach_path and os.path.exists(attach_path):
                 os.remove(attach_path)
             
-            await ctx.followup.send(lines["duplicate"].format(existing.id), ephemeral=True)
+            await ctx.followup.send(lines["duplicate"].format(existing.id))
             return
         
         guild, _ = await Guild.get_or_create(id=ctx.guild.id)
@@ -66,24 +71,22 @@ class Eggs(commands.Cog):
             creator=user,
             origin=guild
         )
-
-        file = None
         
-        e = discord.Embed(title=lines["success"]["title"], color=discord.Color.blurple())
-        e.add_field(name=lines["success"]["content"], value=egg.text)
-        if egg.attach_path and os.path.exists(egg.attach_path):
-            filename = os.path.basename(egg.attach_path)
-
-            file = discord.File(egg.attach_path, filename=filename)
-
-            e.set_image(url=f"attachment://{filename}")
+        e = discord.Embed(
+            title=lines["success"]["title"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
+            color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
+            description=egg.text
+        )
         await utils.brand_embed(e, self.bot, ctx)
+
+        file = utils.show_attachment(egg, e)
         
         await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING)
     
     @app.command(name="get", description="get_description")
     @app.rename(id="get_id", only_nsfw="get_only-nsfw")
     @app.describe(id="get_id_description", only_nsfw="get_only-nsfw_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def get(self, ctx: discord.Interaction, id: int | None=None, only_nsfw: bool | None=None):
         await ctx.response.defer()
 
@@ -131,8 +134,6 @@ class Eggs(commands.Cog):
                 creator = None
 
         origin = self.bot.get_guild(egg.origin.id)
-
-        file = None
         
         e = discord.Embed(
             title=lines["eggn"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
@@ -154,14 +155,39 @@ class Eggs(commands.Cog):
         )
         await utils.brand_embed(e, self.bot, ctx)
 
-        if egg.attach_path and os.path.exists(egg.attach_path):
-            filename = os.path.basename(egg.attach_path)
-
-            file = discord.File(egg.attach_path, filename=filename)
-
-            e.set_image(url=f"attachment://{filename}")
+        file = utils.show_attachment(egg, e)
         
         await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING, view=views.GetEgg(lines, creator, egg.origin))
+    
+    @app.command(name="delete", description="delete_description")
+    @app.rename(id="delete_id")
+    @app.describe(id="delete_id_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def delete(self, ctx: discord.Interaction, id: int):
+        await ctx.response.defer(ephemeral=True)
+
+        lines = await self.bot.get_line("eggs/delete", ctx)
+
+        egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
+
+        if not egg:
+            await ctx.followup.send(content=lines["not_found"].format(id), ephemeral=True)
+            return
+        
+        creatorchk = ctx.user.id == egg.creator.id
+        modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
+
+        if not (creatorchk or modchk):
+            await ctx.followup.send(content=lines["cannot"], ephemeral=True)
+            return
+        
+        e = discord.Embed(title=lines["ready"]["title"].format(egg.id), color=discord.Color.blurple(), description=lines["ready"]["question"])
+        e.add_field(name=lines["ready"]["content"], value=egg.text if egg.text is not None else lines["ready"]["no_content"], inline=False)
+        await utils.brand_embed(e, self.bot, ctx)
+
+        file = utils.show_attachment(egg, e)
+
+        await ctx.followup.send(embed=e, file=file if file is not None else discord.utils.MISSING, view=views.DeleteEgg(lines, egg), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

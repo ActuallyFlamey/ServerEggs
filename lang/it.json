@@ -11,21 +11,25 @@
             },
             "server-description": {
                 "success": "Impostata la descrizione del server:\n{0}"
+            },
+            "privacy": {
+                "already": "L'impostazione è già giusta!",
+                "success": "Privacy del server impostata su `{0}` con successo."
             }
         },
         "eggs": {
             "create": {
+                "no_nsfw": "Non è possibile creare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "banned": "Ti è stato **tolto il permesso** di creare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "success": {
-                    "title": "Uovo creato!",
-                    "content": "Contenuto"
+                    "title": "Uovo creato! (n. {0})"
                 }
             },
             "get": {
-                "not_found": "**Uovo** con ID `{0}` non trovato.",
+                "not_found": "**Uovo** n. {0} non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
                 "nsfw_in_sfw": "Non puoi cercare le **Uova** vietate ai minori in un canale per tutte le età.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
@@ -38,6 +42,18 @@
                     "origin": "Unisciti al Server d'Origine",
                     "creator": "Visualizza il Profilo del Creatore"
                 }
+            },
+            "delete": {
+                "not_found": "L'**Uovo** n. {0} non esiste.",
+                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+                "ready": {
+                    "title": "Elimina Uovo #{0}",
+                    "question": "Sei sicuro di voler eliminare questo **Uovo**?",
+                    "content": "Contenuto",
+                    "no_content": "[Nessun contenuto]"
+                },
+                "confirm": "Conferma Eliminazione",
+                "success": "L'**Uovo** n. {0} è stato eliminato con successo."
             }
         },
         "embed": {
@@ -69,8 +85,13 @@
     "server-description_desc": "desc",
     "server-description_desc_description": "La nuova descrizione.",
 
+    "privacy": "privacy",
+    "privacy_description": "Imposta la privacy del server.",
+    "privacy_private": "privato",
+    "privacy_private_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno?",
+
     "create": "crea",
-    "create_description": "Crea un Uovo",
+    "create_description": "Crea un Uovo.",
     "create_text": "testo",
     "create_text_description": "Il testo da includere con l'Uovo.",
     "create_attachment": "allegato",
@@ -84,6 +105,11 @@
     "get_id_description": "L'ID di un Uovo specifico che stai cercando. Se lasciato vuoto, l'Uovo sarà random.",
     "get_only-nsfw": "solo-vm18",
     "get_only-nsfw_description": "Cerca solo Uova vietate ai minori. Disponibile solo nei canali per maggiorenni.",
+
+    "delete": "elimina",
+    "delete_description": "Elimina un Uovo che ti è permesso gestire.",
+    "delete_id": "id",
+    "delete_id_description": "L'ID dell'Uovo da eliminare.",
 
     "ping": "ping",
     "ping_description": "Ottiene il ritardo di connessione di Server Eggs."
