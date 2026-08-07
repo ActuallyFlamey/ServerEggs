@@ -109,7 +109,7 @@ async def on_guild_join(guild: discord.Guild):
     )
     e.add_field(
         name="What to do now",
-        value="- Set an **inviting description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:False`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`."
+        value="- Set an **inviting description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:True`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`."
     )
     utils.brand_embed(e)
 
