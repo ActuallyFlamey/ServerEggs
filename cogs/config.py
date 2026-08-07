@@ -84,7 +84,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def privacy(self, ctx: discord.Interaction, private: bool):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.get_liness(ctx)
+        lines = await self.bot.get_lines(ctx)
         myloc = self.bot.get_line("config/privacy", lines)
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
