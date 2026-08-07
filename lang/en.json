@@ -32,7 +32,6 @@
             "get": {
                 "not_found": "**Egg** #{0} was not found.",
                 "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
-                "nsfw_in_sfw": "You may not search for NSFW **Egg**s in a SFW channel.",
                 "no_egg": "Could not find any **Egg**s.",
                 "eggn": "Egg #{0}",
                 "creator": "Created by",
@@ -45,9 +44,6 @@
                     "origin": "Join Origin Server",
                     "creator": "View Creator Profile",
                     "report": "Report"
-                },
-                "report": {
-                    "confirm": ""
                 }
             },
             "delete": {
@@ -61,6 +57,24 @@
                 },
                 "confirm": "Confirm Deletion",
                 "success": "**Egg** #{0} was deleted successfully."
+            },
+            "report": {
+                "title": "Report Egg #{0}",
+                "rule": "Report Reason",
+                "rule_desc": "Which rule is this Egg breaking?",
+                "rule_placeholder": "Select the report reason...",
+                "rules": {
+                    "unmarkednsfw": "Unmarked NSFW",
+                    "unmarkednsfw_desc": "This Egg contains NSFW content, but isn't marked as NSFW.",
+                    "hateful": "Hateful/Violent Speech",
+                    "hateful_desc": "This Egg promotes hatred towards any marginalized group.",
+                    "other": "Other (specify)",
+                    "other_desc": "You are reporting this Egg for a different reason. Write why below."
+                },
+                "other": "Custom Report Reason",
+                "other_placeholder": "If you chose \"Other\", specify your reason here...",
+                "success": "**Egg** #{0} was reported successfully.",
+                "already": "You already reported this **Egg**: wait for us to take action..."
             }
         },
         "error": {
@@ -115,8 +129,9 @@
     "get_description": "Get an Egg.",
     "get_id": "id",
     "get_id_description": "The ID of a specific Egg you're searching for. If blank, get a random Egg.",
-    "get_only-nsfw": "only-nsfw",
-    "get_only-nsfw_description": "Only search for NSFW Eggs. Can only be done in a NSFW channel.",
+
+    "nsfw": "nsfw",
+    "nsfw_description": "Get a NSFW Egg.",
 
     "delete": "delete",
     "delete_description": "Delete an Egg that you're allowed to manage.",

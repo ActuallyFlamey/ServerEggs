@@ -58,6 +58,24 @@
                 },
                 "confirm": "Conferma Eliminazione",
                 "success": "L'**Uovo** n. {0} è stato eliminato con successo."
+            },
+            "report": {
+                "title": "Segnala l'Uovo n. {0}",
+                "rule": "Motivo della Segnalazione",
+                "rule_desc": "Quale regola infrange quest'Uovo?",
+                "rule_placeholder": "Seleziona il motivo della segnalazione...",
+                "rules": {
+                    "unmarkednsfw": "Contenuto VM18 non contrassegnato",
+                    "unmarkednsfw_desc": "Questo Uovo contiene contenuti vietati ai minori, ma non è contrassegnato come tale.",
+                    "hateful": "Divulgazione di Odio/Violenza",
+                    "hateful_desc": "Questo Uovo promuove odio verso una qualsiasi minoranza.",
+                    "other": "Altro (specifica)",
+                    "other_desc": "Stai segnalando quest'Uovo per un motivo diverso. Scrivi perché qui sotto."
+                },
+                "other": "Motivo Personalizzato della Segnalazione",
+                "other_placeholder": "Se hai scelto \"Altro\", specifica le tue motivazioni qui...",
+                "success": "L'**Uovo** n. {0} è stato segnalato con successo.",
+                "already": "Hai già segnalato questo **Uovo**: aspetta che ne prendiamo atto..."
             }
         },
         "error": {
@@ -114,6 +132,9 @@
     "get_id_description": "L'ID di un Uovo specifico che stai cercando. Se lasciato vuoto, l'Uovo sarà random.",
     "get_only-nsfw": "solo-vm18",
     "get_only-nsfw_description": "Cerca solo Uova vietate ai minori. Disponibile solo nei canali per maggiorenni.",
+
+    "nsfw": "vm18",
+    "nsfw_description": "Ricevi un Uovo vietato ai minori.",
 
     "delete": "elimina",
     "delete_description": "Elimina un Uovo che ti è permesso gestire.",

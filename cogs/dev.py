@@ -5,6 +5,8 @@ import dotenv
 from discord import app_commands as app
 from discord.ext import commands
 
+from schema import User
+
 dotenv.load_dotenv()
 
 DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
@@ -30,6 +32,27 @@ class Dev(commands.GroupCog):
             guildstr += f"{guild.id} - {guild.name}\n"
 
         await ctx.followup.send(content=guildstr)
+    
+    @app.command(name="unban", description="Unban a User from creating Eggs.")
+    @app.describe(user="The User")
+    @app.check(is_dev)
+    async def unban(self, ctx: discord.Interaction, user: discord.User):
+        await ctx.response.defer()
+
+        db_user = await User.get_or_none(id=user.id)
+
+        if db_user is None:
+            await ctx.followup.send(content="User not found.")
+            return
+        
+        if not db_user.banned:
+            await ctx.followup.send(content="User is not banned.")
+            return
+        
+        db_user.banned = False
+        await db_user.save(update_fields=["banned"])
+
+        await ctx.followup.send(content=f"Unbanned user {db_user.id}.")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Dev(bot), guild=DEVELOPER_GUILD)

@@ -3,8 +3,12 @@ import os
 import discord
 import dotenv
 from discord.ext import commands
+from tortoise.exceptions import IntegrityError
 
 import utils
+from schema import Report, User
+
+from .dev import ReportActions
 
 dotenv.load_dotenv()
 
@@ -37,12 +41,7 @@ class GetEgg(discord.ui.View):
     
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def report(self, ctx: discord.Interaction, button: discord.ui.Button):
-        e = discord.Embed(title=self.myloc["report"]["title"], color=discord.Color.red, description=self.myloc["report"]["confirm"])
-        e.add_field(name=self.myloc["report"]["rules_title"], value=self.myloc["report"]["rules"])
-        e.add_field(name=self.myloc["report"]["agree_title"], value=self.myloc["report"]["rules"])
-        await utils.brand_embed(e, self.lines)
-
-        await ctx.response.send_message(embed=e, view=ReportEgg(self.bot, self.lines, self.egg), ephemeral=True)
+        await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
 
 class DeleteEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
@@ -67,15 +66,68 @@ class DeleteEgg(discord.ui.View):
 
         await ctx.response.edit_message(content=self.myloc["success"].format(eggid), embed=None, attachments=[], view=None)
 
-class ReportEgg(discord.ui.View):
+class ReportEgg(discord.ui.Modal):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
-        super().__init__(timeout=60)
-
+        self.bot = bot
+        self.lines = lines
         self.myloc = bot.get_line("eggs/report", lines)
         self.egg = egg
 
-        self.confirm.label = self.myloc["confirm"]
+        super().__init__(title=self.myloc["title"].format(egg.id))
     
-    @discord.ui.button(style=discord.ButtonStyle.danger)
-    async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
-        ...
+        self.reason = discord.ui.Label(
+            text=self.myloc["rule"],
+            description=self.myloc["rule_desc"],
+            component=discord.ui.Select(
+                placeholder=self.myloc["rule_placeholder"],
+                options=[
+                    discord.SelectOption(label=self.myloc["rules"]["unmarkednsfw"], description=self.myloc["rules"]["unmarkednsfw_desc"]),
+                    discord.SelectOption(label=self.myloc["rules"]["hateful"], description=self.myloc["rules"]["hateful_desc"]),
+                    discord.SelectOption(label=self.myloc["rules"]["other"], description=self.myloc["rules"]["other_desc"]),
+                ]
+            )
+        )
+
+        self.specify = discord.ui.TextInput(
+            label=self.myloc["other"],
+            required=False,
+            max_length=200,
+            placeholder=self.myloc["other_placeholder"]
+        )
+        
+        self.add_item(self.reason)
+        self.add_item(self.specify)
+    
+    async def on_submit(self, ctx: discord.Interaction):
+        await ctx.response.defer(ephemeral=True)
+
+        reporter, _ = await User.get_or_create(id=ctx.user.id)
+
+        reason = self.reason.component.values[0]
+        if reason == self.myloc["rules"]["other"]:
+            reason = self.specify.value
+
+        try:
+            report = await Report.create(
+                egg=self.egg,
+                reporter=reporter,
+                reason=reason
+            )
+
+            reportch = self.bot.get_channel(int(os.getenv("REPORT_CHANNEL")))
+
+            e, file = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, True)
+
+            msg = await reportch.send(
+                content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",
+                embed=e,
+                file=file or discord.utils.MISSING,
+                view=ReportActions(report)
+            )
+
+            report.log_message_id = msg.id
+            await report.save(update_fields=["log_message_id"])
+
+            await ctx.followup.send(content=self.myloc["success"].format(self.egg.id), ephemeral=True)
+        except IntegrityError:
+            await ctx.followup.send(content=self.myloc["already"], ephemeral=True)

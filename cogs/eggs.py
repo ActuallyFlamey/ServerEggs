@@ -85,17 +85,17 @@ class Eggs(commands.Cog):
             color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
             description=egg.text
         )
-        await utils.brand_embed(e, lines)
+        utils.brand_embed(e, lines)
 
         file = await utils.show_attachment(egg, e)
 
         await ctx.followup.send(embed=e, file=file or discord.utils.MISSING)
 
     @app.command(name="get", description="get_description")
-    @app.rename(id="get_id", only_nsfw="get_only-nsfw")
-    @app.describe(id="get_id_description", only_nsfw="get_only-nsfw_description")
+    @app.rename(id="get_id")
+    @app.describe(id="get_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool | None = False):
+    async def get(self, ctx: discord.Interaction, id: int | None):
         await ctx.response.defer()
 
         lines = await self.bot.get_lines(ctx)
@@ -116,13 +116,7 @@ class Eggs(commands.Cog):
         else:
             eggs = Egg.all()
 
-            if only_nsfw:
-                if not is_channel_nsfw:
-                    await ctx.followup.send(myloc["nsfw_in_sfw"])
-                    return
-
-                eggs = eggs.filter(nsfw=True)
-            elif not is_channel_nsfw:
+            if not is_channel_nsfw:
                 eggs = eggs.filter(nsfw=False)
 
             count = await eggs.count()
@@ -141,30 +135,38 @@ class Eggs(commands.Cog):
                 creator = await self.bot.fetch_user(egg.creator.id)
             except discord.NotFound:
                 creator = None
+        
+        e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
-        origin = self.bot.get_guild(egg.origin.id)
+        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.GetEgg(self.bot, lines, egg, creator))
+    
+    @app.command(name="nsfw", description="nsfw_description", nsfw=True)
+    async def nsfw(self, ctx: discord.Interaction):
+        await ctx.response.defer()
 
-        e = discord.Embed(
-            title=myloc["eggn"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
-            color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
-            description=egg.text
-        )
-        e.add_field(
-            name=myloc["creator"],
-            value=f"**{creator.display_name}** ({creator.name})" if creator is not None else myloc["unknown_creator"].format(egg.creator.id),
-            inline=False
-        )
-        e.add_field(
-            name=myloc["origin"],
-            value=f"""
-                **{myloc["origin_name"]}**: {origin.name}
-                {f"**{myloc["origin_desc"]}**: {egg.origin.description}" if egg.origin.description is not None else ""}
-            """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id),
-            inline=False
-        )
-        await utils.brand_embed(e, lines)
+        lines = await self.bot.get_lines(ctx)
+        myloc = self.bot.get_line("eggs/get", lines)
 
-        file = await utils.show_attachment(egg, e)
+        eggs = Egg.all().filter(nsfw=True)
+
+        count = await eggs.count()
+
+        if count == 0:
+            await ctx.followup.send(myloc["no_egg"])
+            return
+
+        randegg = random.randint(0, count - 1)
+        egg = await eggs.offset(randegg).prefetch_related("creator", "origin").first()
+
+        creator = self.bot.get_user(egg.creator.id)
+
+        if creator is None:
+            try:
+                creator = await self.bot.fetch_user(egg.creator.id)
+            except discord.NotFound:
+                creator = None
+        
+        e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
         await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.GetEgg(self.bot, lines, egg, creator))
 
@@ -195,7 +197,7 @@ class Eggs(commands.Cog):
 
         e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=discord.Color.blurple(), description=myloc["ready"]["question"])
         e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
-        await utils.brand_embed(e, lines)
+        utils.brand_embed(e, lines)
 
         file = await utils.show_attachment(egg, e)
 

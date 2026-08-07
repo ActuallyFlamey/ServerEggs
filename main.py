@@ -93,7 +93,7 @@ bot = ServerEggs(intents=discord.Intents.default())
 async def on_ready():
     bot.launch_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
-    logch = bot.get_channel(os.getenv("DEVELOPER_LOG_CHANNEL"))
+    logch = bot.get_channel(int(os.getenv("DEVELOPER_LOG_CHANNEL")))
     await logch.send(f"**Server Eggs** is **REBORN** on **discord.py {discord.__version__}**")
 
 @bot.event
@@ -111,7 +111,7 @@ async def on_guild_join(guild: discord.Guild):
         name="What to do now",
         value="- Set an **inviting description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:False`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`."
     )
-    await utils.brand_embed(e)
+    utils.brand_embed(e)
 
     for channel in guild.text_channels:
         if channel.permissions_for(guild.me).send_messages:
@@ -133,7 +133,7 @@ async def app_command_error(ctx: discord.Interaction, error):
     myloc = bot.get_line("error", lines)
 
     e = discord.Embed(title=myloc["title"], color=0xd62450, description=str(error))
-    await utils.brand_embed(e, lines)
+    utils.brand_embed(e, lines)
 
     await ctx.response.send_message(embed=e)
 
