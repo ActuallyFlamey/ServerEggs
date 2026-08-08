@@ -170,6 +170,7 @@ class Eggs(commands.Cog):
         await self._get(ctx, id)
     
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
+    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def nsfw(self, ctx: discord.Interaction):
         await self._get(ctx, None, True)
     

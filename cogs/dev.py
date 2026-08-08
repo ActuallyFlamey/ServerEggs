@@ -20,16 +20,16 @@ class Dev(commands.GroupCog):
         self.bot = bot
 
     @app.command(name="list-guilds", description="List Guilds the bot is in.")
-    @app.describe(limit="Query limit.")
     @app.check(is_dev)
-    async def list_guilds(self, ctx: discord.Interaction, limit: int = 200):
+    async def list_guilds(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
-        guilds = [guild async for guild in self.bot.fetch_guilds(limit=limit)]
+        guilds = [guild for guild in self.bot.guilds]
 
         guildstr = ""
         for guild in guilds:
-            guildstr += f"{guild.id} - {guild.name}\n"
+            owner = await self.bot.fetch_user(guild.owner_id)
+            guildstr += f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})\n"
 
         await ctx.followup.send(content=guildstr)
     

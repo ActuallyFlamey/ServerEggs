@@ -58,7 +58,9 @@
                     "no_content": "[Nessun contenuto]"
                 },
                 "confirm": "Conferma Eliminazione",
-                "success": "L'**Uovo** n. {0} è stato eliminato con successo."
+                "cancel": "Annulla",
+                "success": "L'**Uovo** n. {0} è stato eliminato con successo.",
+                "cancelled": "Eliminazione annullata."
             },
             "report": {
                 "not_found": "L'**Uovo** n. {0} non esiste.",
@@ -69,6 +71,8 @@
                     "no_content": "[Nessun contenuto]"
                 },
                 "confirm": "Inizia Segnalazione",
+                "cancel": "Annulla",
+                "cancelled": "Segnalazione annullata.",
                 "title": "Segnala l'Uovo n. {0}",
                 "rule": "Motivo della Segnalazione",
                 "rule_desc": "Quale regola infrange quest'Uovo?",

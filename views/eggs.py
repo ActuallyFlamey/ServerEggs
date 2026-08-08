@@ -51,6 +51,7 @@ class DeleteEgg(discord.ui.View):
         self.egg = egg
 
         self.confirm.label = self.myloc["confirm"]
+        self.cancel.label = self.myloc["cancel"]
     
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -65,6 +66,10 @@ class DeleteEgg(discord.ui.View):
         await self.egg.delete()
 
         await ctx.response.edit_message(content=self.myloc["success"].format(eggid), embed=None, attachments=[], view=None)
+    
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
 
 class PreReportEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
@@ -76,10 +81,15 @@ class PreReportEgg(discord.ui.View):
         self.egg = egg
 
         self.confirm.label = self.myloc["confirm"]
+        self.cancel.label = self.myloc["cancel"]
     
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
+    
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
 
 class ReportEgg(discord.ui.Modal):
     def __init__(self, bot: commands.Bot, lines: dict, egg, from_report_command = True):
