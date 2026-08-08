@@ -6,6 +6,7 @@ import os
 import discord
 import dotenv
 from cachetools import TTLCache
+from discord import app_commands as app
 from discord.ext import commands
 from tortoise import Tortoise
 
@@ -54,7 +55,7 @@ class ServerEggs(commands.Bot):
                 user, _ = await User.get_or_create(id=ctx.user.id)
                 self.lang_cache[cache_key] = user.lang
 
-            return self.lang_cache[cache_key]
+            return self.lang_cache[cache_key] or "en"
 
         guild_lang_key = f"guild_{ctx.guild.id}"
         guild_allow_key = f"guild_{ctx.guild.id}_allowuserlang"
@@ -71,7 +72,7 @@ class ServerEggs(commands.Bot):
                 user, _ = await User.get_or_create(id=ctx.user.id)
                 self.lang_cache[user_key] = user.lang
 
-            return self.lang_cache[user_key]
+            return self.lang_cache[user_key] or self.lang_cache[guild_lang_key]
         else:
             return self.lang_cache[guild_lang_key]
 
@@ -138,6 +139,35 @@ async def app_command_error(ctx: discord.Interaction, error):
     await ctx.response.send_message(embed=e)
 
     raise error
+
+@bot.tree.command(name="help", description="help_description")
+@app.rename(about="help_about")
+@app.describe(about="help_about_description")
+@app.choices(about=[
+    app.Choice(name=app.locale_str("create"), value="create"),
+    app.Choice(name=app.locale_str("lay"), value="create"),
+    app.Choice(name=app.locale_str("get"), value="get"),
+    app.Choice(name=app.locale_str("egg"), value="get"),
+    app.Choice(name=app.locale_str("report"), value="report"),
+    app.Choice(name=app.locale_str("delete"), value="delete")
+])
+async def help(ctx: discord.Interaction, about: str | None):
+    lines = await bot.get_lines(ctx)
+    myloc = bot.get_line("help", lines)
+
+    if about is None:
+        myloc = myloc["general"]
+
+        e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
+        e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
+        e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
+        utils.brand_embed(e, lines)
+    else:
+        myloc = myloc["not_available"]
+
+        e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
+    
+    await ctx.response.send_message(embed=e)
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))

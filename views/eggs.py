@@ -41,7 +41,7 @@ class GetEgg(discord.ui.View):
     
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def report(self, ctx: discord.Interaction, button: discord.ui.Button):
-        await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
+        await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg, False))
 
 class DeleteEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
@@ -66,12 +66,28 @@ class DeleteEgg(discord.ui.View):
 
         await ctx.response.edit_message(content=self.myloc["success"].format(eggid), embed=None, attachments=[], view=None)
 
-class ReportEgg(discord.ui.Modal):
+class PreReportEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
+        super().__init__(timeout=60)
+
         self.bot = bot
         self.lines = lines
         self.myloc = bot.get_line("eggs/report", lines)
         self.egg = egg
+
+        self.confirm.label = self.myloc["confirm"]
+    
+    @discord.ui.button(style=discord.ButtonStyle.danger)
+    async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
+
+class ReportEgg(discord.ui.Modal):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, from_report_command = True):
+        self.bot = bot
+        self.lines = lines
+        self.myloc = bot.get_line("eggs/report", lines)
+        self.egg = egg
+        self.from_report_command = from_report_command
 
         super().__init__(title=self.myloc["title"].format(egg.id))
     
@@ -122,12 +138,18 @@ class ReportEgg(discord.ui.Modal):
                 content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",
                 embed=e,
                 file=file or discord.utils.MISSING,
-                view=ReportActions(report)
+                view=ReportActions(report, reporter)
             )
 
             report.log_message_id = msg.id
             await report.save(update_fields=["log_message_id"])
 
-            await ctx.followup.send(content=self.myloc["success"].format(self.egg.id), ephemeral=True)
+            if not self.from_report_command:
+                await ctx.followup.send(content=self.myloc["success"].format(self.egg.id), ephemeral=True)
+            else:
+                await ctx.edit_original_response(content=self.myloc["success"].format(self.egg.id), embed=None, attachments=[], view=None)
         except IntegrityError:
-            await ctx.followup.send(content=self.myloc["already"], ephemeral=True)
+            if not self.from_report_command:
+                await ctx.followup.send(content=self.myloc["already"], ephemeral=True)
+            else:
+                await ctx.edit_original_response(content=self.myloc["already"], embed=None, attachments=[], view=None)

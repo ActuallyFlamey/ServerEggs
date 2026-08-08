@@ -11,6 +11,8 @@ from PIL import Image
 
 dotenv.load_dotenv()
 
+SUPPORTED_FILETYPE_REGEX = r'\.(png|jpg|jpeg|gif|webp)(\?.*)?$'
+
 async def process_attachment(attach: discord.Attachment):
     attach_bytes = await attach.read()
 
@@ -39,7 +41,7 @@ async def process_attachment(attach: discord.Attachment):
 
     return file_path, file_hash[0]
 
-async def show_attachment(egg, embed: discord.Embed):
+def show_attachment(egg, embed: discord.Embed):
     file = None
 
     if egg.attach_path and os.path.exists(egg.attach_path):
@@ -49,15 +51,19 @@ async def show_attachment(egg, embed: discord.Embed):
 
         embed.set_image(url=f"attachment://{filename}")
     elif getattr(egg, "attach_link", None):
-        good_url = await resolve_media_url(egg.attach_link)
+        if not egg.attach_link.startswith(("http://", "https://")):
+            return None
 
-        embed.set_image(url=good_url)
+        embed.set_image(url=egg.attach_link)
 
     return file
 
 # this function was heavily assisted by Gemini 3.1 Pro
-async def resolve_media_url(url: str) -> str:
-    if re.search(r'\.(png|jpg|jpeg|gif|webp)(\?.*)?$', url, re.IGNORECASE):
+async def resolve_media_url(url: str) -> str | None:
+    if not url.startswith(("http://", "https://")):
+        return None
+
+    if re.search(SUPPORTED_FILETYPE_REGEX, url, re.IGNORECASE):
         return url
 
     headers = {
@@ -89,4 +95,7 @@ async def resolve_media_url(url: str) -> str:
         else:
             print(f"[Debug] Could not scrape media URL. Server returned HTTP {response.status} for {url}")
 
-    return url
+    if not re.search(SUPPORTED_FILETYPE_REGEX, url, re.IGNORECASE):
+        return None
+    else:
+        return url

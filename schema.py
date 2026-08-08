@@ -34,7 +34,7 @@ class Guild(Model):
 class User(Model):
     id = fields.BigIntField(primary_key=True, generated=False)
 
-    lang = fields.CharField(5, default="en")
+    lang = fields.CharField(5, default="")
     banned = fields.BooleanField(default=False)
 
     eggs = fields.ReverseRelation["Egg"]

@@ -3,6 +3,7 @@
         "config": {
             "lang": {
                 "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](https://discord.com/users/886686500845138041).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
+                "no_default": "The \"Server Default\" option is for users, not for servers.",
                 "success": "Successfully switched language to \"**English**\"!"
             },
             "allow-user-lang": {
@@ -23,6 +24,7 @@
                 "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "empty": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
+                "invalid_url": "The specified `link` argument does *not* resolve to any **supported media format**.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
                 "banned": "You are **banned** from creating **Eggs**.\nAppealing is not possible *at this time*.",
                 "success": {
@@ -59,6 +61,14 @@
                 "success": "**Egg** #{0} was deleted successfully."
             },
             "report": {
+                "not_found": "**Egg** #{0} does not exist.",
+                "ready": {
+                    "title": "Report Egg #{0}",
+                    "question": "Are you sure you want to report this **Egg**?",
+                    "content": "Content",
+                    "no_content": "[No content]"
+                },
+                "confirm": "Start Report",
                 "title": "Report Egg #{0}",
                 "rule": "Report Reason",
                 "rule_desc": "Which rule is this Egg breaking?",
@@ -84,6 +94,20 @@
             "author": "Server Eggs",
             "footer": "Server Eggs by Flamey"
         },
+        "help": {
+            "general": {
+                "title": "About Server Eggs",
+                "desc": "**Server Eggs** is a Discord bot created by **Flamey** (actuallyflamey).\nIt is designed as a fun way to share content, from which someone may want to join its origin server.",
+                "about": "What are Eggs?",
+                "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
+                "how": "How to use Server Eggs",
+                "how_desc": "- To **create an Egg**, use `/create`.\n  - The `text` argument **adds text** to the Egg.\n  - The `file` argument **adds an attachment** as a file.\n  - The `link` argument **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`."
+            },
+            "not_available": {
+                "title": "Help not available",
+                "desc": "Help is not available for that command at this time."
+            }
+        },
         "utility": {
             "ping": {
                 "latency": "Latency"
@@ -91,6 +115,11 @@
         }
     },
 
+    "help": "help",
+    "help_description": "Get info about Server Eggs or a command.",
+    "help_about": "about",
+    "help_about_description": "The command to get information about.",
+    
     "config": "config",
     "config_description": "Configuration commands.",
     
@@ -98,6 +127,7 @@
     "lang_description": "Sets the response language. In servers, you must have the Manage Server permission.",
     "lang_language": "language",
     "lang_language_description": "The language to set.",
+    "lang_default": "Server Default",
 
     "allow-user-lang": "allow-user-lang",
     "allow-user-lang_description": "Changes the setting on allowing user languages in this server.",
@@ -125,13 +155,22 @@
     "create_nsfw": "nsfw",
     "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
 
+    "lay": "lay",
+
     "get": "get",
     "get_description": "Get an Egg.",
     "get_id": "id",
     "get_id_description": "The ID of a specific Egg you're searching for. If blank, get a random Egg.",
 
+    "egg": "egg",
+
     "nsfw": "nsfw",
     "nsfw_description": "Get a NSFW Egg.",
+
+    "report": "report",
+    "report_description": "Report an Egg.",
+    "report_id": "id",
+    "report_id_description": "The ID of the Egg to report.",
 
     "delete": "delete",
     "delete_description": "Delete an Egg that you're allowed to manage.",

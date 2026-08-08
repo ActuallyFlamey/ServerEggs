@@ -3,29 +3,39 @@ import os
 import discord
 import dotenv
 
+from schema import Egg, Report
+
 dotenv.load_dotenv()
 
 DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
 DEV_IDS = [int(dev_id) for dev_id in os.getenv("DEV_IDS").split(", ")]
 
 class ReportActions(discord.ui.View):
-    def __init__(self, report):
+    def __init__(self, report, reporter):
         super().__init__(timeout=None)
 
         self.report = report
+        self.reporter = reporter
 
-    async def delete_reports(self, ctx: discord.Interaction, egg):
-        all_reports = await egg.reports.all()
+    async def delete_reports(self, ctx: discord.Interaction, action: str, egg: Egg | int):
+        all_reports = await egg.reports.all() if type(egg) == Egg else await Report.filter(egg__id=egg).all()
 
-        for r in all_reports:
-            if r.log_message_id:
-                try:
-                    msg = ctx.channel.get_partial_message(r.log_message_id)
-                    await msg.delete()
-                except discord.HTTPException:
-                    pass 
+        for report in all_reports:
+            try:
+                msg = ctx.channel.get_partial_message(report.log_message_id)
+                await msg.edit(
+                    content=self.resolved(action, egg),
+                    embed=None,
+                    attachments=[],
+                    view=None
+                )
+            except discord.HTTPException:
+                pass 
 
-            await r.delete()
+            await report.delete()
+
+    def resolved(self, action: str, egg_id):
+        return f"**Resolved** report `{self.report.id}`.\n**Reporter**: `{self.reporter.id}`\n**Egg**: `{egg_id}`\n**Reason**: {self.report.reason}\n**Action**: {action}"
 
     async def interaction_check(self, ctx: discord.Interaction):
         if ctx.user.id not in DEV_IDS:
@@ -38,13 +48,17 @@ class ReportActions(discord.ui.View):
     async def ignore(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
+        action = "Ignore"
+
         egg = await self.report.egg
 
-        await self.delete_reports(ctx, egg)
+        await self.delete_reports(ctx, action, egg.id)
     
     @discord.ui.button(label="Mark NSFW", style=discord.ButtonStyle.primary)
     async def mark_nsfw(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
+
+        action = "Mark NSFW"
 
         egg = await self.report.egg
 
@@ -52,17 +66,20 @@ class ReportActions(discord.ui.View):
             egg.nsfw = True
             await egg.save(update_fields=["nsfw"])
         
-        await self.delete_reports(ctx, egg)
+        await self.delete_reports(ctx, action, egg.id)
     
     @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
+        action = "Delete"
+
         egg = await self.report.egg
+        eggid = egg.id
 
         await egg.delete()
 
-        await self.delete_reports(ctx, egg)
+        await self.delete_reports(ctx, action, eggid)
     
     @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger)
     async def delete_ban(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -70,10 +87,13 @@ class ReportActions(discord.ui.View):
 
         egg = await self.report.egg
         creator = await egg.creator
+        eggid = egg.id
+
+        action = f"Delete and Ban User `{creator.id}`"
 
         creator.banned = True
         await creator.save(update_fields=["banned"])
 
         await egg.delete()
 
-        await self.delete_reports(ctx, egg)
+        await self.delete_reports(ctx, action, eggid)

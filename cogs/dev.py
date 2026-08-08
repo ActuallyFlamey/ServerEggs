@@ -5,7 +5,7 @@ import dotenv
 from discord import app_commands as app
 from discord.ext import commands
 
-from schema import User
+from schema import Report, User
 
 dotenv.load_dotenv()
 
@@ -53,6 +53,22 @@ class Dev(commands.GroupCog):
         await db_user.save(update_fields=["banned"])
 
         await ctx.followup.send(content=f"Unbanned user {db_user.id}.")
+    
+    @app.command(name="new-reports", description="Link to the top of the report queue.")
+    @app.check(is_dev)
+    async def new_reports(self, ctx: discord.Interaction):
+        await ctx.response.defer()
+
+        oldest_report = await Report.all().order_by("created_at").first()
+
+        if oldest_report is None:
+            await ctx.followup.send(content="Queue clear!")
+            return
+
+        reportch = self.bot.get_channel(int(os.getenv("REPORT_CHANNEL")))
+        message = reportch.get_partial_message(oldest_report.log_message_id)
+
+        await ctx.followup.send(content=message.jump_url)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Dev(bot), guild=DEVELOPER_GUILD)

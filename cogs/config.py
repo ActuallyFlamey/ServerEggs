@@ -13,6 +13,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(code="lang_language")
     @app.describe(code="lang_language_description")
     @app.choices(code=[
+        app.Choice(name=app.locale_str("lang_default"), value=""),
         app.Choice(name="English", value="en"),
         app.Choice(name="Italiano", value="it"),
     ])
@@ -21,10 +22,14 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await ctx.response.defer(ephemeral=True)
 
         if ctx.guild:
-            if not ctx.permissions.manage_guild:
-                lines = await self.bot.get_lines(ctx)
-                myloc = self.bot.get_line("config/lang", lines)
+            lines = await self.bot.get_lines(ctx)
+            myloc = self.bot.get_line("config/lang", lines)
 
+            if code == "":
+                await ctx.followup.send(myloc["no_default"], ephemeral=True)
+                return
+
+            if not ctx.permissions.manage_guild:
                 await ctx.followup.send(myloc["no_permissions"], ephemeral=True)
                 return
             else:

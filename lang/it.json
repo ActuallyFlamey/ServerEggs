@@ -3,6 +3,7 @@
         "config": {
             "lang": {
                 "no_permissions": "È necessario il permesso **Gestisci Server** per eseguire questo comando qui.\n\n-# Se intendevi impostare la **tua lingua di risposta personale**, esegui `/configura lingua` nei [miei DM](https://discord.com/users/886686500845138041).\n-# **Non tutti i server permettono** l'uso delle lingue personali, ma **nei DM funzionerà sempre**.",
+                "no_default": "L'opzione \"Predefinita dal Server\" è per gli utenti, non per i server.",
                 "success": "Impostata la lingua \"**Italiano**\" con successo!"
             },
             "allow-user-lang": {
@@ -23,6 +24,7 @@
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
+                "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "banned": "Ti è stato **tolto il permesso** di creare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "success": {
@@ -32,7 +34,6 @@
             "get": {
                 "not_found": "**Uovo** n. {0} non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
-                "nsfw_in_sfw": "Non puoi cercare le **Uova** vietate ai minori in un canale per tutte le età.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
                 "eggn": "Uovo n. {0}",
                 "creator": "Creato da",
@@ -60,6 +61,14 @@
                 "success": "L'**Uovo** n. {0} è stato eliminato con successo."
             },
             "report": {
+                "not_found": "L'**Uovo** n. {0} non esiste.",
+                "ready": {
+                    "title": "Segnala l'Uovo n. {0}",
+                    "question": "Sei sicuro di voler segnalare questo **Uovo**?",
+                    "content": "Contenuto",
+                    "no_content": "[Nessun contenuto]"
+                },
+                "confirm": "Inizia Segnalazione",
                 "title": "Segnala l'Uovo n. {0}",
                 "rule": "Motivo della Segnalazione",
                 "rule_desc": "Quale regola infrange quest'Uovo?",
@@ -85,12 +94,31 @@
             "author": "Server Eggs",
             "footer": "Server Eggs di Flamey"
         },
+        "help": {
+            "general": {
+                "title": "Informazioni su Server Eggs",
+                "desc": "**Server Eggs** è un bot di Discord creato da **Flamey** (actuallyflamey).\nÈ un modo creativo di condividere contenuti attraverso i quali uno potrebbe decidere di unirsi al suo server d'origine.",
+                "about": "Cosa sono le Uova?",
+                "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
+                "how": "Come usare Server Eggs",
+                "how_desc": "- Per **creare un Uovo**, usa `/crea`.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`."
+            },
+            "not_available": {
+                "title": "Aiuto non disponibile",
+                "desc": "Non ci sono aiuti riguardanti questo comando al momento."
+            }
+        },
         "utility": {
             "ping": {
                 "latency": "Ritardo"
             }
         }
     },
+
+    "help": "aiuto",
+    "help_description": "Ottieni informazioni riguardanti Server Eggs o un comando.",
+    "help_about": "riguardo-a",
+    "help_about_description": "Il comando di cui ricevere informazioni a riguardo.",
 
     "config": "configura",
     "config_description": "Comandi di configurazione.",
@@ -99,6 +127,7 @@
     "lang_description": "Imposta la lingua delle risposte. Nei server occorre il permesso Gestisci Server.",
     "lang_language": "lingua",
     "lang_language_description": "La lingua da impostare.",
+    "lang_default": "Predefinita dal Server",
 
     "allow-user-lang": "permetti-lingua-personale",
     "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
@@ -123,18 +152,25 @@
     "create_file_description": "L'allegato da includere con l'Uovo in forma di file.",
     "create_link": "link",
     "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
-    "create_nsfw": "nsfw",
+    "create_nsfw": "vm18",
     "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
+
+    "lay": "deponi",
 
     "get": "ricevi",
     "get_description": "Ricevi un Uovo.",
     "get_id": "id",
     "get_id_description": "L'ID di un Uovo specifico che stai cercando. Se lasciato vuoto, l'Uovo sarà random.",
-    "get_only-nsfw": "solo-vm18",
-    "get_only-nsfw_description": "Cerca solo Uova vietate ai minori. Disponibile solo nei canali per maggiorenni.",
+
+    "egg": "uovo",
 
     "nsfw": "vm18",
     "nsfw_description": "Ricevi un Uovo vietato ai minori.",
+
+    "report": "segnala",
+    "report_description": "Segnala un Uovo.",
+    "report_id": "id",
+    "report_id_description": "L'ID dell'Uovo da segnalare.",
 
     "delete": "elimina",
     "delete_description": "Elimina un Uovo che ti è permesso gestire.",
