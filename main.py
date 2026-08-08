@@ -151,6 +151,7 @@ async def app_command_error(ctx: discord.Interaction, error):
     app.Choice(name=app.locale_str("report"), value="report"),
     app.Choice(name=app.locale_str("delete"), value="delete")
 ])
+@app.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def help(ctx: discord.Interaction, about: str | None):
     lines = await bot.get_lines(ctx)
     myloc = bot.get_line("help", lines)

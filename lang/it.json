@@ -105,7 +105,7 @@
                 "about": "Cosa sono le Uova?",
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
-                "how_desc": "- Per **creare un Uovo**, usa `/crea`.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`."
+                "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`."
             },
             "not_available": {
                 "title": "Aiuto non disponibile",
