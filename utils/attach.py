@@ -11,7 +11,7 @@ from PIL import Image
 
 dotenv.load_dotenv()
 
-SUPPORTED_FILETYPE_REGEX = r'\.(png|jpg|jpeg|gif|webp)(\?.*)?$'
+SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp)(?:[?#].*)?$'
 
 async def process_attachment(attach: discord.Attachment):
     attach_bytes = await attach.read()
@@ -64,38 +64,47 @@ async def resolve_media_url(url: str) -> str | None:
         return None
 
     if re.search(SUPPORTED_FILETYPE_REGEX, url, re.IGNORECASE):
+        if "tenor.com" in url.lower():
+            tenor_id_match = re.search(r'tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/', url)
+            if tenor_id_match:
+                return f"https://c.tenor.com/{tenor_id_match.group(1)}/tenor.gif"
         return url
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)",
+        "User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discord.com)",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
 
-    async with aiohttp.ClientSession() as session, session.get(url, headers=headers, timeout=5) as response:
-        if response.status == 200:
-            html = await response.text()
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, headers=headers, timeout=10) as response:
+                if response.status != 200:
+                    print(f"[Debug] HTTP {response.status} for {url}")
+                    return None
+                    
+                html = await response.text()
 
-            if "tenor.com" in url:
-                tenor_match = re.search(r'(https://(?:media|c)\.tenor\.com/[^\'"]+\.gif)', html, re.IGNORECASE)
-                if tenor_match:
-                    return tenor_match.group(1)
+                meta_tags = re.findall(r'<meta[^>]+>', html, re.IGNORECASE)
+                
+                for tag in meta_tags:
+                    if re.search(r'(?:property|name|itemprop)=[\'"](?:og:video|og:image|twitter:image)[\'"]', tag, re.IGNORECASE):
 
-            match = re.search(r'<meta[^>]+property=[\'"](?:og|twitter):image[\'"][^>]+content=[\'"]([^\'"]+)[\'"]', html, re.IGNORECASE)
+                        content_match = re.search(r'content=[\'"]([^\'"]+)[\'"]', tag, re.IGNORECASE)
+                        if content_match:
+                            extracted = content_match.group(1)
 
-            if not match:
-                match = re.search(r'<meta[^>]+content=[\'"]([^\'"]+)[\'"][^>]+property=[\'"](?:og|twitter):image[\'"]', html, re.IGNORECASE)
+                            if re.search(SUPPORTED_FILETYPE_REGEX, extracted, re.IGNORECASE):
 
-            if not match:
-                match = re.search(r'<meta[^>]+name=[\'"]twitter:image[\'"][^>]+content=[\'"]([^\'"]+)[\'"]', html, re.IGNORECASE)
+                                if "tenor.com" in extracted.lower():
+                                    tenor_id_match = re.search(r'tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/', extracted)
+                                    if tenor_id_match:
+                                        extracted = f"https://c.tenor.com/{tenor_id_match.group(1)}/tenor.gif"
 
-            if match:
-                return match.group(1)
-            else:
-                print(f"[Debug] Got 200 OK for {url}, but regex failed to find an image link.")
-        else:
-            print(f"[Debug] Could not scrape media URL. Server returned HTTP {response.status} for {url}")
+                                return extracted
+                                
+                print(f"[Debug] Got 200 OK, but no valid media meta tag found for {url}")
 
-    if not re.search(SUPPORTED_FILETYPE_REGEX, url, re.IGNORECASE):
-        return None
-    else:
-        return url
+        except (aiohttp.ClientError, asyncio.TimeoutError, UnicodeDecodeError) as e:
+            print(f"[Debug] Exception resolving {url}: {e.__class__.__name__} - {str(e)}")
+
+    return None

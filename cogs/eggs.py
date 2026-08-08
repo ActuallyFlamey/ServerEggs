@@ -58,9 +58,9 @@ class Eggs(commands.Cog):
         elif link:
             attach_link = await utils.resolve_media_url(link)
 
-        if attach_link is None and link:
-            await ctx.followup.send(myloc["invalid_url"])
-            return
+            if attach_link is None:
+                await ctx.followup.send(myloc["invalid_url"])
+                return
 
         existing = await Egg.filter(text=trimtext, attach_hash=attach_hash, attach_link=attach_link).first()
 
@@ -77,7 +77,7 @@ class Eggs(commands.Cog):
             text=trimtext,
             attach_path=attach_path,
             attach_hash=attach_hash,
-            attach_link=link,
+            attach_link=attach_link,
             nsfw=nsfw,
             creator=user,
             origin=guild
