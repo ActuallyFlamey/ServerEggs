@@ -10,8 +10,8 @@ class Utility(commands.Cog):
     @app.command(name="ping", description="ping_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def ping(self, ctx: discord.Interaction):
-        lines = await self.bot.get_lines(ctx)
-        myloc = self.bot.get_line("utility/ping", lines)
+        lines = await self.bot.fetch_lines(ctx)
+        myloc = self.bot.get_lines("utility/ping", lines)
 
         await ctx.response.send_message(f"**{myloc["latency"]}**: {round(self.bot.latency * 1000, 1)}ms")
 

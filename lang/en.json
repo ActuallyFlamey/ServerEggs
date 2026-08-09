@@ -31,6 +31,18 @@
                     "title": "Egg created! (#{0})"
                 }
             },
+            "eggify": {
+                "ready": "Create an **Egg** from this message?",
+                "confirm": "Yes",
+                "cancel": "No",
+                "cancelled": "Creation cancelled.",
+                "title": "Create Egg from Message",
+                "text": "Egg Text (optional)",
+                "text_placeholder": "Insert the Egg text here...",
+                "nsfw": "Mark as NSFW",
+                "nsfw_desc": "Is this Egg NSFW? Failing to label correctly will result in punishment.",
+                "success": "Created an **Egg** from this message."
+            },
             "get": {
                 "not_found": "**Egg** #{0} was not found.",
                 "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
@@ -160,6 +172,8 @@
     "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
 
     "lay": "lay",
+
+    "eggify": "Eggify",
 
     "get": "get",
     "get_description": "Get an Egg.",

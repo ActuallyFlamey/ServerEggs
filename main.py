@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import os
+import re
 
 import discord
 import dotenv
@@ -11,6 +12,7 @@ from discord.ext import commands
 from tortoise import Tortoise
 
 import utils
+import views
 from schema import Guild, User
 from tortoise_config import TORTOISE_ORM
 
@@ -76,12 +78,12 @@ class ServerEggs(commands.Bot):
         else:
             return self.lang_cache[guild_lang_key]
 
-    async def get_lines(self, ctx: discord.Interaction):
+    async def fetch_lines(self, ctx: discord.Interaction):
         lang = await self.get_lang(ctx)
 
         return self.locales.get(lang, self.locales["en"])["lines"]
     
-    def get_line(self, path: str, lines: dict):
+    def get_lines(self, path: str, lines: dict):
         return utils.recursive_find(path, lines)
 
     async def close(self):
@@ -130,8 +132,8 @@ async def on_guild_remove(guild: discord.Guild):
 
 @bot.tree.error
 async def app_command_error(ctx: discord.Interaction, error):
-    lines = await bot.get_lines(ctx)
-    myloc = bot.get_line("error", lines)
+    lines = await bot.fetch_lines(ctx)
+    myloc = bot.get_lines("error", lines)
 
     e = discord.Embed(title=myloc["title"], color=0xd62450, description=str(error))
     utils.brand_embed(e, lines)
@@ -153,8 +155,8 @@ async def app_command_error(ctx: discord.Interaction, error):
 ])
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def help(ctx: discord.Interaction, about: str | None):
-    lines = await bot.get_lines(ctx)
-    myloc = bot.get_line("help", lines)
+    lines = await bot.fetch_lines(ctx)
+    myloc = bot.get_lines("help", lines)
 
     if about is None:
         myloc = myloc["general"]
@@ -169,6 +171,29 @@ async def help(ctx: discord.Interaction, about: str | None):
         e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
     
     await ctx.response.send_message(embed=e)
+
+@bot.tree.context_menu(name="eggify")
+@app.allowed_contexts(guilds=True, dms=False, private_channels=False)
+async def eggify(ctx: discord.Interaction, message: discord.Message):
+    await ctx.response.defer(ephemeral=True)
+
+    lines = await bot.fetch_lines(ctx)
+    myloc = bot.get_lines("eggs/eggify", lines)
+
+    file = message.attachments[0] if message.attachments else None
+
+    content = message.content
+    link = None
+
+    url_match = re.search(r'(?<!\]\()<?(https?://[^\s>]+)>?\s*$', content)
+
+    if url_match and not file:
+        link = url_match.group(1)
+        content = content[:url_match.start()].strip()
+
+    content = content[:4000] + ("…" if len(content) > 4000 else "") if content else None
+
+    await ctx.followup.send(content=myloc["ready"], view=views.PreEggify(bot, lines, content, file, link), ephemeral=True)
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))

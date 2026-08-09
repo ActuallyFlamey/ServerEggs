@@ -19,7 +19,7 @@ def brand_embed(e: discord.Embed, lines: dict | None = None):
     e.set_footer(text=lines["embed"]["footer"], icon_url=icon)
 
 async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, include_id = False):
-    myloc = bot.get_line("eggs/get", lines)
+    myloc = bot.get_lines("eggs/get", lines)
 
     if creator is None:
         creator = bot.get_user(egg.creator.id)

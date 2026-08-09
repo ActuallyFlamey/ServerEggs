@@ -12,13 +12,70 @@ from .dev import ReportActions
 
 dotenv.load_dotenv()
 
+class PreEggify(discord.ui.View):
+    def __init__(self, bot: commands.Bot, lines: dict, text: str | None, file: discord.Attachment | None, link: str | None):
+        super().__init__(timeout=None)
+
+        self.bot = bot
+        self.lines = lines
+        self.myloc = bot.get_lines("eggs/eggify", lines)
+        self.text = text
+        self.file = file
+        self.link = link
+
+        self.confirm.label = self.myloc["confirm"]
+        self.cancel.label = self.myloc["cancel"]
+    
+    @discord.ui.button(style=discord.ButtonStyle.primary)
+    async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_modal(Eggify(self.bot, self.lines, self.text, self.file, self.link))
+    
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
+
+class Eggify(discord.ui.Modal):
+    def __init__(self, bot: commands.Bot, lines: dict, text: str | None, file: discord.Attachment | None, link: str | None):
+        self.bot = bot
+        self.lines = lines
+        self.myloc = bot.get_lines("eggs/eggify", lines)
+
+        self.text = text
+        self.file = file
+        self.link = link
+
+        super().__init__(title=self.myloc["title"])
+    
+        self.eggtext = discord.ui.TextInput(
+            label=self.myloc["text"],
+            placeholder=self.myloc["text_placeholder"],
+            default=text,
+            required=False,
+            style=discord.TextStyle.paragraph
+        )
+
+        self.nsfw = discord.ui.Label(
+            text=self.myloc["nsfw"],
+            description=self.myloc["nsfw_desc"],
+            component=discord.ui.Checkbox()
+        )
+
+        self.add_item(self.eggtext)
+        self.add_item(self.nsfw)
+
+    async def on_submit(self, ctx: discord.Interaction):
+        await ctx.response.edit_message(content=self.myloc["success"], view=None)
+
+        cog = self.bot.get_cog("Eggs")
+        await cog._create(ctx, self.eggtext.value, self.file, self.link, self.nsfw.component.value)
+
 class GetEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User):
         super().__init__(timeout=None)
 
         self.bot = bot
         self.lines = lines
-        self.myloc = bot.get_line("eggs/get", lines)
+        self.myloc = bot.get_lines("eggs/get", lines)
         self.egg = egg
 
         if egg.origin.invite is not None:
@@ -47,7 +104,7 @@ class DeleteEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):
         super().__init__(timeout=60)
         
-        self.myloc = bot.get_line("eggs/delete", lines)
+        self.myloc = bot.get_lines("eggs/delete", lines)
         self.egg = egg
 
         self.confirm.label = self.myloc["confirm"]
@@ -77,7 +134,7 @@ class PreReportEgg(discord.ui.View):
 
         self.bot = bot
         self.lines = lines
-        self.myloc = bot.get_line("eggs/report", lines)
+        self.myloc = bot.get_lines("eggs/report", lines)
         self.egg = egg
 
         self.confirm.label = self.myloc["confirm"]
@@ -95,7 +152,7 @@ class ReportEgg(discord.ui.Modal):
     def __init__(self, bot: commands.Bot, lines: dict, egg, from_report_command = True):
         self.bot = bot
         self.lines = lines
-        self.myloc = bot.get_line("eggs/report", lines)
+        self.myloc = bot.get_lines("eggs/report", lines)
         self.egg = egg
         self.from_report_command = from_report_command
 

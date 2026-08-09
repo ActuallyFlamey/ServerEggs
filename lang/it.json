@@ -31,6 +31,18 @@
                     "title": "Uovo creato! (n. {0})"
                 }
             },
+            "eggify": {
+                "ready": "Creare un **Uovo** a partire da questo messaggio?",
+                "confirm": "Sì",
+                "cancel": "No",
+                "cancelled": "Creazione annullata.",
+                "title": "Crea Uovo da un Messaggio",
+                "text": "Testo dell'Uovo (facoltativo)",
+                "text_placeholder": "Inserisci il testo dell'Uovo qui...",
+                "nsfw": "Segna come VM18",
+                "nsfw_desc": "Questo Uovo è vietato ai minori? La mancata etichettatura corretta comporterà una sanzione.",
+                "success": "Created an **Egg** from this message."
+            },
             "get": {
                 "not_found": "**Uovo** n. {0} non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
@@ -160,6 +172,8 @@
     "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
 
     "lay": "deponi",
+
+    "eggify": "Uov-izza",
 
     "get": "ricevi",
     "get_description": "Ricevi un Uovo.",

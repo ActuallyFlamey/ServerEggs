@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 import discord
 from discord import app_commands as app
@@ -15,10 +16,11 @@ class Eggs(commands.Cog):
         self.bot = bot
 
     async def _create(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None = False):
-        await ctx.response.defer()
+        if not ctx.response.is_done():
+            await ctx.response.defer()
 
-        lines = await self.bot.get_lines(ctx)
-        myloc = self.bot.get_line("eggs/create", lines)
+        lines = await self.bot.fetch_lines(ctx)
+        myloc = self.bot.get_lines("eggs/create", lines)
 
         is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
         if nsfw and not is_channel_nsfw:
@@ -43,7 +45,7 @@ class Eggs(commands.Cog):
             text = text.strip()
             if text == "": text = None
 
-        trimtext = text[:4095] + ("…" if len(text) > 4095 else "") if text else None
+        trimtext = text[:4000] + ("…" if len(text) > 4000 else "") if text else None
 
         attach_path = None
         attach_hash = None
@@ -111,8 +113,8 @@ class Eggs(commands.Cog):
     async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
         await ctx.response.defer()
 
-        lines = await self.bot.get_lines(ctx)
-        myloc = self.bot.get_line("eggs/get", lines)
+        lines = await self.bot.fetch_lines(ctx)
+        myloc = self.bot.get_lines("eggs/get", lines)
 
         is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
 
@@ -181,8 +183,8 @@ class Eggs(commands.Cog):
     async def report(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.get_lines(ctx)
-        myloc = self.bot.get_line("eggs/report", lines)
+        lines = await self.bot.fetch_lines(ctx)
+        myloc = self.bot.get_lines("eggs/report", lines)
 
         egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
 
@@ -207,8 +209,8 @@ class Eggs(commands.Cog):
     async def delete(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.get_lines(ctx)
-        myloc = self.bot.get_line("eggs/delete", lines)
+        lines = await self.bot.fetch_lines(ctx)
+        myloc = self.bot.get_lines("eggs/delete", lines)
 
         egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
 

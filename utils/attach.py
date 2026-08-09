@@ -59,6 +59,7 @@ def show_attachment(egg, embed: discord.Embed):
     return file
 
 # this function was heavily assisted by Gemini 3.1 Pro
+# this function is also genuinely made of crystal. touch it too hard and it will break. i hate parsing links.
 async def resolve_media_url(url: str) -> str | None:
     if not url.startswith(("http://", "https://")):
         return None
@@ -105,6 +106,6 @@ async def resolve_media_url(url: str) -> str | None:
                 print(f"[Debug] Got 200 OK, but no valid media meta tag found for {url}")
 
         except (aiohttp.ClientError, asyncio.TimeoutError, UnicodeDecodeError) as e:
-            print(f"[Debug] Exception resolving {url}: {e.__class__.__name__} - {str(e)}")
+            print(f"[Debug] Exception resolving {url}: {e.__class__.__name__} - {e!s}")
 
     return None
