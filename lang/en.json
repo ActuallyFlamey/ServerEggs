@@ -24,7 +24,7 @@
                 "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "empty": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
-                "invalid_url": "The specified `link` argument does *not* resolve to any **supported media format**.",
+                "invalid_url": "The specified `link` argument does *not* resolve to any **supported media format**.\nRemember, for now it's **images only**!",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
                 "banned": "You are **banned** from creating **Eggs**.\nAppealing is not possible *at this time*.",
                 "success": {
@@ -46,6 +46,7 @@
             "get": {
                 "not_found": "**Egg** #{0} was not found.",
                 "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
+                "secret": "This **Egg** is secret!\nYou can only find it randomly...",
                 "no_egg": "Could not find any **Egg**s.",
                 "eggn": "Egg #{0}",
                 "creator": "Created by",
@@ -58,6 +59,17 @@
                     "origin": "Join Origin Server",
                     "creator": "View Creator Profile",
                     "report": "Report"
+                }
+            },
+            "edit": {
+                "noedit": "You didn't detail any edits.",
+                "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
+                "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
+                "invalid_url": "The specified `link` argument does *not* resolve to any **supported media format**.\nRemember, for now it's **images only**!",
+                "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
+                "banned": "You are **banned** from editing **Eggs**.\nAppealing is not possible *at this time*.",
+                "success": {
+                    "title": "Egg #{0} edited!"
                 }
             },
             "delete": {
@@ -117,7 +129,9 @@
                 "about": "What are Eggs?",
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
-                "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` argument **adds text** to the Egg.\n  - The `file` argument **adds an attachment** as a file.\n  - The `link` argument **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`."
+                "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` argument **adds text** to the Egg.\n  - The `file` argument **adds an attachment** as a file.\n  - The `link` argument **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`.",
+                "beta": "Server Eggs is in Beta!",
+                "beta_desc": "Because **Server Eggs** is in **private beta**, you can't add it to your server yet.\nAlso, all data from this beta will be deleted once it ends."
             },
             "not_available": {
                 "title": "Help not available",
@@ -184,6 +198,19 @@
 
     "nsfw": "nsfw",
     "nsfw_description": "Get a NSFW Egg.",
+
+    "edit": "edit",
+    "edit_description": "Edit an Egg.",
+    "edit_id": "id",
+    "edit_id_description": "The ID of the Egg to edit.",
+    "edit_text": "text",
+    "edit_text_description": "The new text included with the Egg.",
+    "edit_file": "file",
+    "edit_file_description": "The new attachment included with the Egg as a file.",
+    "edit_link": "link",
+    "edit_link_description": "The new attachment included with the Egg as a URL.",
+    "edit_nsfw": "nsfw",
+    "edit_nsfw_description": "Whether the Egg should be marked as NSFW.",
 
     "report": "report",
     "report_description": "Report an Egg.",

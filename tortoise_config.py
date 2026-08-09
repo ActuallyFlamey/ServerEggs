@@ -7,9 +7,10 @@ dotenv.load_dotenv()
 TORTOISE_ORM = {
     "connections": {"default": os.getenv("DATABASE_URL")},
     "apps": {
-        "models": {
+        "eggs": {
             "models": ["schema"], 
-            "default_connection": "default"
+            "default_connection": "default",
+            "migrations": "migrations"
         }
     }
 }

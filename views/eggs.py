@@ -8,7 +8,7 @@ from tortoise.exceptions import IntegrityError
 import utils
 from schema import Report, User
 
-from .dev import ReportActions
+from .mod import ReportActions
 
 dotenv.load_dotenv()
 
@@ -205,7 +205,7 @@ class ReportEgg(discord.ui.Modal):
                 content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",
                 embed=e,
                 file=file or discord.utils.MISSING,
-                view=ReportActions(report, reporter)
+                view=ReportActions(self.bot, report, reporter)
             )
 
             report.log_message_id = msg.id

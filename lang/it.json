@@ -24,7 +24,7 @@
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
-                "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.",
+                "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "banned": "Ti è stato **tolto il permesso** di creare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "success": {
@@ -46,6 +46,7 @@
             "get": {
                 "not_found": "**Uovo** n. {0} non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
+                "secret": "Questo **Uovo** è segreto!\nPuoi trovarlo solamente a caso...",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
                 "eggn": "Uovo n. {0}",
                 "creator": "Creato da",
@@ -117,7 +118,9 @@
                 "about": "Cosa sono le Uova?",
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
-                "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`."
+                "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
+                "beta": "Server Eggs è in Beta!",
+                "beta_desc": "Siccome **Server Eggs** è in **beta privata**, non puoi ancora aggiungerlo al tuo server.\nInoltre, tutti i dati di questa beta verranno eliminati una volta finita."
             },
             "not_available": {
                 "title": "Aiuto non disponibile",
@@ -184,6 +187,19 @@
 
     "nsfw": "vm18",
     "nsfw_description": "Ricevi un Uovo vietato ai minori.",
+
+    "edit": "modifica",
+    "edit_description": "Modifica un Uovo.",
+    "edit_id": "id",
+    "edit_id_description": "L'ID dell'Uovo da modificare.",
+    "edit_text": "testo",
+    "edit_text_description": "Il nuovo testo da includere con l'Uovo.",
+    "edit_file": "file",
+    "edit_file_description": "Il nuovo allegato da includere con l'Uovo in forma di file.",
+    "edit_link": "link",
+    "edit_link_description": "Il nuovo allegato da includere con l'Uovo in forma di URL.",
+    "edit_nsfw": "vm18",
+    "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",

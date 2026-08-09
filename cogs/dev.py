@@ -10,10 +10,11 @@ from schema import Report, User
 dotenv.load_dotenv()
 
 DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
-DEV_IDS = [int(dev_id) for dev_id in os.getenv("DEV_IDS").split(", ")]
 
 def is_dev(ctx: discord.Interaction):
-    return ctx.user.id in DEV_IDS
+    if not ctx.guild or ctx.guild.id != DEVELOPER_GUILD.id: return False
+
+    return ctx.guild.get_role(int(os.getenv("DEVELOPER_ROLE_ID"))) in ctx.user.roles
 
 class Dev(commands.GroupCog):
     def __init__(self, bot: commands.Bot):

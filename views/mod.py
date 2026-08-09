@@ -2,18 +2,19 @@ import os
 
 import discord
 import dotenv
+from discord.ext import commands
 
 from schema import Egg, Report
 
 dotenv.load_dotenv()
 
 DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
-DEV_IDS = [int(dev_id) for dev_id in os.getenv("DEV_IDS").split(", ")]
 
 class ReportActions(discord.ui.View):
-    def __init__(self, report, reporter):
+    def __init__(self, bot: commands.Bot, report, reporter):
         super().__init__(timeout=None)
 
+        self.bot = bot
         self.report = report
         self.reporter = reporter
 
@@ -38,7 +39,13 @@ class ReportActions(discord.ui.View):
         return f"**Resolved** report `{self.report.id}`.\n**Reporter**: `{self.reporter.id}`\n**Egg**: `{egg_id}`\n**Reason**: {self.report.reason}\n**Action**: {action}"
 
     async def interaction_check(self, ctx: discord.Interaction):
-        if ctx.user.id not in DEV_IDS:
+        if ctx.guild.id != DEVELOPER_GUILD.id:
+            await ctx.response.send_message(content="Not allowed.", ephemeral=True)
+            return False
+
+        modrole = ctx.guild.get_role(int(os.getenv("MOD_ROLE_ID")))
+
+        if modrole not in ctx.user.roles:
             await ctx.response.send_message(content="Not allowed.", ephemeral=True)
             return False
         

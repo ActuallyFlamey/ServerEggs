@@ -32,9 +32,17 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
 
     origin = bot.get_guild(egg.origin.id)
 
+    color = discord.Color.blurple()
+    if egg.secret and egg.nsfw:
+        color = discord.Color.fuchsia()
+    elif egg.secret:
+        color = discord.Color.yellow()
+    elif egg.nsfw:
+        color = discord.Color.red()
+
     e = discord.Embed(
-        title=myloc["eggn"].format(egg.id) + (" 🌶️" if egg.nsfw else ""),
-        color=discord.Color.blurple() if not egg.nsfw else discord.Color.red(),
+        title=myloc["eggn"].format(egg.id) + (" ⭐" if egg.secret else "") + (" 🌶️" if egg.nsfw else ""),
+        color=color,
         description=egg.text
     )
     e.add_field(

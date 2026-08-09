@@ -116,13 +116,18 @@ async def on_guild_join(guild: discord.Guild):
     )
     utils.brand_embed(e)
 
-    for channel in guild.text_channels:
-        if channel.permissions_for(guild.me).send_messages:
-            try:
-                await channel.send(embed=e)
-                break
-            except (discord.Forbidden, discord.HTTPException):
-                continue
+    systemch = guild.system_channel
+
+    if systemch and systemch.permissions_for(guild.me).send_messages:
+        await systemch.send(embed=e)
+    else:
+        for channel in guild.text_channels:
+            if channel.permissions_for(guild.me).send_messages:
+                try:
+                    await channel.send(embed=e)
+                    break
+                except (discord.Forbidden, discord.HTTPException):
+                    continue
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
@@ -164,12 +169,14 @@ async def help(ctx: discord.Interaction, about: str | None):
         e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
         e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
-        utils.brand_embed(e, lines)
+        e.add_field(name=myloc["beta"], value=myloc["beta_desc"], inline=False)
     else:
         myloc = myloc["not_available"]
 
         e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
-    
+
+    utils.brand_embed(e, lines)
+
     await ctx.response.send_message(embed=e)
 
 @bot.tree.context_menu(name="eggify")
