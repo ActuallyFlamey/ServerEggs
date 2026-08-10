@@ -123,7 +123,7 @@
                 "how": "How to use Server Eggs",
                 "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` argument **adds text** to the Egg.\n  - The `file` argument **adds an attachment** as a file.\n  - The `link` argument **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`.",
                 "beta": "Server Eggs is in Beta!",
-                "beta_desc": "Because **Server Eggs** is in **private beta**, you can't add it to your server yet.\nAlso, all data from this beta will be deleted once it ends."
+                "beta_desc": "Because **Server Eggs** is in **private beta**, all data from this beta will be deleted once it ends."
             },
             "not_available": {
                 "title": "Help not available",
