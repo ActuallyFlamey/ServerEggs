@@ -70,6 +70,13 @@ class Dev(commands.GroupCog):
         message = reportch.get_partial_message(oldest_report.log_message_id)
 
         await ctx.followup.send(content=message.jump_url)
+    
+    @app.command(name="reload", description="Reload a Cog.")
+    @app.check(is_dev)
+    async def reload_cog(self, ctx: discord.Interaction, cog: str):
+        await self.bot.reload_extension(f"cogs.{cog}")
+
+        await ctx.response.send_message(f"Reloaded `{cog}` module successfully.")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Dev(bot), guild=DEVELOPER_GUILD)
