@@ -123,7 +123,7 @@
                 "how": "Come usare Server Eggs",
                 "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
                 "beta": "Server Eggs è in Beta!",
-                "beta_desc": "Siccome **Server Eggs** è in **beta privata**, tutti i dati di questa beta verranno eliminati una volta finita."
+                "beta_desc": "Siccome **Server Eggs** è in **beta**, tutti i dati di questa beta verranno eliminati una volta finita."
             },
             "not_available": {
                 "title": "Aiuto non disponibile",
