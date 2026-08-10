@@ -19,16 +19,19 @@
             }
         },
         "eggs": {
-            "create": {
-                "no_nsfw": "Non è possibile creare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
+            "create_edit": {
+                "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
-                "empty": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
+                "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
+                "empty_edit": "Non hai specificato alcuna modifica.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
-                "banned": "Ti è stato **tolto il permesso** di creare **Uova**.\n*Al momento* non è possibile fare ricorso.",
+                "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "success": {
-                    "title": "Uovo creato! (n. {0})"
+                    "title": "Uovo n. {0} {1}!",
+                    "created": "creato",
+                    "edited": "modificato"
                 }
             },
             "eggify": {
