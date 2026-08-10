@@ -67,7 +67,7 @@ class Eggify(discord.ui.Modal):
         await ctx.response.edit_message(content=self.myloc["success"], view=None)
 
         cog = self.bot.get_cog("Eggs")
-        await cog._create(ctx, self.eggtext.value, self.file, self.link, self.nsfw.component.value)
+        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, self.nsfw.component.value)
 
 class GetEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User):

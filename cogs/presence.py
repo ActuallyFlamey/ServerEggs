@@ -26,7 +26,7 @@ class Presence(commands.Cog):
     async def update_presence(self):
         presence = next(self.activities)
 
-        await self.bot.change_presence(activity=discord.Game(name=presence.format(guilds=len(self.bot.guilds))))
+        await self.bot.change_presence(activity=discord.CustomActivity(name=presence.format(guilds=len(self.bot.guilds))))
     
     @update_presence.before_loop
     async def before_update_presence(self):
