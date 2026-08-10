@@ -25,7 +25,6 @@ class ServerEggs(commands.Bot):
         super().__init__("", intents=discord.Intents.default())
 
         self.locales = {}
-
         self.lang_cache = TTLCache(10000, ttl=3600)
 
     async def setup_hook(self):
