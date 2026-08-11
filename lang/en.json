@@ -20,14 +20,16 @@
         },
         "eggs": {
             "create_edit": {
-                "no_nsfw": "Cannot create or edit a **NSFW Egg** in a **SFW channel**.",
-                "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "empty_create": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
                 "empty_edit": "You didn't specify any edits.",
+                "no_nsfw": "Cannot create or edit a **NSFW Egg** in a **SFW channel**.",
+                "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
+                "banned": "You are **banned** from creating and editing **Egg**s.\nAppealing is not possible *at this time*.",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
                 "invalid_url": "The specified `link` argument does *not* resolve to any **supported media format**.\nRemember, for now it's **images only**!",
+                "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
+                "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
-                "banned": "You are **banned** from creating and editing **Eggs**.\nAppealing is not possible *at this time*.",
                 "success": {
                     "title": "Egg #{0} {1}!",
                     "created": "created",

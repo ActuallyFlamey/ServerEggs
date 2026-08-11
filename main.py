@@ -142,7 +142,10 @@ async def app_command_error(ctx: discord.Interaction, error):
     e = discord.Embed(title=myloc["title"], color=0xd62450, description=str(error))
     utils.brand_embed(e, lines)
 
-    await ctx.response.send_message(embed=e)
+    if ctx.response.is_done():
+        await ctx.followup.send(embed=e)
+    else:
+        await ctx.response.send_message(embed=e)
 
     raise error
 

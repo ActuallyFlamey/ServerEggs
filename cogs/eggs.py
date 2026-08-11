@@ -1,6 +1,9 @@
+import asyncio
+import io
 import os
 import random
 
+import aiohttp
 import discord
 from discord import app_commands as app
 from discord.ext import commands
@@ -15,12 +18,12 @@ class Eggs(commands.Cog):
         self.bot = bot
 
     async def create_or_edit(
-        self, 
-        ctx: discord.Interaction, 
-        id: int | None = None, 
-        text: str | None = None, 
-        file: discord.Attachment | None = None, 
-        link: str | None = None, 
+        self,
+        ctx: discord.Interaction,
+        id: int | None = None,
+        text: str | None = None,
+        file: discord.Attachment | None = None,
+        link: str | None = None,
         nsfw: bool | None = None
     ):
         if not ctx.response.is_done():
@@ -55,14 +58,14 @@ class Eggs(commands.Cog):
             egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
 
             if not egg:
-                await ctx.followup.send(content=myloc["not_found"].format(id), ephemeral=True)
+                await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
                 return
-        
+
             creatorchk = ctx.user.id == egg.creator.id
             modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
 
             if not (creatorchk or modchk):
-                await ctx.followup.send(content=myloc["cannot"], ephemeral=True)
+                await ctx.followup.send(myloc["cannot"], ephemeral=True)
                 return
 
         trimtext = None
@@ -70,18 +73,44 @@ class Eggs(commands.Cog):
             text = text.strip() or None
             trimtext = text[:4000] + ("…" if text and len(text) > 4000 else "") if text else None
 
-        attach_path = attach_hash = attach_link = None
+        attach_path = attach_hash = attach_link = attach_file = attach_bytes = None
         if file:
-            if file.content_type and file.content_type.startswith("image/"):
-                attach_path, attach_hash = await utils.process_attachment(file)
-            else:
+            if not file.content_type or not file.content_type.startswith("image/"):
                 await ctx.followup.send(myloc["images_only"])
                 return
+            
+            attach_file = await file.to_file()
         elif link:
             attach_link = await utils.resolve_media_url(link)
             if attach_link is None:
                 await ctx.followup.send(myloc["invalid_url"])
                 return
+
+            try:
+                async with aiohttp.ClientSession() as session, session.get(attach_link, timeout=10) as res:
+                    if res.status == 200:
+                        filebytes = await res.read()
+                        with io.BytesIO(filebytes) as stream:
+                            attach_file = discord.File(stream)
+                    else:
+                        await ctx.followup.send(myloc["could_not_scan"])
+                        return
+            except (aiohttp.ClientError, asyncio.TimeoutError):
+                await ctx.followup.send(myloc["could_not_scan"])
+                return
+
+        if attach_file:
+            scan, attach_bytes = await utils.scan_csam(attach_file)
+            if scan:
+                await ctx.followup.send(myloc["illegal"])
+
+                user.banned = True
+                await user.save()
+
+                return
+        
+        if file:
+            attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
 
         check_text = trimtext if text is not None else (egg.text if id else None)
         check_hash = attach_hash if file else (None if link else (egg.attach_hash if id else None))
@@ -143,14 +172,14 @@ class Eggs(commands.Cog):
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def create(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
         await self.create_or_edit(ctx, None, text, file, link, nsfw)
-    
+
     @app.command(name="lay", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
     @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def lay(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
         await self.create_or_edit(ctx, None, text, file, link, nsfw)
-    
+
     async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
         await ctx.response.defer()
 
@@ -169,7 +198,7 @@ class Eggs(commands.Cog):
             if egg.nsfw and not is_channel_nsfw:
                 await ctx.followup.send(myloc["nsfw_id_in_sfw"])
                 return
-            
+
             if egg.secret:
                 await ctx.followup.send(myloc["secret"])
                 return
@@ -197,7 +226,7 @@ class Eggs(commands.Cog):
                 creator = await self.bot.fetch_user(egg.creator.id)
             except discord.NotFound:
                 creator = None
-        
+
         e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
         await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.GetEgg(self.bot, lines, egg, creator))
@@ -208,26 +237,26 @@ class Eggs(commands.Cog):
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def get(self, ctx: discord.Interaction, id: int | None):
         await self._get(ctx, id)
-    
+
     @app.command(name="egg", description="get_description")
     @app.rename(id="get_id")
     @app.describe(id="get_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def egg(self, ctx: discord.Interaction, id: int | None):
         await self._get(ctx, id)
-    
+
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def nsfw(self, ctx: discord.Interaction):
         await self._get(ctx, None, True)
-    
+
     @app.command(name="edit", description="edit_description")
     @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", nsfw="edit_nsfw")
     @app.describe(id="edit_id_description", text="edit_text_description", file="edit_file_description", link="edit_link_description", nsfw="edit_nsfw_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def edit(self, ctx: discord.Interaction, id: int, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
         await self.create_or_edit(ctx, id, text, file, link, nsfw)
-    
+
     @app.command(name="report", description="report_description")
     @app.rename(id="report_id")
     @app.describe(id="report_id_description")
@@ -243,7 +272,7 @@ class Eggs(commands.Cog):
         if not egg:
             await ctx.followup.send(myloc["not_found"].format(id))
             return
-        
+
         text = egg.text[:1023] + ("…" if len(egg.text) > 1023 else "") if egg.text else None
 
         e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=discord.Color.red(), description=myloc["ready"]["question"])

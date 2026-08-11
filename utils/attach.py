@@ -1,5 +1,7 @@
 import asyncio
 import io
+import logging
+import mimetypes
 import os
 import re
 
@@ -11,10 +13,12 @@ from PIL import Image
 
 dotenv.load_dotenv()
 
-SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp)(?:[?#].*)?$'
+logger = logging.getLogger("eggsmedia")
 
-async def process_attachment(attach: discord.Attachment):
-    attach_bytes = await attach.read()
+SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp|mp4|webm|mov)(?:[?#].*)?$'
+
+async def process_attachment(attach: discord.Attachment, prebytes: bytes | None):
+    attach_bytes = prebytes if prebytes else await attach.read()
 
     file_hash = []
     file_path = f"{os.getenv('MEDIA_PATH')}/{attach.id}.webp"
@@ -57,6 +61,42 @@ def show_attachment(egg, embed: discord.Embed):
         embed.set_image(url=egg.attach_link)
 
     return file
+
+async def scan_csam(file: discord.File) -> (bool, bytes):
+    scanbytes = file.fp.read()
+    file.fp.seek(0)
+
+    api_user = os.getenv("ARACHNID_USER")
+    api_password = os.getenv("ARACHNID_PASSWORD")
+
+    if not api_user or not api_password:
+        print("[Warning] Arachnid Shield credentials missing. Skipping CSAM scan.")
+        return False, scanbytes
+
+    endpoint = "https://shield.projectarachnid.com/v1/media"
+    auth = aiohttp.BasicAuth(api_user, api_password)
+
+    content_type, _ = mimetypes.guess_type(file.filename)
+    headers = {"Content-Type": content_type or "application/octet-stream"}
+
+    try:
+        async with aiohttp.ClientSession() as session, session.post(endpoint, auth=auth, data=scanbytes, headers=headers, timeout=15) as response:
+            if response.status == 200:
+                data = await response.json()
+
+                classification = data.get("classification", "")
+
+                if classification in ["csam", "harmful-abusive-material"]:
+                    logger.critical(f"HARMFUL CONTENT DETECTED: {classification}")
+                    return True, None
+
+                return False, scanbytes
+            else:
+                print(f"Arachnid Shield API Error: HTTP {response.status} {response.text}")
+                return False, scanbytes
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        print(f"Arachnid Shield API connection failed: {e}")
+        return False, scanbytes
 
 # this function was heavily assisted by Gemini 3.1 Pro
 # this function is also genuinely made of crystal. touch it too hard and it will break. i hate parsing links.

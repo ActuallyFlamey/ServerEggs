@@ -17,7 +17,8 @@ class Presence(commands.Cog):
             "Enjoying this public beta?",
             "Surprisingly not about DELTARUNE.",
             "I like my Eggs open-source.",
-            "Support at discord.gg/G9vfEZGZnT"
+            "Support at discord.gg/G9vfEZGZnT",
+            "Gambling without any stakes! So awesome!"
         ])
 
         self.update_presence.start()
