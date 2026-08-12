@@ -1,9 +1,6 @@
-import asyncio
-import io
 import os
 import random
 
-import aiohttp
 import discord
 from discord import app_commands as app
 from discord.ext import commands
@@ -24,7 +21,8 @@ class Eggs(commands.Cog):
         text: str | None = None,
         file: discord.Attachment | None = None,
         link: str | None = None,
-        nsfw: bool | None = None
+        nsfw: bool | None = None,
+        secret: bool | None = None
     ):
         if not ctx.response.is_done():
             await ctx.response.defer()
@@ -117,15 +115,16 @@ class Eggs(commands.Cog):
             await ctx.followup.send(myloc["duplicate"].format(existing.id))
             return
 
-        if not id:
-            guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
+        if not id:
             egg = await Egg.create(
                 text=trimtext,
                 attach_path=attach_path,
                 attach_hash=attach_hash,
                 attach_link=attach_link,
                 nsfw=nsfw or False,
+                secret=secret or False,
                 creator=user,
                 origin=guild
             )
@@ -142,14 +141,18 @@ class Eggs(commands.Cog):
 
             await egg.save()
 
+        creator = self.bot.get_user(egg.creator.id)
+        await utils.log_egg(self.bot, lines, guild, egg, creator, ctx.user, bool(id))
+
         e = discord.Embed(
-            title=myloc["success"]["title"]
+            title=myloc["title"]
                 .format(
                     egg.id,
-                    format(myloc["success"]["created"] if not id else myloc["success"]["edited"])
+                    format(myloc["created"] if not id else myloc["edited"])
                 )
-                + (" 🌶️" if egg.nsfw else ""),
-            color=discord.Color.red() if egg.nsfw else discord.Color.blurple(),
+                + (" ⭐" if egg.secret else " ")
+                + ("🌶️" if egg.nsfw else ""),
+            color=utils.get_egg_color(egg),
             description=egg.text
         )
         utils.brand_embed(e, lines)
@@ -159,18 +162,34 @@ class Eggs(commands.Cog):
         await ctx.followup.send(embed=e, file=out_file or discord.utils.MISSING)
 
     @app.command(name="create", description="create_description")
-    @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
-    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
+    @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
+    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description", secret="create_secret_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    async def create(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
-        await self.create_or_edit(ctx, None, text, file, link, nsfw)
+    async def create(
+        self,
+        ctx: discord.Interaction,
+        text: str | None,
+        file: discord.Attachment | None,
+        link: str | None,
+        nsfw: bool | None,
+        secret: bool | None
+    ):
+        await self.create_or_edit(ctx, None, text, file, link, nsfw, secret)
 
     @app.command(name="lay", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
     @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    async def lay(self, ctx: discord.Interaction, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
-        await self.create_or_edit(ctx, None, text, file, link, nsfw)
+    async def lay(
+        self,
+        ctx: discord.Interaction,
+        text: str | None,
+        file: discord.Attachment | None,
+        link: str | None,
+        nsfw: bool | None,
+        secret: bool | None
+    ):
+        await self.create_or_edit(ctx, None, text, file, link, nsfw, secret)
 
     async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
         await ctx.response.defer()

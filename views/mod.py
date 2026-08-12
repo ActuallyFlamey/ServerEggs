@@ -4,6 +4,7 @@ import discord
 import dotenv
 from discord.ext import commands
 
+import utils
 from schema import Egg, Report
 
 dotenv.load_dotenv()
@@ -82,9 +83,7 @@ class ReportActions(discord.ui.View):
         action = "Delete"
 
         egg = await self.report.egg
-        eggid = egg.id
-
-        await egg.delete()
+        eggid = await utils.egg_delete(egg)
 
         await self.delete_reports(ctx, action, eggid)
     
@@ -94,13 +93,11 @@ class ReportActions(discord.ui.View):
 
         egg = await self.report.egg
         creator = await egg.creator
-        eggid = egg.id
+        eggid = await utils.egg_delete(egg)
 
         action = f"Delete and Ban User `{creator.id}`"
 
         creator.banned = True
         await creator.save(update_fields=["banned"])
-
-        await egg.delete()
 
         await self.delete_reports(ctx, action, eggid)

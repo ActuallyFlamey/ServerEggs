@@ -11,11 +11,16 @@
                 "success": "Modificato il permesso di utilizzare le lingue personali con successo (`{0}`)!"
             },
             "server-description": {
-                "success": "Impostata la descrizione del server:\n{0}"
+                "success": "Impostata la descrizione del server:"
             },
             "privacy": {
                 "already": "L'impostazione è già giusta!",
                 "success": "Privacy del server impostata su `{0}` con successo."
+            },
+            "log": {
+                "already": "L'impostazione è già giusta!",
+                "missing_perms": "Non ho il permesso di scrivere i registri lì!",
+                "success": "Canale di registro Uova impostato su {0} con successo."
             }
         },
         "eggs": {
@@ -30,11 +35,10 @@
                 "illegal": "**RILEVATI CONTENUTI ILLEGALI**. Ti è appena stato **tolto il permesso** di creare o modificare **Uova**.",
                 "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
-                "success": {
-                    "title": "Uovo n. {0} {1}!",
-                    "created": "creato",
-                    "edited": "modificato"
-                }
+                "log": "**{0}** ({1}) ha {2} l'**Uovo #{3}**",
+                "title": "Uovo n. {0} {1}!",
+                "created": "creato",
+                "edited": "modificato"
             },
             "eggify": {
                 "ready": "Creare un **Uovo** a partire da questo messaggio?",
@@ -132,6 +136,13 @@
                 "desc": "Non ci sono aiuti riguardanti questo comando al momento."
             }
         },
+        "log": {
+            "mark_nsfw": "Segna come VM18",
+            "delete": "Elimina",
+            "report": "Segnala",
+            "marked_nsfw": "Segnato l'**Uovo n. {0}** come NSFW.",
+            "deleted": "Eliminato l'**Uovo n. {0}**."
+        },
         "utility": {
             "ping": {
                 "latency": "Ritardo"
@@ -168,6 +179,11 @@
     "privacy_private": "privato",
     "privacy_private_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno?",
 
+    "log": "registro",
+    "log_description": "Imposta un canale da usare come registro delle Uova create qui.",
+    "log_channel": "canale",
+    "log_channel_description": "Il canale da utilizzare come registro.",
+
     "create": "crea",
     "create_description": "Crea un Uovo.",
     "create_text": "testo",
@@ -178,6 +194,8 @@
     "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
     "create_nsfw": "vm18",
     "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
+    "create_secret": "segreto",
+    "create_secret_description": "Se quest'Uovo deve apparire solo per caso.",
 
     "lay": "deponi",
 
@@ -194,7 +212,7 @@
     "nsfw_description": "Ricevi un Uovo vietato ai minori.",
 
     "edit": "modifica",
-    "edit_description": "Modifica un Uovo.",
+    "edit_description": "Modifica un Uovo che ti è permesso gestire.",
     "edit_id": "id",
     "edit_id_description": "L'ID dell'Uovo da modificare.",
     "edit_text": "testo",

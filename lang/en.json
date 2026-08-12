@@ -11,11 +11,16 @@
                 "success": "Successfully modified the setting regarding usage of user languages (`{0}`)!"
             },
             "server-description": {
-                "success": "Successfully set server description to:\n{0}"
+                "success": "Successfully set server description to:"
             },
             "privacy": {
                 "already": "The setting is already correct!",
                 "success": "Server privacy successfully set to `{0}`."
+            },
+            "log": {
+                "already": "The setting is already correct!",
+                "missing_perms": "I don't have permission to write logs there!",
+                "success": "Log channel successfully set to {0}."
             }
         },
         "eggs": {
@@ -30,11 +35,10 @@
                 "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
                 "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
-                "success": {
-                    "title": "Egg #{0} {1}!",
-                    "created": "created",
-                    "edited": "edited"
-                }
+                "log": "**{0}** ({1}) {2} **Egg #{3}**",
+                "title": "Egg #{0} {1}!",
+                "created": "created",
+                "edited": "edited"
             },
             "eggify": {
                 "ready": "Create an **Egg** from this message?",
@@ -132,6 +136,13 @@
                 "desc": "Help is not available for that command at this time."
             }
         },
+        "log": {
+            "mark_nsfw": "Mark NSFW",
+            "delete": "Delete",
+            "report": "Report",
+            "marked_nsfw": "Marked **Egg #{0}** as NSFW.",
+            "deleted": "Deleted **Egg #{0}**."
+        },
         "utility": {
             "ping": {
                 "latency": "Latency"
@@ -168,6 +179,11 @@
     "privacy_private": "private",
     "privacy_private_description": "Should this server be accessible from the Eggs created in it?",
 
+    "log": "log",
+    "log_description": "Set a log channel for Eggs created here.",
+    "log_channel": "channel",
+    "log_channel_description": "The channel to log new Eggs to.",
+
     "create": "create",
     "create_description": "Create an Egg.",
     "create_text": "text",
@@ -178,6 +194,8 @@
     "create_link_description": "The attachment included with the Egg as a URL.",
     "create_nsfw": "nsfw",
     "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "create_secret": "secret",
+    "create_secret_description": "Whether this Egg should only appear randomly.",
 
     "lay": "lay",
 
@@ -194,7 +212,7 @@
     "nsfw_description": "Get a NSFW Egg.",
 
     "edit": "edit",
-    "edit_description": "Edit an Egg.",
+    "edit_description": "Edit an Egg that you're allowed to manage.",
     "edit_id": "id",
     "edit_id_description": "The ID of the Egg to edit.",
     "edit_text": "text",

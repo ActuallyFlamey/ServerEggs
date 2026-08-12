@@ -112,15 +112,7 @@ class DeleteEgg(discord.ui.View):
     
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
-        if self.egg.attach_path and os.path.exists(self.egg.attach_path):
-            try:
-                os.remove(self.egg.attach_path)
-            except OSError:
-                print(f"log: failed to delete attachment for Egg {self.egg.id}")
-        
-        eggid = self.egg.id
-
-        await self.egg.delete()
+        eggid = await utils.egg_delete(self.egg)
 
         await ctx.response.edit_message(content=self.myloc["success"].format(eggid), embed=None, attachments=[], view=None)
     

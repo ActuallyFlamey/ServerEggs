@@ -31,6 +31,8 @@ class Guild(Model):
     lang = fields.CharField(5, default="en")
     allow_user_lang = fields.BooleanField(default=True)
 
+    logch = fields.BigIntField(null=True)
+
     eggs = fields.ReverseRelation["Egg"]
 
 class User(Model):

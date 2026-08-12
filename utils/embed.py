@@ -18,6 +18,18 @@ def brand_embed(e: discord.Embed, lines: dict | None = None):
     e.set_author(name=lines["embed"]["author"], icon_url=icon)
     e.set_footer(text=lines["embed"]["footer"], icon_url=icon)
 
+def get_egg_color(egg):
+    color = discord.Color.blurple()
+
+    if egg.secret and egg.nsfw:
+        color = discord.Color.fuchsia()
+    elif egg.secret:
+        color = discord.Color.yellow()
+    elif egg.nsfw:
+        color = discord.Color.red()
+    
+    return color
+
 async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, include_id = False):
     myloc = bot.get_lines("eggs/get", lines)
 
@@ -32,16 +44,10 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
 
     origin = bot.get_guild(egg.origin.id)
 
-    color = discord.Color.blurple()
-    if egg.secret and egg.nsfw:
-        color = discord.Color.fuchsia()
-    elif egg.secret:
-        color = discord.Color.yellow()
-    elif egg.nsfw:
-        color = discord.Color.red()
+    color = get_egg_color(egg)
 
     e = discord.Embed(
-        title=myloc["eggn"].format(egg.id) + (" ⭐" if egg.secret else "") + (" 🌶️" if egg.nsfw else ""),
+        title=myloc["eggn"].format(egg.id) + (" ⭐" if egg.secret else " ") + ("🌶️" if egg.nsfw else ""),
         color=color,
         description=egg.text
     )
