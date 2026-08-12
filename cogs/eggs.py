@@ -73,34 +73,26 @@ class Eggs(commands.Cog):
             text = text.strip() or None
             trimtext = text[:4000] + ("…" if text and len(text) > 4000 else "") if text else None
 
-        attach_path = attach_hash = attach_link = attach_file = attach_bytes = None
+        attach_path = attach_hash = attach_link = scanfile = attach_bytes = None
         if file:
             if not file.content_type or not file.content_type.startswith("image/"):
                 await ctx.followup.send(myloc["images_only"])
                 return
-            
-            attach_file = await file.to_file()
+
+            scanfile = await file.to_file()
         elif link:
             attach_link = await utils.resolve_media_url(link)
             if attach_link is None:
                 await ctx.followup.send(myloc["invalid_url"])
                 return
 
-            try:
-                async with aiohttp.ClientSession() as session, session.get(attach_link, timeout=10) as res:
-                    if res.status == 200:
-                        filebytes = await res.read()
-                        with io.BytesIO(filebytes) as stream:
-                            attach_file = discord.File(stream)
-                    else:
-                        await ctx.followup.send(myloc["could_not_scan"])
-                        return
-            except (aiohttp.ClientError, asyncio.TimeoutError):
+            scanfile = await utils.url_to_file(attach_link)
+            if not scanfile:
                 await ctx.followup.send(myloc["could_not_scan"])
                 return
 
-        if attach_file:
-            scan, attach_bytes = await utils.scan_csam(attach_file)
+        if scanfile:
+            scan, attach_bytes = await utils.scan_csam(scanfile)
             if scan:
                 await ctx.followup.send(myloc["illegal"])
 
@@ -108,7 +100,7 @@ class Eggs(commands.Cog):
                 await user.save()
 
                 return
-        
+
         if file:
             attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
 

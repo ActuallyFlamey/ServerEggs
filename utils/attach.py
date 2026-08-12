@@ -45,6 +45,20 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
 
     return file_path, file_hash[0]
 
+async def url_to_file(url: str) -> discord.File | None:
+    file = None
+
+    try:
+        async with aiohttp.ClientSession() as session, session.get(url, timeout=10) as res:
+            if res.status == 200:
+                filebytes = await res.read()
+                with io.BytesIO(filebytes) as stream:
+                    file = discord.File(stream)
+    except (aiohttp.ClientError, asyncio.TimeoutError):
+        pass
+
+    return file
+
 def show_attachment(egg, embed: discord.Embed):
     file = None
 
