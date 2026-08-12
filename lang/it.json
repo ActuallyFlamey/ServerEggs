@@ -223,6 +223,8 @@
     "edit_link_description": "Il nuovo allegato da includere con l'Uovo in forma di URL.",
     "edit_nsfw": "vm18",
     "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
+    "edit_secret": "segreto",
+    "edit_secret_description": "Se quest'Uovo deve apparire solo per caso.",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",

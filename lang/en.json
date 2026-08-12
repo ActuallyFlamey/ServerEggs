@@ -223,6 +223,8 @@
     "edit_link_description": "The new attachment included with the Egg as a URL.",
     "edit_nsfw": "nsfw",
     "edit_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "edit_secret": "secret",
+    "edit_secret_description": "Whether this Egg should only appear randomly.",
 
     "report": "report",
     "report_description": "Report an Egg.",

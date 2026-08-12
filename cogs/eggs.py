@@ -262,11 +262,19 @@ class Eggs(commands.Cog):
         await self._get(ctx, None, True)
 
     @app.command(name="edit", description="edit_description")
-    @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", nsfw="edit_nsfw")
-    @app.describe(id="edit_id_description", text="edit_text_description", file="edit_file_description", link="edit_link_description", nsfw="edit_nsfw_description")
+    @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", nsfw="edit_nsfw", secret="edit_secret")
+    @app.describe(id="edit_id_description", text="edit_text_description", file="edit_file_description", link="edit_link_description", nsfw="edit_nsfw_description", secret="edit_secret_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def edit(self, ctx: discord.Interaction, id: int, text: str | None, file: discord.Attachment | None, link: str | None, nsfw: bool | None):
-        await self.create_or_edit(ctx, id, text, file, link, nsfw)
+    async def edit(
+        self,
+        ctx: discord.Interaction,
+        id: int, text: str | None,
+        file: discord.Attachment | None,
+        link: str | None,
+        nsfw: bool | None,
+        secret: bool | None
+    ):
+        await self.create_or_edit(ctx, id, text, file, link, nsfw, secret)
 
     @app.command(name="report", description="report_description")
     @app.rename(id="report_id")
