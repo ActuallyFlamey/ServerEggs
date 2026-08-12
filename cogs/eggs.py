@@ -30,7 +30,7 @@ class Eggs(commands.Cog):
         lines = await self.bot.fetch_lines(ctx)
         myloc = self.bot.get_lines("eggs/create_edit", lines)
 
-        if text is None and file is None and link is None and nsfw is None:
+        if text is None and file is None and link is None and nsfw is None and secret is None:
             if not id:
                 await ctx.followup.send(myloc["empty_create"])
             else:
@@ -138,6 +138,7 @@ class Eggs(commands.Cog):
                 egg.attach_hash = attach_hash
                 egg.attach_link = attach_link
             if nsfw is not None: egg.nsfw = nsfw
+            if secret is not None: egg.secret = secret
 
             await egg.save()
 
