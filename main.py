@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 import re
+import traceback
 
 import discord
 import dotenv
@@ -147,7 +148,7 @@ async def app_command_error(ctx: discord.Interaction, error):
     else:
         await ctx.response.send_message(embed=e)
 
-    raise error
+    traceback.print_exception(type(error), error, error.__traceback__)
 
 @bot.tree.command(name="help", description="help_description")
 @app.rename(about="help_about")
