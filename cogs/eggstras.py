@@ -75,7 +75,11 @@ class Eggstras(commands.Cog):
             view=views.EggLoop(self.bot, lines, myloc, ctx.user, collection) if not check else discord.utils.MISSING
         )
 
-    leaderboard = app.Group(name="leaderboard", description="leaderboard_description")
+    leaderboard = app.Group(
+        name="leaderboard",
+        description="leaderboard_description",
+        allowed_contexts=app.AppCommandContext(guild=True, dm_channel=True, private_channel=True)
+    )
 
     async def make_leaderboard(self, ctx: discord.Interaction, lbtype: typing.Literal["collections", "creations"]):
         await ctx.response.defer()
@@ -132,12 +136,10 @@ class Eggstras(commands.Cog):
         await ctx.followup.send(embed=e)
     
     @leaderboard.command(name="leaderboard_collections", description="leaderboard_collections_description")
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def lb_collections(self, ctx: discord.Interaction):
         await self.make_leaderboard(ctx, "collections")
     
     @leaderboard.command(name="leaderboard_creations", description="leaderboard_creations_description")
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def lb_creations(self, ctx: discord.Interaction):
         await self.make_leaderboard(ctx, "creations")
 
