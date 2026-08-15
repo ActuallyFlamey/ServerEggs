@@ -72,7 +72,7 @@ class Eggstras(commands.Cog):
         await ctx.followup.send(
             embed=e,
             file=file or discord.utils.MISSING,
-            view=views.EggLoop(self.bot, lines, ctx.user, collection) if not check else discord.utils.MISSING
+            view=views.EggLoop(self.bot, lines, myloc, ctx.user, collection) if not check else discord.utils.MISSING
         )
 
     leaderboard = app.Group(name="leaderboard", description="leaderboard_description")

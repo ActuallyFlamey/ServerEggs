@@ -26,7 +26,7 @@ class ReportActions(discord.ui.View):
             try:
                 msg = ctx.channel.get_partial_message(report.log_message_id)
                 await msg.edit(
-                    self.resolved(action, egg),
+                    content=self.resolved(action, egg),
                     embed=None,
                     attachments=[],
                     view=None
