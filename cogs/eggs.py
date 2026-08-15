@@ -217,10 +217,10 @@ class Eggs(commands.Cog):
         else:
             eggs = Egg.all()
 
-            if not is_channel_nsfw:
-                eggs = eggs.filter(nsfw=False)
-            elif only_nsfw:
+            if only_nsfw:
                 eggs = eggs.filter(nsfw=True)
+            elif not is_channel_nsfw:
+                eggs = eggs.filter(nsfw=False)
 
             count = await eggs.count()
 
