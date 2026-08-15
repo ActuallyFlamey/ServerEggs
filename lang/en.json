@@ -53,10 +53,11 @@
                 "success": "Created an **Egg** from this message."
             },
             "get": {
-                "not_found": "**Egg** #{0} was not found.",
+                "not_found": "**Egg #{0}** was not found.",
                 "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
                 "secret": "This **Egg** is secret!\nYou can only find it randomly...",
                 "no_egg": "Could not find any **Egg**s.",
+                "collected": "**Egg #{0}** has been **collected**!\n-# Check your collected **Egg**s with `/collected`!",
                 "eggn": "Egg #{0}",
                 "creator": "Created by",
                 "unknown_creator": "Unknown User {0}",
@@ -70,8 +71,15 @@
                     "report": "Report"
                 }
             },
+            "collected": {
+                "not_collected": "You haven't collected **Egg #{0}**.",
+                "nsfw_id_in_sfw": "You have collected **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
+                "nsfw_in_sfw": "You can't filter your collection by \"**NSFW only**\" in a **SFW channel**.",
+                "empty": "No collected **Egg**s with this criteria!",
+                "not_yours": "Only the **original command user** can read through the collection."
+            },
             "delete": {
-                "not_found": "**Egg** #{0} does not exist.",
+                "not_found": "**Egg #{0}** does not exist.",
                 "cannot": "You don't have permission to manage this **Egg**.",
                 "ready": {
                     "title": "Delete Egg #{0}",
@@ -81,11 +89,11 @@
                 },
                 "confirm": "Confirm Deletion",
                 "cancel": "Cancel",
-                "success": "**Egg** #{0} was deleted successfully.",
+                "success": "**Egg #{0}** was deleted successfully.",
                 "cancelled": "Deletion cancelled."
             },
             "report": {
-                "not_found": "**Egg** #{0} does not exist.",
+                "not_found": "**Egg #{0}** does not exist.",
                 "ready": {
                     "title": "Report Egg #{0}",
                     "question": "Are you sure you want to report this **Egg**?",
@@ -109,7 +117,7 @@
                 },
                 "other": "Custom Report Reason",
                 "other_placeholder": "If you chose \"Other\", specify your reason here...",
-                "success": "**Egg** #{0} was reported successfully.",
+                "success": "**Egg #{0}** was reported successfully.",
                 "already": "You already reported this **Egg**: wait for us to take action..."
             }
         },
@@ -225,6 +233,15 @@
     "edit_nsfw_description": "Whether the Egg should be marked as NSFW.",
     "edit_secret": "secret",
     "edit_secret_description": "Whether this Egg should only appear randomly.",
+
+    "collected": "collected",
+    "collected_description": "View your Egg collection, or check if you've collected a specific Egg.",
+    "collected_check": "check",
+    "collected_check_description": "Check if you've collected a specific Egg ID.",
+    "collected_nsfw": "only-nsfw",
+    "collected_nsfw_description": "Filter your collection by \"NSFW only\".",
+    "collected_secret": "only-secret",
+    "collected_secret_description": "Filter your collection by \"secret only\".",
 
     "report": "report",
     "report_description": "Report an Egg.",

@@ -24,7 +24,7 @@ def get_egg_color(egg):
     if egg.secret and egg.nsfw:
         color = discord.Color.fuchsia()
     elif egg.secret:
-        color = discord.Color.yellow()
+        color = discord.Color.gold()
     elif egg.nsfw:
         color = discord.Color.red()
     

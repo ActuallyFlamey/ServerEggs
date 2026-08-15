@@ -1,3 +1,4 @@
+import collections
 import os
 
 import discord
@@ -99,6 +100,41 @@ class GetEgg(discord.ui.View):
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def report(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg, False))
+
+class EggLoop(discord.ui.View):
+    def __init__(self, bot: commands.Bot, lines: dict, user: discord.User, eggs):
+        super().__init__(timeout=None)
+
+        self.bot = bot
+        self.lines = lines
+        self.myloc = bot.get_lines("eggs/collected", lines)
+        self.user = user
+        self.eggs = collections.deque(eggs)
+
+        if len(self.eggs) <= 1:
+            self.prev.disabled = True
+            self.next.disabled = True
+    
+    async def interaction_check(self, ctx: discord.Interaction):
+        if ctx.user.id != self.user.id:
+            await ctx.response.send_message(self.myloc["not_yours"], ephemeral=True)
+            return False
+        
+        return True
+    
+    async def respond(self, ctx: discord.Interaction):
+        e, file = await utils.get_egg_embed(self.bot, self.lines, self.eggs[0])
+        await ctx.response.edit_message(embed=e, attachments=[file] if file else [])
+    
+    @discord.ui.button(label="◀️", style=discord.ButtonStyle.primary)
+    async def prev(self, ctx: discord.Interaction, button: discord.ui.Button):
+        self.eggs.rotate(1)
+        await self.respond(ctx)
+
+    @discord.ui.button(label="▶️", style=discord.ButtonStyle.primary)
+    async def next(self, ctx: discord.Interaction, button: discord.ui.Button):
+        self.eggs.rotate(-1)
+        await self.respond(ctx)
 
 class DeleteEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg):

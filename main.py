@@ -45,9 +45,7 @@ class ServerEggs(commands.Bot):
             if file.endswith(".py") and not file.startswith("__"):
                 await self.load_extension(f"cogs.{file[:-3]}")
 
-        self.tree.copy_global_to(guild=DEVELOPER_GUILD)
         await self.tree.sync()
-        await self.tree.sync(guild=DEVELOPER_GUILD)
 
     async def get_lang(self, ctx: discord.Interaction) -> str:
         if not ctx.guild:

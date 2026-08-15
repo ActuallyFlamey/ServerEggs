@@ -32,8 +32,8 @@
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
+                "could_not_scan": "Non è stato possibile ottenere il contenuto multimediale per il controllo dei contenuti illegali.",
                 "illegal": "**RILEVATI CONTENUTI ILLEGALI**. Ti è appena stato **tolto il permesso** di creare o modificare **Uova**.",
-                "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "log": "**{0}** ({1}) ha {2} l'**Uovo #{3}**",
                 "title": "Uovo n. {0} {1}!",
@@ -53,10 +53,11 @@
                 "success": "Created an **Egg** from this message."
             },
             "get": {
-                "not_found": "**Uovo** n. {0} non trovato.",
+                "not_found": "**Uovo n. {0}** non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
                 "secret": "Questo **Uovo** è segreto!\nPuoi trovarlo solamente a caso...",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
+                "collected": "L'**Uovo n. {0}** è stato **collezionato**!\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
                 "eggn": "Uovo n. {0}",
                 "creator": "Creato da",
                 "unknown_creator": "Utente Sconosciuto {0}",
@@ -70,8 +71,15 @@
                     "report": "Segnala"
                 }
             },
+            "collected": {
+                "not_collected": "Non hai collezionato l'**Uovo n. {0}**.",
+                "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
+                "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
+                "empty": "Non ci sono **Uova** collezionate con questi criteri!",
+                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
+            },
             "delete": {
-                "not_found": "L'**Uovo** n. {0} non esiste.",
+                "not_found": "L'**Uovo n. {0}** non esiste.",
                 "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
                 "ready": {
                     "title": "Elimina Uovo #{0}",
@@ -81,11 +89,11 @@
                 },
                 "confirm": "Conferma Eliminazione",
                 "cancel": "Annulla",
-                "success": "L'**Uovo** n. {0} è stato eliminato con successo.",
+                "success": "L'**Uovo n. {0}** è stato eliminato con successo.",
                 "cancelled": "Eliminazione annullata."
             },
             "report": {
-                "not_found": "L'**Uovo** n. {0} non esiste.",
+                "not_found": "L'**Uovo n. {0}** non esiste.",
                 "ready": {
                     "title": "Segnala l'Uovo n. {0}",
                     "question": "Sei sicuro di voler segnalare questo **Uovo**?",
@@ -109,7 +117,7 @@
                 },
                 "other": "Motivo Personalizzato della Segnalazione",
                 "other_placeholder": "Se hai scelto \"Altro\", specifica le tue motivazioni qui...",
-                "success": "L'**Uovo** n. {0} è stato segnalato con successo.",
+                "success": "L'**Uovo n. {0}** è stato segnalato con successo.",
                 "already": "Hai già segnalato questo **Uovo**: aspetta che ne prendiamo atto..."
             }
         },
@@ -225,6 +233,15 @@
     "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
     "edit_secret": "segreto",
     "edit_secret_description": "Se quest'Uovo deve apparire solo per caso.",
+
+    "collected": "collezione",
+    "collected_description": "Osserva la tua collezione di Uova, o controlla se hai già collezionato un Uovo specifico.",
+    "collected_check": "controlla",
+    "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
+    "collected_nsfw": "solo-vm18",
+    "collected_nsfw_description": "Filtra la tua collezione per \"solo VM18\".",
+    "collected_secret": "solo-segreti",
+    "collected_secret_description": "Filtra la tua collezione per \"solo segreti\".",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",

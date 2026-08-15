@@ -26,7 +26,7 @@ class ReportActions(discord.ui.View):
             try:
                 msg = ctx.channel.get_partial_message(report.log_message_id)
                 await msg.edit(
-                    content=self.resolved(action, egg),
+                    self.resolved(action, egg),
                     embed=None,
                     attachments=[],
                     view=None
@@ -41,13 +41,13 @@ class ReportActions(discord.ui.View):
 
     async def interaction_check(self, ctx: discord.Interaction):
         if ctx.guild.id != DEVELOPER_GUILD.id:
-            await ctx.response.send_message(content="Not allowed.", ephemeral=True)
+            await ctx.response.send_message("Not allowed.", ephemeral=True)
             return False
 
         modrole = ctx.guild.get_role(int(os.getenv("MOD_ROLE_ID")))
 
         if modrole not in ctx.user.roles:
-            await ctx.response.send_message(content="Not allowed.", ephemeral=True)
+            await ctx.response.send_message("Not allowed.", ephemeral=True)
             return False
         
         return True
