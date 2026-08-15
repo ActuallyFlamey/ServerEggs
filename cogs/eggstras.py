@@ -119,7 +119,7 @@ class Eggstras(commands.Cog):
 
             entries.append(f"{mod}{prefix} — {name}{who} — {f"{count:_}".replace("_", " ")}{mod}")
         
-        if author_rank >= 15:
+        if not any(row["id"] == ctx.user.id for row in collectors):
             entries.append(f"*`{author_rank}` — **{ctx.user.display_name}** ({ctx.user.name}) — {f"{author_count:_}".replace("_", " ")}*")
         
         e = discord.Embed(
