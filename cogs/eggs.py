@@ -165,6 +165,7 @@ class Eggs(commands.Cog):
     @app.command(name="create", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
     @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description", secret="create_secret_description")
+    @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def create(
         self,
@@ -180,6 +181,7 @@ class Eggs(commands.Cog):
     @app.command(name="lay", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
     @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
+    @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def lay(
         self,
@@ -270,65 +272,8 @@ class Eggs(commands.Cog):
         await self._get(ctx, id)
 
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def nsfw(self, ctx: discord.Interaction):
         await self._get(ctx, None, True)
-    
-    @app.command(name="collected", description="collected_description")
-    @app.rename(check="collected_check", nsfw="collected_nsfw", secret="collected_secret")
-    @app.describe(check="collected_check_description", nsfw="collected_nsfw_description", secret="collected_secret_description")
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def collected(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
-        await ctx.response.defer()
-
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggs/collected", lines)
-
-        nsfw_allowed = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else bool(isinstance(ctx.channel, discord.PrivateChannel))
-
-        user, _ = await User.get_or_create(id=ctx.user.id)
-        
-        if check is not None:
-            egg = await user.collected.filter(id=check).prefetch_related("creator", "origin").first()
-        
-            if not egg:
-                await ctx.followup.send(myloc["not_collected"].format(check))
-                return
-
-            if egg.nsfw and not nsfw_allowed:
-                await ctx.followup.send(myloc["nsfw_id_in_sfw"].format(check))
-                return
-
-            collection = [egg]
-        else:
-            query = user.collected.all().prefetch_related("creator", "origin")
-
-            if not nsfw_allowed:
-                if nsfw:
-                    await ctx.followup.send(myloc["nsfw_in_sfw"])
-                    return
-
-                query = query.filter(nsfw=False)
-            
-            if nsfw:
-                query = query.filter(nsfw=True)
-            
-            if secret:
-                query = query.filter(secret=True)
-
-            collection = await query
-
-            if not collection:
-                await ctx.followup.send(myloc["empty"])
-                return
-        
-        e, file = await utils.get_egg_embed(self.bot, lines, collection[0])
-
-        await ctx.followup.send(
-            embed=e,
-            file=file or discord.utils.MISSING,
-            view=views.EggLoop(self.bot, lines, ctx.user, collection) if not check else discord.utils.MISSING
-        )
 
     @app.command(name="edit", description="edit_description")
     @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", nsfw="edit_nsfw", secret="edit_secret")

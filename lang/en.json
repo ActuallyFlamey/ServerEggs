@@ -71,13 +71,6 @@
                     "report": "Report"
                 }
             },
-            "collected": {
-                "not_collected": "You haven't collected **Egg #{0}**.",
-                "nsfw_id_in_sfw": "You have collected **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
-                "nsfw_in_sfw": "You can't filter your collection by \"**NSFW only**\" in a **SFW channel**.",
-                "empty": "No collected **Egg**s with this criteria!",
-                "not_yours": "Only the **original command user** can read through the collection."
-            },
             "delete": {
                 "not_found": "**Egg #{0}** does not exist.",
                 "cannot": "You don't have permission to manage this **Egg**.",
@@ -119,6 +112,20 @@
                 "other_placeholder": "If you chose \"Other\", specify your reason here...",
                 "success": "**Egg #{0}** was reported successfully.",
                 "already": "You already reported this **Egg**: wait for us to take action..."
+            }
+        },
+        "eggstras": {
+            "collected": {
+                "not_collected": "You haven't collected **Egg #{0}**.",
+                "nsfw_id_in_sfw": "You have collected **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
+                "nsfw_in_sfw": "You can't filter your collection by \"**NSFW only**\" in a **SFW channel**.",
+                "empty": "No collected **Egg**s with this criteria!",
+                "not_yours": "Only the **original command user** can read through the collection."
+            },
+            "leaderboard": {
+                "you": " **__[YOU]__**",
+                "collections": "Egg Collectors' Leaderboard",
+                "creations": "Egg Creators' Leaderboard"
             }
         },
         "error": {
@@ -234,15 +241,6 @@
     "edit_secret": "secret",
     "edit_secret_description": "Whether this Egg should only appear randomly.",
 
-    "collected": "collected",
-    "collected_description": "View your Egg collection, or check if you've collected a specific Egg.",
-    "collected_check": "check",
-    "collected_check_description": "Check if you've collected a specific Egg ID.",
-    "collected_nsfw": "only-nsfw",
-    "collected_nsfw_description": "Filter your collection by \"NSFW only\".",
-    "collected_secret": "only-secret",
-    "collected_secret_description": "Filter your collection by \"secret only\".",
-
     "report": "report",
     "report_description": "Report an Egg.",
     "report_id": "id",
@@ -252,6 +250,24 @@
     "delete_description": "Delete an Egg that you're allowed to manage.",
     "delete_id": "id",
     "delete_id_description": "The ID of the Egg to delete.",
+
+    "collected": "collected",
+    "collected_description": "View your Egg collection, or check if you've collected a specific Egg.",
+    "collected_check": "check",
+    "collected_check_description": "Check if you've collected a specific Egg ID.",
+    "collected_nsfw": "only-nsfw",
+    "collected_nsfw_description": "Filter your collection by \"NSFW only\".",
+    "collected_secret": "only-secret",
+    "collected_secret_description": "Filter your collection by \"secret only\".",
+
+    "leaderboard": "leaderboard",
+    "leaderboard_description": "View leaderboards for various stats.",
+
+    "leaderboard_collections": "collections",
+    "leaderboard_collections_description": "See who has collected the most Eggs.",
+
+    "leaderboard_creations": "creations",
+    "leaderboard_creations_description": "See who has created the most Eggs.",
 
     "ping": "ping",
     "ping_description": "Gets Server Eggs's latency."

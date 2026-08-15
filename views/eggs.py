@@ -102,14 +102,14 @@ class GetEgg(discord.ui.View):
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg, False))
 
 class EggLoop(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, user: discord.User, eggs):
+    def __init__(self, bot: commands.Bot, lines: dict, user: discord.User, eggs: collections.deque):
         super().__init__(timeout=None)
 
         self.bot = bot
         self.lines = lines
         self.myloc = bot.get_lines("eggs/collected", lines)
         self.user = user
-        self.eggs = collections.deque(eggs)
+        self.eggs = eggs
 
         if len(self.eggs) <= 1:
             self.prev.disabled = True

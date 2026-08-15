@@ -71,13 +71,6 @@
                     "report": "Segnala"
                 }
             },
-            "collected": {
-                "not_collected": "Non hai collezionato l'**Uovo n. {0}**.",
-                "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
-                "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
-                "empty": "Non ci sono **Uova** collezionate con questi criteri!",
-                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
-            },
             "delete": {
                 "not_found": "L'**Uovo n. {0}** non esiste.",
                 "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
@@ -119,6 +112,20 @@
                 "other_placeholder": "Se hai scelto \"Altro\", specifica le tue motivazioni qui...",
                 "success": "L'**Uovo n. {0}** è stato segnalato con successo.",
                 "already": "Hai già segnalato questo **Uovo**: aspetta che ne prendiamo atto..."
+            }
+        },
+        "eggstras": {
+            "collected": {
+                "not_collected": "Non hai collezionato l'**Uovo n. {0}**.",
+                "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
+                "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
+                "empty": "Non ci sono **Uova** collezionate con questi criteri!",
+                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
+            },
+            "leaderboard": {
+                "you": " **__[TU]__**",
+                "collections": "Classifica dei Collezionisti d'Uova",
+                "creations": "Classifica dei Creatori d'Uova"
             }
         },
         "error": {
@@ -234,15 +241,6 @@
     "edit_secret": "segreto",
     "edit_secret_description": "Se quest'Uovo deve apparire solo per caso.",
 
-    "collected": "collezione",
-    "collected_description": "Osserva la tua collezione di Uova, o controlla se hai già collezionato un Uovo specifico.",
-    "collected_check": "controlla",
-    "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
-    "collected_nsfw": "solo-vm18",
-    "collected_nsfw_description": "Filtra la tua collezione per \"solo VM18\".",
-    "collected_secret": "solo-segreti",
-    "collected_secret_description": "Filtra la tua collezione per \"solo segreti\".",
-
     "report": "segnala",
     "report_description": "Segnala un Uovo.",
     "report_id": "id",
@@ -252,6 +250,24 @@
     "delete_description": "Elimina un Uovo che ti è permesso gestire.",
     "delete_id": "id",
     "delete_id_description": "L'ID dell'Uovo da eliminare.",
+
+    "collected": "collezione",
+    "collected_description": "Osserva la tua collezione di Uova, o controlla se hai già collezionato un Uovo specifico.",
+    "collected_check": "controlla",
+    "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
+    "collected_nsfw": "solo-vm18",
+    "collected_nsfw_description": "Filtra la tua collezione per \"solo VM18\".",
+    "collected_secret": "solo-segreti",
+    "collected_secret_description": "Filtra la tua collezione per \"solo segreti\".",
+
+    "leaderboard": "classifica",
+    "leaderboard_description": "Vedi le classifiche per varie statistiche",
+
+    "leaderboard_collections": "collezioni",
+    "leaderboard_collections_description": "Vedi chi ha collezionato più Uova",
+
+    "leaderboard_creations": "creazioni",
+    "leaderboard_creations_description": "Vedi chi ha creato più Uova.",
 
     "ping": "ping",
     "ping_description": "Ottiene il ritardo di connessione di Server Eggs."
