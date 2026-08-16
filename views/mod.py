@@ -83,9 +83,9 @@ class ReportActions(discord.ui.View):
         action = "Delete"
 
         egg = await self.report.egg
-        eggid = await utils.egg_delete(egg)
 
-        await self.delete_reports(ctx, action, eggid)
+        await self.delete_reports(ctx, action, egg.id)
+        await utils.egg_delete(egg)
     
     @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger)
     async def delete_ban(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -93,11 +93,11 @@ class ReportActions(discord.ui.View):
 
         egg = await self.report.egg
         creator = await egg.creator
-        eggid = await utils.egg_delete(egg)
 
         action = f"Delete and Ban User `{creator.id}`"
 
         creator.banned = True
         await creator.save(update_fields=["banned"])
 
-        await self.delete_reports(ctx, action, eggid)
+        await self.delete_reports(ctx, action, egg.id)
+        await utils.egg_delete(egg)

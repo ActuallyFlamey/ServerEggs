@@ -12,6 +12,6 @@ class UITranslator(app.Translator):
         if not lines and "-" in locale.value:
             lines = self.bot.locales.get(locale.value.split("-")[0])
         
-        if not lines: return None
+        if not lines: lines = self.bot.locales.get("en")
 
         return lines.get(line.message)

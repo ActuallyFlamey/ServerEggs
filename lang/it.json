@@ -48,6 +48,8 @@
                 "title": "Crea Uovo da un Messaggio",
                 "text": "Testo dell'Uovo (facoltativo)",
                 "text_placeholder": "Inserisci il testo dell'Uovo qui...",
+                "secret": "Segna come Segreto",
+                "secret_desc": "Fare sì che questo Uovo sia ottenibile solo casualmente?",
                 "nsfw": "Segna come VM18",
                 "nsfw_desc": "Questo Uovo è vietato ai minori? La mancata etichettatura corretta comporterà una sanzione.",
                 "success": "Created an **Egg** from this message."
@@ -55,9 +57,10 @@
             "get": {
                 "not_found": "**Uovo n. {0}** non trovato.",
                 "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
-                "secret": "Questo **Uovo** è segreto!\nPuoi trovarlo solamente a caso...",
+                "secret": "Questo **Uovo** è segreto!\nPuoi trovarlo solo casualmente...",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
-                "collected": "L'**Uovo n. {0}** è stato **collezionato**!\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
+                "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
+                "collections": "L'**Uovo n. {0}** è stato collezionato **{1} volte**.",
                 "eggn": "Uovo n. {0}",
                 "creator": "Creato da",
                 "unknown_creator": "Utente Sconosciuto {0}",
@@ -146,9 +149,41 @@
                 "beta": "Server Eggs è in Beta!",
                 "beta_desc": "Siccome **Server Eggs** è in **beta**, tutti i dati di questa beta verranno eliminati una volta finita."
             },
-            "not_available": {
-                "title": "Aiuto non disponibile",
-                "desc": "Non ci sono aiuti riguardanti questo comando al momento."
+            "create": {
+                "title": "Informazioni sul Creare Uova",
+                "desc": "**Comandi**: `/crea`, `/deponi`\n\nCon questi comandi, puoi **creare un Uovo**. L'**Uovo** che crei sarà poi disponibile **ovunque ci sia Server Eggs**.\n\n**Parametri**:\n- `testo`: [Facoltativo] Aggiungi un **testo** all'**Uovo**.\n  - Apparirà come descrizione dell'Embed.\n- `file`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come file.\n- `link`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come URL.\n  - Utile se vuoi usare librerie di GIF come Klipy.\n  - ***Nota**: Non puoi usare sia `file` che `link` allo stesso tempo.*\n- `segreto`: [Facoltativo] Segna un **Uovo** come **Segreto**!\n  - Significa che **non sarà possibile** vedere quest'**Uovo** con l'ID: solo casualmente!\n- `vm18`: [Facoltativo] *(solo nei canali vietati ai minori)* Segna un **Uovo** come **vietato ai minori**.\n  - Significà che **verra mostrato solo** nei **canali vietati ai minori**."
+            },
+            "get": {
+                "title": "Informazioni sull'Ottenere Uova",
+                "desc": "**Comandi**: `/ricevi`, `/uovo`\n\nCon questi comandi, **riceverai an Uovo**. Se il parametro `id` non è specificato, l'**Uovo** verrà **pescato a caso dal mucchio globale** e **aggiunto alla tua collezione** se non l'hai già visto.\n\n**Parametri**:\n- `id`: [Facoltativo] Osserva un **Uovo** specifico cercando il suo ID."
+            },
+            "edit": {
+                "title": "Informazioni sul Modificare Uova",
+                "desc": "**Comandi**: `/modifica`\n\nCon questo comando, puoi **modificare un Uovo**. Devi avere il permesso di modificarlo: perciò devi **essere il suo creatore** o **un Gestore del Server dov'è stato creato**.\n**Sovrascrivi solo i parametri che selezioni**, quindi, se hai creato un **Uovo** di solo testo e vuoi renderlo Segreto, basta che imposti `segreto` su `Vero` here, senza toccare `testo`.\n\n**Parametri**:\n- `id`: L'ID dell'**Uovo** che vuoi modificare.\n- Gli altri parametri sono gli stessi di `/crea`/`/deponi`."
+            },
+            "report": {
+                "title": "Informazioni sul Segnalare Uova",
+                "desc": "**Comandi**: `/segnala`\n\nCon questo comando, o col tasto \"Segnala\" quando ricevi un **Uovo**, puoi **segnalare un Uovo**. Questo lo manderà ai **Moderatori di Uova** globali, che decideranno cosa fare. Se sospetti che un **Uovo** stia infrangendo qualche regola, non esitare a segnalarlo!\n\n**Parametri**:\n- `id`: L'ID dell'**Uovo** che vuoi segnalare."
+            },
+            "delete": {
+                "title": "Informazioni sull'Eliminare Uova",
+                "desc": "**Comandi**: `/elimina`\n\nCon questo comando, puoi **eliminare un Uovo**. Devi avere il permesso di modificarlo: perciò devi **essere il suo creatore** o **un Gestore del Server dov'è stato creato**.\n\n**Parametri**:\n- `id`: L'ID dell'**Uovo** che vuoi eliminare."
+            },
+            "eggify": {
+                "title": "Informazioni sull'Uov-izzare i Messaggi",
+                "desc": "Puoi **trasformare un messaggio in un Uovo** cliccandolo col tasto destro (o premendolo, da disp. mobile), andando sul menu *App*, e scegliendo ***Uov-izza***.\nDa lì, puoi **modificare il testo** (di base, sarà il *contenuto del messaggio originale*), e **segnarlo come Segreto** e/o **vietato ai minori**."
+            },
+            "collected": {
+                "title": "Informazioni sulle Collezioni di Uova",
+                "desc": "**Comandi**: `/collezione`\n\nCon questo comando, puoi **vedere la tua collezione di Uova**, che è composta da tutte le **Uova** che hai trovato casualmente. Alternativamente, puoi usare il parametro `controlla` per vedere se hai collezionato un **Uovo** specifico.\n\n**Parametri**:\n- `controlla`: [Facoltativo] L'ID di un **Uovo**, per vedere se l'hai collezionato.\n- `solo-segreti`: [Facoltativo] Filtra la tua collezione, e ti mostra solo le **Uova Segrete** che hai trovato.\n- `solo-vm18`: [Facoltativo] *(solo nei canali vietati ai minori)* Filtra la tua collezione, e ti mostra solo le **Uova vietate ai minori** che hai trovato."
+            },
+            "leaderboard": {
+                "title": "Informazioni sulle Classifiche",
+                "desc": "**Comandi**: `/classifica collezioni`, `/classifica creazioni`\n\nI comandi delle classifiche ti mostrano la **Top 15** di una categoria.\nLe categorie sono:\n- **Collezioni**: Gli utenti che hanno collezionato più **Uova**.\n- **Creazioni**: Gli utenti che hanno creato più **Uova**."
+            },
+            "config": {
+                "title": "Informazioni sul Configurare Server Eggs",
+                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Le **lingue specificate dagli utenti** dovrebbero essere **permesse** in questo server? Oppure va **imposta a tutti** la **lingua del server**?\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Ci si deve poter **unire** a questo server attraverso le **Uova create qui** o no?\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
             }
         },
         "log": {
@@ -210,7 +245,7 @@
     "create_nsfw": "vm18",
     "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
     "create_secret": "segreto",
-    "create_secret_description": "Se quest'Uovo deve apparire solo per caso.",
+    "create_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
 
     "lay": "deponi",
 
@@ -239,7 +274,7 @@
     "edit_nsfw": "vm18",
     "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
     "edit_secret": "segreto",
-    "edit_secret_description": "Se quest'Uovo deve apparire solo per caso.",
+    "edit_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",

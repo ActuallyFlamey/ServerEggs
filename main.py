@@ -110,7 +110,7 @@ async def on_guild_join(guild: discord.Guild):
     )
     e.add_field(
         name="What to do now",
-        value="- Set an **inviting description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:True`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`."
+        value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:True`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`."
     )
     utils.brand_embed(e)
 
@@ -156,8 +156,13 @@ async def app_command_error(ctx: discord.Interaction, error):
     app.Choice(name=app.locale_str("lay"), value="create"),
     app.Choice(name=app.locale_str("get"), value="get"),
     app.Choice(name=app.locale_str("egg"), value="get"),
+    app.Choice(name=app.locale_str("edit"), value="edit"),
     app.Choice(name=app.locale_str("report"), value="report"),
-    app.Choice(name=app.locale_str("delete"), value="delete")
+    app.Choice(name=app.locale_str("delete"), value="delete"),
+    app.Choice(name=app.locale_str("Eggify"), value="eggify"),
+    app.Choice(name=app.locale_str("collected"), value="collected"),
+    app.Choice(name=app.locale_str("leaderboard"), value="leaderboard"),
+    app.Choice(name=app.locale_str("config"), value="config")
 ])
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def help(ctx: discord.Interaction, about: str | None):
@@ -172,7 +177,7 @@ async def help(ctx: discord.Interaction, about: str | None):
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
         e.add_field(name=myloc["beta"], value=myloc["beta_desc"], inline=False)
     else:
-        myloc = myloc["not_available"]
+        myloc = myloc[about]
 
         e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
 

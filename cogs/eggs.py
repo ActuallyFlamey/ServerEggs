@@ -239,6 +239,8 @@ class Eggs(commands.Cog):
             if not await user.collected.filter(id=egg.id).exists():
                 await user.collected.add(egg)
                 collected = True
+        
+        collections = await egg.collectors.all().count()
 
         creator = self.bot.get_user(egg.creator.id)
 
@@ -251,7 +253,7 @@ class Eggs(commands.Cog):
         e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
         await ctx.followup.send(
-            myloc["collected"].format(egg.id) if collected else discord.utils.MISSING,
+            myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
             embed=e,
             file=file or discord.utils.MISSING,
             view=views.GetEgg(self.bot, lines, egg, creator)

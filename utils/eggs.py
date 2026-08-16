@@ -7,9 +7,5 @@ async def egg_delete(egg):
             os.remove(egg.attach_path)
         except OSError:
             print(f"log: failed to delete attachment for Egg {egg.id}")
-        
-    eggid = egg.id
 
     await egg.delete()
-
-    return eggid

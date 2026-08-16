@@ -55,6 +55,12 @@ class Eggify(discord.ui.Modal):
             style=discord.TextStyle.paragraph
         )
 
+        self.secret = discord.ui.Label(
+            text=self.myloc["secret"],
+            description=self.myloc["secret_desc"],
+            component=discord.ui.Checkbox()
+        )
+
         self.nsfw = discord.ui.Label(
             text=self.myloc["nsfw"],
             description=self.myloc["nsfw_desc"],
@@ -68,7 +74,7 @@ class Eggify(discord.ui.Modal):
         await ctx.response.edit_message(content=self.myloc["success"], view=None)
 
         cog = self.bot.get_cog("Eggs")
-        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, self.nsfw.component.value)
+        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, self.nsfw.component.value, self.secret.component.value)
 
 class GetEgg(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User):
