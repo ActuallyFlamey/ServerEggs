@@ -6,7 +6,6 @@ import re
 import traceback
 
 import discord
-import dotenv
 from cachetools import TTLCache
 from discord import app_commands as app
 from discord.ext import commands
@@ -17,9 +16,6 @@ import views
 from schema import Guild, User
 from tortoise_config import TORTOISE_ORM
 
-dotenv.load_dotenv()
-
-DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
 
 class ServerEggs(commands.Bot):
     def __init__(self, *, intents: discord.Intents):

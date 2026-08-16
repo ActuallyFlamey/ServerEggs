@@ -2,6 +2,7 @@ import os
 import random
 
 import discord
+import dotenv
 from discord import app_commands as app
 from discord.ext import commands
 
@@ -9,10 +10,23 @@ import utils
 import views
 from schema import Egg, Guild, User
 
+dotenv.load_dotenv()
 
 class Eggs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+    
+    async def manage_check(self, ctx: discord.Interaction, egg):
+        creatorchk = ctx.user.id == egg.creator.id
+
+        modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
+
+        devguild = self.bot.get_guild(int(os.getenv("DEVELOPER_GUILD_ID")))
+        modrole = devguild.get_role(int(os.getenv("MOD_ROLE_ID")))
+        devguilduser = await devguild.fetch_member(ctx.user.id)
+        globalmodchk = any(role.id == modrole.id for role in devguilduser.roles)
+
+        return creatorchk or modchk or globalmodchk
 
     async def create_or_edit(
         self,
@@ -59,10 +73,9 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
                 return
 
-            creatorchk = ctx.user.id == egg.creator.id
-            modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
+            manageable = await self.manage_check(ctx, egg)
 
-            if not (creatorchk or modchk):
+            if not manageable:
                 await ctx.followup.send(myloc["cannot"], ephemeral=True)
                 return
 
@@ -115,7 +128,7 @@ class Eggs(commands.Cog):
             await ctx.followup.send(myloc["duplicate"].format(existing.id))
             return
 
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id) if ctx.guild else (None, None)
 
         if not id:
             egg = await Egg.create(
@@ -143,7 +156,7 @@ class Eggs(commands.Cog):
             await egg.save()
 
         creator = self.bot.get_user(egg.creator.id)
-        await utils.log_egg(self.bot, lines, guild, egg, creator, ctx.user, bool(id))
+        if ctx.guild: await utils.log_egg(self.bot, lines, guild, egg, creator, ctx.user, bool(id))
 
         e = discord.Embed(
             title=myloc["title"]
@@ -334,10 +347,9 @@ class Eggs(commands.Cog):
             await ctx.followup.send(content=myloc["not_found"].format(id), ephemeral=True)
             return
 
-        creatorchk = ctx.user.id == egg.creator.id
-        modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
+        manageable = self.manage_check(ctx, egg)
 
-        if not (creatorchk or modchk):
+        if not manageable:
             await ctx.followup.send(content=myloc["cannot"], ephemeral=True)
             return
 
