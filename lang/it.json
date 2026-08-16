@@ -30,6 +30,8 @@
                 "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
+                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
                 "could_not_scan": "Non è stato possibile ottenere il contenuto multimediale per il controllo dei contenuti illegali.",

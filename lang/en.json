@@ -30,6 +30,8 @@
                 "no_nsfw": "Cannot create or edit a **NSFW Egg** in a **SFW channel**.",
                 "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "banned": "You are **banned** from creating and editing **Egg**s.\nAppealing is not possible *at this time*.",
+                "not_found": "**Egg #{0}** does not exist.",
+                "cannot": "You don't have permission to manage this **Egg**.",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
                 "invalid_url": "The specified `link` parameter does *not* resolve to any **supported media format**.\nRemember, for now it's **images only**!",
                 "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
