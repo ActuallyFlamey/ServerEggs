@@ -347,7 +347,7 @@ class Eggs(commands.Cog):
             await ctx.followup.send(content=myloc["not_found"].format(id), ephemeral=True)
             return
 
-        manageable = self.manage_check(ctx, egg)
+        manageable = await self.manage_check(ctx, egg)
 
         if not manageable:
             await ctx.followup.send(content=myloc["cannot"], ephemeral=True)
