@@ -160,8 +160,10 @@ def show_attachment(egg, embed: discord.Embed):
     return file, link, inline
 
 EMBEDDABLE_MEDIA_HOSTS = (
-    "youtube.com",
-    "youtu.be",
+    "youtube.com", "youtu.be",
+    "twitter.com", "x.com",
+    "fxtwitter.com", "fixupx.com",
+    "vxtwitter.com", "fixvx.com",
     "tiktok.com",
     "twitch.tv",
     "vimeo.com",
