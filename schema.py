@@ -56,6 +56,7 @@ class Report(Model):
 
     reason = fields.CharField(max_length=200, null=True)
     log_message_id = fields.BigIntField(null=True)
+    related_message_id = fields.BigIntField(null=True)
 
     created_at = fields.DatetimeField(auto_now_add=True)
 

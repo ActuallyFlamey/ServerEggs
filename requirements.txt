@@ -8,12 +8,14 @@ attrs==26.1.0
 audioop-lts==0.2.2
 cachetools==7.1.7
 discord.py==2.7.1
+ffmpeg==1.4
 frozenlist==1.8.0
 idna==3.18
 ImageHash==4.3.2
 iso8601==2.1.0
 multidict==6.7.1
 numpy==2.5.2
+pdqhash==0.2.8
 pillow==12.3.0
 propcache==0.5.2
 pypika-tortoise==0.6.5

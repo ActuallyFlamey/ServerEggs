@@ -32,9 +32,11 @@
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "not_found": "L'**Uovo n. {0}** non esiste.",
                 "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
-                "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
-                "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
+                "supported_only": "Puoi **solo** allegare **immagini**, **video**, o **audio**.",
+                "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato** (immagine, video, audio).",
                 "could_not_scan": "Non è stato possibile ottenere il contenuto multimediale per il controllo dei contenuti illegali.",
+                "processing": "Stiamo elaborando il tuo **Uovo**...\n-# Potrebbe volerci un po'! Stiamo solo controllando che tu non abbia allegato niente di illegale.",
+                "too_long": "Il tuo allegato è **troppo lungo**! Il limite è di **60 secondi**.",
                 "illegal": "**RILEVATI CONTENUTI ILLEGALI**. Ti è appena stato **tolto il permesso** di creare o modificare **Uova**.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "log": "**{0}** ({1}) ha {2} l'**Uovo #{3}**",
@@ -84,9 +86,11 @@
                     "title": "Elimina Uovo #{0}",
                     "question": "Sei sicuro di voler eliminare questo **Uovo**?",
                     "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]"
+                    "no_content": "[Nessun contenuto]",
+                    "link": "Link Allegato"
                 },
                 "confirm": "Conferma Eliminazione",
+                "show_extra_attachment": "Mostra Allegato Extra",
                 "cancel": "Annulla",
                 "success": "L'**Uovo n. {0}** è stato eliminato con successo.",
                 "cancelled": "Eliminazione annullata."
@@ -97,9 +101,11 @@
                     "title": "Segnala l'Uovo n. {0}",
                     "question": "Sei sicuro di voler segnalare questo **Uovo**?",
                     "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]"
+                    "no_content": "[Nessun contenuto]",
+                    "link": "Link Allegato"
                 },
                 "confirm": "Inizia Segnalazione",
+                "show_extra_attachment": "Mostra Allegato Extra",
                 "cancel": "Annulla",
                 "cancelled": "Segnalazione annullata.",
                 "title": "Segnala l'Uovo n. {0}",
@@ -126,6 +132,7 @@
                 "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
                 "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
                 "empty": "Non ci sono **Uova** collezionate con questi criteri!",
+                "show_extra_attachment": "Mostra Allegato Extra",
                 "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
             },
             "leaderboard": {

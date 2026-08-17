@@ -86,8 +86,10 @@ class Eggs(commands.Cog):
 
         attach_path = attach_hash = attach_link = scanfile = attach_bytes = None
         if file:
-            if not file.content_type or not file.content_type.startswith("image/"):
-                await ctx.followup.send(myloc["images_only"])
+            content_type = utils.get_content_type(file)
+
+            if not file.content_type or content_type not in {"image", "video", "audio"}:
+                await ctx.followup.send(myloc["supported_only"])
                 return
 
             scanfile = await file.to_file()
@@ -97,15 +99,23 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["invalid_url"])
                 return
 
-            scanfile = await utils.url_to_file(attach_link)
-            if not scanfile:
-                await ctx.followup.send(myloc["could_not_scan"])
-                return
+            if not utils.is_native_embed(attach_link):
+                scanfile = await utils.url_to_file(attach_link)
+                if not scanfile:
+                    await ctx.followup.send(myloc["could_not_scan"])
+                    return
+        
+        processing = await ctx.followup.send(myloc["processing"])
 
         if scanfile:
-            scan, attach_bytes = await utils.scan_csam(scanfile)
+            scan, too_long, attach_bytes = await utils.scan_csam(scanfile)
+
+            if too_long:
+                await processing.edit(content=myloc["too_long"])
+                return
+
             if scan:
-                await ctx.followup.send(myloc["illegal"])
+                await processing.edit(content=myloc["illegal"])
 
                 user.banned = True
                 await user.save()
@@ -125,7 +135,7 @@ class Eggs(commands.Cog):
             if attach_path and os.path.exists(attach_path):
                 os.remove(attach_path)
 
-            await ctx.followup.send(myloc["duplicate"].format(existing.id))
+            await processing.edit(content=myloc["duplicate"].format(existing.id))
             return
 
         guild, _ = await Guild.get_or_create(id=ctx.guild.id) if ctx.guild else (None, None)
@@ -171,9 +181,14 @@ class Eggs(commands.Cog):
         )
         utils.brand_embed(e, lines)
 
-        out_file = utils.show_attachment(egg, e)
+        resfile, reslink, inline = utils.show_attachment(egg, e)
 
-        await ctx.followup.send(embed=e, file=out_file or discord.utils.MISSING)
+        attachments = []
+        if inline and resfile:
+            attachments = [resfile]
+
+        eggmsg = await processing.edit(content=None, embed=e, attachments=attachments)
+        if not inline: await eggmsg.reply(reslink, file=resfile or discord.utils.MISSING)
 
     @app.command(name="create", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
@@ -272,14 +287,15 @@ class Eggs(commands.Cog):
             except discord.NotFound:
                 creator = None
 
-        e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
-        await ctx.followup.send(
+        eggmsg = await ctx.followup.send(
             myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
             embed=e,
-            file=file or discord.utils.MISSING,
+            file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
             view=views.GetEgg(self.bot, lines, egg, creator)
         )
+        if not inline: await eggmsg.reply(link, file=file or discord.utils.MISSING)
 
     @app.command(name="get", description="get_description")
     @app.rename(id="get_id")
@@ -336,9 +352,21 @@ class Eggs(commands.Cog):
         e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
         utils.brand_embed(e, lines)
 
-        file = utils.show_attachment(egg, e)
+        file, link, inline = utils.show_attachment(egg, e)
 
-        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.PreReportEgg(self.bot, lines, egg), ephemeral=True)
+        if link:
+            e.add_field(name=myloc["ready"]["link"], value=link)
+
+        await ctx.followup.send(
+            embed=e,
+            file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
+            view=views.PreReportEgg(
+                self.bot, lines, egg,
+                file if not inline else None,
+                link if not inline else None
+            ),
+            ephemeral=True
+        )
 
     @app.command(name="delete", description="delete_description")
     @app.rename(id="delete_id")
@@ -368,9 +396,21 @@ class Eggs(commands.Cog):
         e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
         utils.brand_embed(e, lines)
 
-        file = utils.show_attachment(egg, e)
+        file, link, inline = utils.show_attachment(egg, e)
 
-        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.DeleteEgg(self.bot, lines, egg), ephemeral=True)
+        if link:
+            e.add_field(name=myloc["ready"]["link"], value=link)
+
+        await ctx.followup.send(
+            embed=e,
+            file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
+            view=views.DeleteEgg(
+                self.bot, lines, egg,
+                file if not inline else None,
+                link if not inline else None
+            ),
+            ephemeral=True
+        )
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

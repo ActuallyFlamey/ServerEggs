@@ -66,6 +66,6 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
     )
     utils.brand_embed(e, lines)
 
-    file = utils.show_attachment(egg, e)
+    file, link, inline = utils.show_attachment(egg, e)
 
-    return e, file
+    return e, file, link, inline

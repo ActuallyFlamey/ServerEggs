@@ -67,12 +67,16 @@ class Eggstras(commands.Cog):
         collection = collections.deque(collection)
         collection.rotate(random.randint(0, len(collection)))
 
-        e, file = await utils.get_egg_embed(self.bot, lines, collection[0])
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, collection[0])
 
         await ctx.followup.send(
             embed=e,
-            file=file or discord.utils.MISSING,
-            view=views.EggLoop(self.bot, lines, myloc, ctx.user, collection) if not check else discord.utils.MISSING
+            file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
+            view=views.EggLoop(
+                self.bot, lines, myloc, ctx.user, collection,
+                file if not inline else None,
+                link if not inline else None
+            ) if not check else discord.utils.MISSING
         )
 
     leaderboard = app.Group(

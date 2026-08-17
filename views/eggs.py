@@ -26,11 +26,11 @@ class PreEggify(discord.ui.View):
 
         self.confirm.label = self.myloc["confirm"]
         self.cancel.label = self.myloc["cancel"]
-    
+
     @discord.ui.button(style=discord.ButtonStyle.primary)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.send_modal(Eggify(self.bot, self.lines, self.text, self.file, self.link))
-    
+
     @discord.ui.button(style=discord.ButtonStyle.secondary)
     async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
@@ -46,7 +46,7 @@ class Eggify(discord.ui.Modal):
         self.link = link
 
         super().__init__(title=self.myloc["title"])
-    
+
         self.eggtext = discord.ui.TextInput(
             label=self.myloc["text"],
             placeholder=self.myloc["text_placeholder"],
@@ -92,7 +92,7 @@ class GetEgg(discord.ui.View):
                     url=egg.origin.invite
                 )
             )
-        
+
         if creator is not None:
             self.add_item(
                 discord.ui.Button(
@@ -100,15 +100,15 @@ class GetEgg(discord.ui.View):
                     url=f"https://discord.com/users/{creator.id}"
                 )
             )
-        
+
         self.report.label = self.myloc["button"]["report"]
-    
+
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def report(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg, False))
 
 class EggLoop(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, myloc: dict, user: discord.User, eggs: collections.deque):
+    def __init__(self, bot: commands.Bot, lines: dict, myloc: dict, user: discord.User, eggs: collections.deque, init_extrafile: str | None, init_extralink: str | None):
         super().__init__(timeout=None)
 
         self.bot = bot
@@ -117,25 +117,60 @@ class EggLoop(discord.ui.View):
         self.user = user
         self.eggs = eggs
 
+        self.extrafile = init_extrafile
+        self.extralink = init_extralink
+        self.extramsg = None
+
         if len(self.eggs) <= 1:
             self.prev.disabled = True
             self.next.disabled = True
-    
+
+        if not self.extralink:
+            self.show_extra_attachment.disabled = True
+
+        self.show_extra_attachment.label = self.myloc["show_extra_attachment"]
+
     async def interaction_check(self, ctx: discord.Interaction):
         if ctx.user.id != self.user.id:
             await ctx.response.send_message(self.myloc["not_yours"], ephemeral=True)
             return False
-        
+
         return True
-    
+
     async def respond(self, ctx: discord.Interaction):
-        e, file = await utils.get_egg_embed(self.bot, self.lines, self.eggs[0])
-        await ctx.response.edit_message(embed=e, attachments=[file] if file else [])
-    
+        if self.extramsg:
+            await self.extramsg.delete()
+
+        e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.eggs[0])
+
+        attachments = []
+        if inline:
+            if file:
+                attachments = [file]
+
+            self.show_extra_attachment.disabled = True
+
+        if not inline:
+            self.extrafile = file
+            self.extralink = link
+            self.show_extra_attachment.disabled = False
+
+        await ctx.response.edit_message(embed=e, attachments=attachments, view=self)
+
     @discord.ui.button(label="◀️", style=discord.ButtonStyle.primary)
     async def prev(self, ctx: discord.Interaction, button: discord.ui.Button):
         self.eggs.rotate(1)
         await self.respond(ctx)
+
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
+
+        self.extramsg = await ctx.original_response()
 
     @discord.ui.button(label="▶️", style=discord.ButtonStyle.primary)
     async def next(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -143,27 +178,45 @@ class EggLoop(discord.ui.View):
         await self.respond(ctx)
 
 class DeleteEgg(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, egg):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, file: discord.File | None, link: str | None):
         super().__init__(timeout=60)
-        
+
         self.myloc = bot.get_lines("eggs/delete", lines)
         self.egg = egg
 
+        self.extrafile = file
+        self.extralink = link
+
         self.confirm.label = self.myloc["confirm"]
         self.cancel.label = self.myloc["cancel"]
-    
+
+        self.show_extra_attachment.label = self.myloc["show_extra_attachment"]
+
+        if not (file or link):
+            self.show_extra_attachment.disabled = True
+
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
-        eggid = await utils.egg_delete(self.egg)
+        eggid = self.egg.id
+
+        await utils.egg_delete(self.egg)
 
         await ctx.response.edit_message(content=self.myloc["success"].format(eggid), embed=None, attachments=[], view=None)
-    
+
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
+
     @discord.ui.button(style=discord.ButtonStyle.secondary)
     async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
 
 class PreReportEgg(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, egg):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, file: discord.File | None, link: str | None):
         super().__init__(timeout=60)
 
         self.bot = bot
@@ -171,13 +224,29 @@ class PreReportEgg(discord.ui.View):
         self.myloc = bot.get_lines("eggs/report", lines)
         self.egg = egg
 
+        self.extrafile = file
+        self.extralink = link
+
         self.confirm.label = self.myloc["confirm"]
         self.cancel.label = self.myloc["cancel"]
-    
+
+        self.show_extra_attachment.label = self.myloc["show_extra_attachment"]
+
+        if not (file or link):
+            self.show_extra_attachment.disabled = True
+
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
-    
+
+    @discord.ui.button(style=discord.ButtonStyle.secondary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
+
     @discord.ui.button(style=discord.ButtonStyle.secondary)
     async def cancel(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.edit_message(content=self.myloc["cancelled"], embed=None, attachments=[], view=None)
@@ -191,7 +260,7 @@ class ReportEgg(discord.ui.Modal):
         self.from_report_command = from_report_command
 
         super().__init__(title=self.myloc["title"].format(egg.id))
-    
+
         self.reason = discord.ui.Label(
             text=self.myloc["rule"],
             description=self.myloc["rule_desc"],
@@ -211,10 +280,10 @@ class ReportEgg(discord.ui.Modal):
             max_length=200,
             placeholder=self.myloc["other_placeholder"]
         )
-        
+
         self.add_item(self.reason)
         self.add_item(self.specify)
-    
+
     async def on_submit(self, ctx: discord.Interaction):
         await ctx.response.defer(ephemeral=True)
 
@@ -233,17 +302,22 @@ class ReportEgg(discord.ui.Modal):
 
             reportch = self.bot.get_channel(int(os.getenv("REPORT_CHANNEL")))
 
-            e, file = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, True)
+            e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, True)
 
             msg = await reportch.send(
                 content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",
                 embed=e,
-                file=file or discord.utils.MISSING,
+                file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
                 view=ReportActions(self.bot, report, reporter)
             )
 
+            related = None
+            if not inline:
+                related = await msg.reply(link, file=file or discord.utils.MISSING)
+
             report.log_message_id = msg.id
-            await report.save(update_fields=["log_message_id"])
+            report.related_message_id = related.id if related else None
+            await report.save(update_fields=["log_message_id", "related_message_id"])
 
             if not self.from_report_command:
                 await ctx.followup.send(content=self.myloc["success"].format(self.egg.id), ephemeral=True)
