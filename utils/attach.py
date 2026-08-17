@@ -132,7 +132,7 @@ async def resolve_media_url(url: str) -> str | None:
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(url, headers=headers, timeout=10) as response:
+            async with session.get(url, headers=headers, timeout=20) as response:
                 if response.status != 200:
                     print(f"[Debug] HTTP {response.status} for {url}")
                     return None

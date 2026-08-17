@@ -225,14 +225,23 @@ class Eggs(commands.Cog):
                 return
 
             if egg.nsfw and not is_channel_nsfw:
-                await ctx.followup.send(myloc["nsfw_id_in_sfw"])
+                await ctx.followup.send(myloc["nsfw_id_in_sfw"].format(id))
                 return
 
             if egg.secret:
-                await ctx.followup.send(myloc["secret"])
+                await ctx.followup.send(myloc["secret"].format(id))
+                return
+
+            if ctx.guild and await egg.filtered_in.filter(id=ctx.guild.id).exists():
+                await ctx.followup.send(myloc["filtered"].format(id, ctx.guild.name))
                 return
         else:
             eggs = Egg.all()
+
+            if ctx.guild:
+                filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
+                if filtered:
+                    eggs = eggs.filter(id__not_in=filtered)
 
             if only_nsfw:
                 eggs = eggs.filter(nsfw=True)

@@ -158,7 +158,8 @@ async def app_command_error(ctx: discord.Interaction, error):
     app.Choice(name=app.locale_str("Eggify"), value="eggify"),
     app.Choice(name=app.locale_str("collected"), value="collected"),
     app.Choice(name=app.locale_str("leaderboard"), value="leaderboard"),
-    app.Choice(name=app.locale_str("config"), value="config")
+    app.Choice(name=app.locale_str("config"), value="config"),
+    app.Choice(name=app.locale_str("filter"), value="filter")
 ])
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def help(ctx: discord.Interaction, about: str | None):

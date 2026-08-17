@@ -2,7 +2,7 @@
     "lines": {
         "config": {
             "lang": {
-                "no_permissions": "È necessario il permesso **Gestisci Server** per eseguire questo comando qui.\n\n-# Se intendevi impostare la **tua lingua di risposta personale**, esegui `/configura lingua` nei [miei DM](https://discord.com/users/886686500845138041).\n-# **Non tutti i server permettono** l'uso delle lingue personali, ma **nei DM funzionerà sempre**.",
+                "no_permissions": "È necessario il permesso **Gestisci Server** per eseguire questo comando qui.\n\n-# Se intendevi impostare la **tua lingua di risposta personale**, esegui `/configura lingua` nei [miei DM](<https://discord.com/users/886686500845138041>).\n-# **Non tutti i server permettono** l'uso delle lingue personali, ma **nei DM funzionerà sempre**.",
                 "no_default": "L'opzione \"Predefinita dal Server\" è per gli utenti, non per i server.",
                 "success": "Impostata la lingua \"**Italiano**\" con successo!"
             },
@@ -58,8 +58,9 @@
             },
             "get": {
                 "not_found": "**Uovo n. {0}** non trovato.",
-                "nsfw_id_in_sfw": "**Uovo** trovato, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
-                "secret": "Questo **Uovo** è segreto!\nPuoi trovarlo solo casualmente...",
+                "nsfw_id_in_sfw": "Ho trovato l'**Uovo n. {0}**, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
+                "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
+                "filtered": "L'**Uovo n. {0}** esiste, ma i moderatori di **{1}** hanno deciso di **bloccarlo** dall'apparire qui.\nRiprova **altrove**, tipo un **server diverso** o **i miei DM**.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
                 "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
                 "collections": "L'**Uovo n. {0}** è stato collezionato **{1} volte**.",
@@ -186,6 +187,10 @@
             "config": {
                 "title": "Informazioni sul Configurare Server Eggs",
                 "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Le **lingue specificate dagli utenti** dovrebbero essere **permesse** in questo server? Oppure va **imposta a tutti** la **lingua del server**?\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Ci si deve poter **unire** a questo server attraverso le **Uova create qui** o no?\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
+            },
+            "filter": {
+                "title": "Informazioni sul Filtrare Uova",
+                "desc": "**Comandi**: `/filtra`\n\nCon questo comando, i Gestori dei Server possono **commutare lo stato del filtro** per un **Uovo**. È utile qualora un **Uovo** non infranga le regole *globali*, e perciò è permesso dai **Moderatori di Uova**, ma i moderatori *locali* del server trovano che sia inappropriato per i loro membri.\nSe un **Uovo** era **già stato filtrato**, utilizzare questo comando su di esso un'altra volta gli **toglierà il filtro**.\n\n**Parametri**:\n- `id`: L'ID dell'**Uovo** per cui commutare lo stato del filtro."
             }
         },
         "log": {
@@ -194,6 +199,13 @@
             "report": "Segnala",
             "marked_nsfw": "Segnato l'**Uovo n. {0}** come NSFW.",
             "deleted": "Eliminato l'**Uovo n. {0}**."
+        },
+        "mod": {
+            "filter": {
+                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "unfiltered": "**Rimossi i filtri** dall'**Uovo n. {0}** con successo!\nOra può **tornare ad apparire** in questo server.",
+                "filtered": "**Filtrato** l'**Uovo n. {0}** con successo!\nOra **non potrà più apparire** in questo server."
+            }
         },
         "utility": {
             "ping": {
@@ -305,6 +317,11 @@
 
     "leaderboard_creations": "creazioni",
     "leaderboard_creations_description": "Vedi chi ha creato più Uova.",
+
+    "filter": "filtra",
+    "filter_description": "Vieta a un Uovo specifico di apparire in questo server.",
+    "filter_id": "id",
+    "filter_id_description": "L'ID dell'Uovo per cui commutare lo stato del filtro.",
 
     "ping": "ping",
     "ping_description": "Ottiene il ritardo di connessione di Server Eggs."

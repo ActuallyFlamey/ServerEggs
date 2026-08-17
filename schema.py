@@ -33,6 +33,8 @@ class Guild(Model):
 
     logch = fields.BigIntField(null=True)
 
+    filtered: fields.ManyToManyField["Egg"] = fields.ManyToManyField("eggs.Egg", related_name="filtered_in", through="guild_filtered_eggs")
+
     eggs = fields.ReverseRelation["Egg"]
 
 class User(Model):

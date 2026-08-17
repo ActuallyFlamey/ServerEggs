@@ -2,7 +2,7 @@
     "lines": {
         "config": {
             "lang": {
-                "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](https://discord.com/users/886686500845138041).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
+                "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](<https://discord.com/users/886686500845138041>).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
                 "no_default": "The \"Server Default\" option is for users, not for servers.",
                 "success": "Successfully switched language to \"**English**\"!"
             },
@@ -58,8 +58,9 @@
             },
             "get": {
                 "not_found": "**Egg #{0}** was not found.",
-                "nsfw_id_in_sfw": "**Egg** found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
-                "secret": "This **Egg** is secret!\nYou can only find it randomly...",
+                "nsfw_id_in_sfw": "**Egg #{0}** was found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
+                "secret": "**Egg #{0}** is secret!\nYou can only find it randomly...",
+                "filtered": "**Egg #{0}** exists, but **{1}**'s moderators have decided to **block it** from showing up here.\nTry again **somewhere else**, like a **different server** or **my DMs**.",
                 "no_egg": "Could not find any **Egg**s.",
                 "collected": "**Egg #{0}** has been **collected**!\nIt has now been collected **{1} times**.\n-# Check your collected **Egg**s with `/collected`!",
                 "collections": "**Egg #{0}** was collected **{1} times**.",
@@ -186,6 +187,10 @@
             "config": {
                 "title": "About Configuring Server Eggs",
                 "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Should **user-specified languages** be **allowed** in this server? Or should the **server language** be **enforced**?\n  - `allow` parameter: True or False.\n- `/config privacy`: Should this server be **joinable** through **Eggs created here** or not?\n  - `private` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
+            },
+            "filter": {
+                "title": "About Filtering Eggs",
+                "desc": "**Commands**: `/filter`\n\nUsing this command, Server Managers can **toggle filtering** for an **Egg**. This is helpful when an **Egg** does not break the *global* rules, and therefore is allowed by the **Egg Moderators**, but *local* server moderators feel it's inappropriate for their members.\nIf an **Egg** was **already filtered**, running this command on it again will **unfilter it**.\n\n**Parameters**:\n- `id`: The ID of the **Egg** you want to toggle filters for."
             }
         },
         "log": {
@@ -194,6 +199,13 @@
             "report": "Report",
             "marked_nsfw": "Marked **Egg #{0}** as NSFW.",
             "deleted": "Deleted **Egg #{0}**."
+        },
+        "mod": {
+            "filter": {
+                "not_found": "**Egg #{0}** does not exist.",
+                "unfiltered": "Successfully **unfiltered** **Egg #{0}**.\nIt can now **appear again** in this server.",
+                "filtered": "Successfully **filtered** **Egg #{0}**.\nIt will **no longer appear** in this server."
+            }
         },
         "utility": {
             "ping": {
@@ -305,6 +317,11 @@
 
     "leaderboard_creations": "creations",
     "leaderboard_creations_description": "See who has created the most Eggs.",
+
+    "filter": "filter",
+    "filter_description": "Prevent a specific Egg from appearing in this server.",
+    "filter_id": "id",
+    "filter_id_description": "The ID of the Egg to toggle filters on.",
 
     "ping": "ping",
     "ping_description": "Gets Server Eggs's latency."
