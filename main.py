@@ -108,6 +108,10 @@ async def on_guild_join(guild: discord.Guild):
         name="What to do now",
         value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:True`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`."
     )
+    e.add_field(
+        name="For Server Managers",
+        value="**Not always** is an **Egg worth reporting** to the global **Egg Moderators**.\nIf you feel like it's not appropriate for your members, you can simply **stop it** from **appearing here** by using `/filter`."
+    )
     utils.brand_embed(e)
 
     systemch = guild.system_channel

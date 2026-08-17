@@ -27,7 +27,7 @@ async def scan_csam(file: discord.File) -> (bool, bool, bytes):
 
         if duration is not None and duration > 60:
             print(f"ERROR: Rejected upload: media duration {round(duration, 1)}s exceeds limit of 60s")
-            return False, False, scanbytes
+            return False, True, scanbytes
 
     api_user = os.getenv("ARACHNID_USER")
     api_password = os.getenv("ARACHNID_PASSWORD")
@@ -50,7 +50,7 @@ async def scan_csam(file: discord.File) -> (bool, bool, bytes):
         payload = {"hashes": hashes}
 
         try:
-            async with aiohttp.ClientSession() as session, session.post(endpoint, auth=auth, json=payload, timeout=20) as response:
+            async with aiohttp.ClientSession() as session, session.post(endpoint, auth=auth, json=payload, timeout=900) as response:
                     if response.status == 200:
                         data = await response.json()
 

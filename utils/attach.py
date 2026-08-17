@@ -123,8 +123,11 @@ async def url_to_file(url: str) -> discord.File | None:
         async with aiohttp.ClientSession() as session, session.get(url, timeout=10) as res:
             if res.status == 200:
                 filebytes = await res.read()
-                with io.BytesIO(filebytes) as stream:
-                    file = discord.File(stream)
+
+                parsed_path = urlparse(url).path
+                filename = os.path.basename(parsed_path) or "media.mp4"
+
+                return discord.File(io.BytesIO(filebytes), filename=filename)
     except (aiohttp.ClientError, asyncio.TimeoutError):
         pass
 
