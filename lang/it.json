@@ -42,7 +42,8 @@
                 "log": "**{0}** ({1}) ha {2} l'**Uovo #{3}**",
                 "title": "Uovo n. {0} {1}!",
                 "created": "creato",
-                "edited": "modificato"
+                "edited": "modificato",
+                "show_extra_attachment": "Mostra Allegato Extra"
             },
             "eggify": {
                 "ready": "Creare un **Uovo** a partire da questo messaggio?",
@@ -76,6 +77,7 @@
                 "button": {
                     "origin": "Unisciti al Server d'Origine",
                     "creator": "Visualizza il Profilo del Creatore",
+                    "show_extra_attachment": "Mostra Allegato Extra",
                     "report": "Segnala"
                 }
             },

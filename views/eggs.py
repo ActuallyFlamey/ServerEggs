@@ -13,6 +13,25 @@ from .mod import ReportActions
 
 dotenv.load_dotenv()
 
+class CreateEgg(discord.ui.View):
+    def __init__(self, bot: commands.Bot, myloc: dict, file: discord.Attachment | None, link: str | None):
+        super().__init__(timeout=None)
+
+        self.bot = bot
+        self.myloc = myloc
+        self.extrafile = file
+        self.extralink = link
+
+        self.show_extra_attachment.label = self.myloc["show_extra_attachment"]
+
+    @discord.ui.button(style=discord.ButtonStyle.primary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
+
 class PreEggify(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, text: str | None, file: discord.Attachment | None, link: str | None):
         super().__init__(timeout=None)
@@ -77,7 +96,7 @@ class Eggify(discord.ui.Modal):
         await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, self.nsfw.component.value, self.secret.component.value)
 
 class GetEgg(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User, file: discord.Attachment | None, link: str | None):
         super().__init__(timeout=None)
 
         self.bot = bot
@@ -85,11 +104,15 @@ class GetEgg(discord.ui.View):
         self.myloc = bot.get_lines("eggs/get", lines)
         self.egg = egg
 
+        self.extrafile = file
+        self.extralink = link
+
         if egg.origin.invite is not None:
             self.add_item(
                 discord.ui.Button(
                     label=self.myloc["button"]["origin"],
-                    url=egg.origin.invite
+                    url=egg.origin.invite,
+                    row=1
                 )
             )
 
@@ -97,11 +120,24 @@ class GetEgg(discord.ui.View):
             self.add_item(
                 discord.ui.Button(
                     label=self.myloc["button"]["creator"],
-                    url=f"https://discord.com/users/{creator.id}"
+                    url=f"https://discord.com/users/{creator.id}",
+                    row=1
                 )
             )
 
+        self.show_extra_attachment.label = self.myloc["button"]["show_extra_attachment"]
         self.report.label = self.myloc["button"]["report"]
+
+        if not (file or link):
+            self.remove_item(self.show_extra_attachment)
+
+    @discord.ui.button(style=discord.ButtonStyle.primary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
 
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def report(self, ctx: discord.Interaction, button: discord.ui.Button):

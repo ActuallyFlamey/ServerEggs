@@ -187,8 +187,17 @@ class Eggs(commands.Cog):
         if inline and resfile:
             attachments = [resfile]
 
-        eggmsg = await processing.edit(content=None, embed=e, attachments=attachments)
-        if not inline: await eggmsg.reply(reslink, file=resfile or discord.utils.MISSING)
+        await processing.edit(
+            content=None,
+            embed=e,
+            attachments=attachments,
+            view=views.CreateEgg(
+                self.bot,
+                myloc,
+                resfile if not inline else None,
+                reslink if not inline else None
+            )
+        )
 
     @app.command(name="create", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
@@ -289,13 +298,16 @@ class Eggs(commands.Cog):
 
         e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator)
 
-        eggmsg = await ctx.followup.send(
+        await ctx.followup.send(
             myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
             embed=e,
             file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
-            view=views.GetEgg(self.bot, lines, egg, creator)
+            view=views.GetEgg(
+                self.bot, lines, egg, creator,
+                file if not inline else None,
+                link if not inline else None
+            )
         )
-        if not inline: await eggmsg.reply(link, file=file or discord.utils.MISSING)
 
     @app.command(name="get", description="get_description")
     @app.rename(id="get_id")

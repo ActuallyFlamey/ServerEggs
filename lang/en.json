@@ -42,7 +42,8 @@
                 "log": "**{0}** ({1}) {2} **Egg #{3}**",
                 "title": "Egg #{0} {1}!",
                 "created": "created",
-                "edited": "edited"
+                "edited": "edited",
+                "show_extra_attachment": "Show Extra Attachment"
             },
             "eggify": {
                 "ready": "Create an **Egg** from this message?",
@@ -76,6 +77,7 @@
                 "button": {
                     "origin": "Join Origin Server",
                     "creator": "View Creator Profile",
+                    "show_extra_attachment": "Show Extra Attachment",
                     "report": "Report"
                 }
             },
