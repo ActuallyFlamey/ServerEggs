@@ -338,7 +338,7 @@ class ReportEgg(discord.ui.Modal):
 
             reportch = self.bot.get_channel(int(os.getenv("REPORT_CHANNEL")))
 
-            e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, True)
+            e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, None, False, True)
 
             msg = await reportch.send(
                 content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",

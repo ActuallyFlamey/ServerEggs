@@ -65,6 +65,7 @@
                 "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
                 "filtered": "L'**Uovo n. {0}** esiste, ma i moderatori di **{1}** hanno deciso di **bloccarlo** dall'apparire qui.\nRiprova **altrove**, tipo un **server diverso** o **i miei DM**.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
+                "collection_status": "Stato Collezionamento",
                 "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
                 "collections": "L'**Uovo n. {0}** è stato collezionato **{1} volte**.",
                 "eggn": "Uovo n. {0}",

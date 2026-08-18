@@ -296,10 +296,10 @@ class Eggs(commands.Cog):
             except discord.NotFound:
                 creator = None
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator)
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator, collections, collected)
 
         await ctx.followup.send(
-            myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
+            # myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
             embed=e,
             file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
             view=views.GetEgg(
