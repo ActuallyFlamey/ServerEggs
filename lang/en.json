@@ -37,6 +37,7 @@
                 "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
                 "processing": "Processing your **Egg**...\n-# This may take a while! We're just checking you didn't attach anything illegal.",
                 "too_long": "Your attachment is **too long**! The limit is **60 seconds**.",
+                "convert_failed": "Failed to convert your **attachment** to a supported format. It may be corrupted or use an unsupported codec.",
                 "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
                 "log": "**{0}** ({1}) {2} **Egg #{3}**",

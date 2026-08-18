@@ -106,6 +106,10 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
             file_path = f"{media_dir}/{attach.id}.{ext}"
 
             converted_bytes = await transcode(attach_bytes, ext)
+            if converted_bytes is None:
+                print("ERROR: Failed to convert attachment, aborting")
+                return None, None
+
             file_hash = hashlib.sha256(converted_bytes).hexdigest()
 
             def save():
@@ -259,6 +263,9 @@ async def resolve_media_url(url: str) -> str | None:
 
                     elif prop in ("og:image", "og:image:url", "og:image:secure_url", "twitter:image", "twitter:image:src") and not candidates["image"]:
                             candidates["image"] = media_link
+
+                if candidates["image"] and re.search(r"\.gif(?:[?#].*)?$", candidates["image"], re.IGNORECASE):
+                    return candidates["image"]
 
                 return candidates["video"] or candidates["audio"] or candidates["image"]
 

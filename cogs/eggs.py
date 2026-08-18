@@ -111,6 +111,9 @@ class Eggs(commands.Cog):
 
         if file:
             attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
+            if not attach_path:
+                await processing.edit(content=myloc["convert_failed"])
+                return
 
         check_text = trimtext if text is not None else (egg.text if id else None)
         check_hash = attach_hash if file else (None if link else (egg.attach_hash if id else None))
