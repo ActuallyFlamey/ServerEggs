@@ -6,6 +6,7 @@ import re
 import traceback
 
 import discord
+import dotenv
 from cachetools import TTLCache
 from discord import app_commands as app
 from discord.ext import commands
@@ -16,6 +17,9 @@ import views
 from schema import Guild, User
 from tortoise_config import TORTOISE_ORM
 
+dotenv.load_dotenv()
+
+DEVELOPER_GUILD = discord.Object(id=int(os.getenv("DEVELOPER_GUILD_ID")))
 
 def _resolve_lang_ref(value, root, seen):
     if not isinstance(value, str) or not value.startswith("$"):
@@ -71,6 +75,7 @@ class ServerEggs(commands.Bot):
                 await self.load_extension(f"cogs.{file[:-3]}")
 
         await self.tree.sync()
+        await self.tree.sync(guild=DEVELOPER_GUILD)
 
     async def get_lang(self, ctx: discord.Interaction) -> str:
         if not ctx.guild:

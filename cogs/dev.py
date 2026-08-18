@@ -33,7 +33,7 @@ class Dev(commands.GroupCog):
         await ctx.followup.send(content="\n".join(entries))
     
     @app.command(name="unban", description="Unban a User from creating Eggs.")
-    @app.describe(user="The User")
+    @app.describe(user="The User to unban.")
     @app.check(is_dev)
     async def unban(self, ctx: discord.Interaction, user: discord.User):
         await ctx.response.defer()
@@ -72,9 +72,25 @@ class Dev(commands.GroupCog):
     @app.command(name="reload", description="Reload a Cog.")
     @app.check(is_dev)
     async def reload_cog(self, ctx: discord.Interaction, cog: str):
+        await ctx.response.defer()
+
         await self.bot.reload_extension(f"cogs.{cog}")
 
-        await ctx.response.send_message(f"Reloaded `{cog}` module successfully.")
+        await ctx.followup.send(f"Reloaded `{cog}` module successfully.")
+    
+    @app.command(name="sync", description="Sync the Command Tree.")
+    @app.describe(devguildonly="Only sync for the DEVELOPER_GUILD.")
+    @app.check(is_dev)
+    async def sync(self, ctx: discord.Interaction, devguildonly: bool = False):
+        await ctx.response.defer()
+
+        if devguildonly:
+            synced = await self.bot.tree.sync(guild=DEVELOPER_GUILD)
+            await ctx.followup.send(f"Synced {len(synced)} guild command(s).")
+        else:
+            synced_global = await self.bot.tree.sync()
+            synced_guild = await self.bot.tree.sync(guild=DEVELOPER_GUILD)
+            await ctx.followup.send(f"Synced {len(synced_global)} global and {len(synced_guild)} guild command(s).")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Dev(bot), guild=DEVELOPER_GUILD)
