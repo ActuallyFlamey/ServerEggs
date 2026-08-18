@@ -156,15 +156,28 @@ def show_attachment(egg, embed: discord.Embed):
 
     return file, link, inline
 
+def file_path(file: discord.File | None) -> str | None:
+    """Path on disk backing a File, or None if it was created from a buffer."""
+    if file is None:
+        return None
+
+    name = getattr(file.fp, "name", None)
+    return name if isinstance(name, str) else None
+
 def attachment_kwargs(file, link, inline):
     send_file = (file or discord.utils.MISSING) if inline else discord.utils.MISSING
-    view_file = file if not inline else None
+    view_file = file_path(file) if not inline else None
     view_link = link if not inline else None
 
     return send_file, view_file, view_link
 
 async def send_extra(ctx: discord.Interaction, file, link):
-    await ctx.response.send_message(link, file=file or discord.utils.MISSING, ephemeral=True)
+    if isinstance(file, discord.File):
+        file = file_path(file)
+
+    extra = discord.File(file) if file else None
+
+    await ctx.response.send_message(link, file=extra or discord.utils.MISSING, ephemeral=True)
 
 EMBEDDABLE_MEDIA_HOSTS = (
     "youtube.com", "youtu.be",

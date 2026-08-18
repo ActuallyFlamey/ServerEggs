@@ -29,10 +29,6 @@ class ReportActions(AttachmentView):
                     attachments=[],
                     view=None
                 )
-
-                if report.related_message_id:
-                    reply = ctx.channel.get_partial_message(report.related_message_id)
-                    await reply.delete()
             except discord.HTTPException:
                 pass 
 

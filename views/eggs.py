@@ -155,7 +155,7 @@ class EggLoop(AttachmentView):
 
             self.show_extra_attachment.disabled = True
         else:
-            self.extrafile = file
+            self.extrafile = utils.file_path(file)
             self.extralink = link
             self.show_extra_attachment.disabled = False
 
