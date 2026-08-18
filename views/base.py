@@ -27,6 +27,20 @@ class AttachmentView(discord.ui.View):
             elif disable_if_missing:
                 button.disabled = True
 
+    def reorder(self, order: list[str]):
+        present = {id(item) for item in self.children}
+
+        ordered = []
+        for name in order:
+            item = getattr(self, name)
+            if id(item) in present:
+                ordered.append(item)
+
+        for item in self.children:
+            self.remove_item(item)
+        for item in ordered:
+            self.add_item(item)
+
     @discord.ui.button(style=discord.ButtonStyle.primary)
     async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
         await utils.send_extra(ctx, self.extrafile, self.extralink)

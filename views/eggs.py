@@ -133,6 +133,7 @@ class EggLoop(AttachmentView):
             self.next.disabled = True
 
         self.setup_extra(self.myloc["show_extra_attachment"], style=discord.ButtonStyle.secondary, disable_if_missing=True)
+        self.reorder(["prev", "show_extra_attachment", "next"])
 
     async def interaction_check(self, ctx: discord.Interaction):
         if ctx.user.id != self.user.id:
@@ -180,6 +181,7 @@ class DeleteEgg(AttachmentView):
         self.confirm.label = self.myloc["confirm"]
         self.cancel.label = self.myloc["cancel"]
         self.setup_extra(self.myloc["show_extra_attachment"], style=discord.ButtonStyle.secondary, disable_if_missing=True)
+        self.reorder(["confirm", "show_extra_attachment", "cancel"])
 
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
@@ -205,6 +207,7 @@ class PreReportEgg(AttachmentView):
         self.confirm.label = self.myloc["confirm"]
         self.cancel.label = self.myloc["cancel"]
         self.setup_extra(self.myloc["show_extra_attachment"], style=discord.ButtonStyle.secondary, disable_if_missing=True)
+        self.reorder(["confirm", "show_extra_attachment", "cancel"])
 
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):

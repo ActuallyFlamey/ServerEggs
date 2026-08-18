@@ -15,9 +15,9 @@ async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.U
     if not logch: return
 
     e, file, link, inline = await get_egg_embed(bot, lines, egg, creator)
-    sfile, _, _ = utils.attachment_kwargs(file, link, inline)
+    sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
 
-    log = await logch.send(
+    await logch.send(
         myloc["log"].format(
             actor.display_name,
             actor.name,
@@ -26,6 +26,5 @@ async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.U
         ),
         embed=e,
         file=sfile,
-        view=views.ModLogActions(bot, lines, egg)
+        view=views.ModLogActions(bot, lines, egg, vfile, vlink)
     )
-    if not inline: await log.reply(link, file=file or discord.utils.MISSING)
