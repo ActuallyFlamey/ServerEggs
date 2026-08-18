@@ -8,6 +8,7 @@ import utils
 import views
 from schema import Egg, Guild, User
 
+
 class Eggs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -163,7 +164,7 @@ class Eggs(commands.Cog):
         utils.brand_embed(e, lines)
 
         resfile, reslink, inline = utils.show_attachment(egg, e)
-        sfile, vfile, vlink = utils.attachment_kwargs(resfile, reslink, inline)
+        _, vfile, vlink = utils.attachment_kwargs(resfile, reslink, inline)
 
         attachments = [resfile] if inline and resfile else []
 
