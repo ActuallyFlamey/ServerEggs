@@ -344,16 +344,15 @@ class ReportEgg(discord.ui.Modal):
                 content=f"New report from **{ctx.user.name}** ({reporter.id}).\n**Reason**: {report.reason}",
                 embed=e,
                 file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
-                view=ReportActions(self.bot, report, reporter)
+                view=ReportActions(
+                    self.bot, report, reporter,
+                    file if not inline else None,
+                    link if not inline else None
+                )
             )
 
-            related = None
-            if not inline:
-                related = await msg.reply(link, file=file or discord.utils.MISSING)
-
             report.log_message_id = msg.id
-            report.related_message_id = related.id if related else None
-            await report.save(update_fields=["log_message_id", "related_message_id"])
+            await report.save(update_fields=["log_message_id"])
 
             if not self.from_report_command:
                 await ctx.followup.send(content=self.myloc["success"].format(self.egg.id), ephemeral=True)

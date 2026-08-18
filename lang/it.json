@@ -203,6 +203,7 @@
             }
         },
         "log": {
+            "show_extra_attachment": "Mostra Allegato Extra",
             "mark_nsfw": "Segna come VM18",
             "delete": "Elimina",
             "report": "Segnala",

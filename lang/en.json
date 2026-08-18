@@ -203,6 +203,7 @@
             }
         },
         "log": {
+            "show_extra_attachment": "Show Extra Attachment",
             "mark_nsfw": "Mark NSFW",
             "delete": "Delete",
             "report": "Report",

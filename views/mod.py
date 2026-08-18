@@ -12,12 +12,18 @@ dotenv.load_dotenv()
 DEVELOPER_GUILD = discord.Object(id=os.getenv("DEVELOPER_GUILD_ID"))
 
 class ReportActions(discord.ui.View):
-    def __init__(self, bot: commands.Bot, report, reporter):
+    def __init__(self, bot: commands.Bot, report, reporter, file: discord.Attachment | None, link: str | None):
         super().__init__(timeout=None)
 
         self.bot = bot
         self.report = report
         self.reporter = reporter
+
+        self.extrafile = file
+        self.extralink = link
+
+        if not (file or link):
+            self.remove_item(self.show_extra_attachment)
 
     async def delete_reports(self, ctx: discord.Interaction, action: str, egg: Egg | int):
         all_reports = await egg.reports.all() if type(egg) == Egg else await Report.filter(egg__id=egg).all()
@@ -56,7 +62,15 @@ class ReportActions(discord.ui.View):
         
         return True
     
-    @discord.ui.button(label="Ignore", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Show Extra Attachment", style=discord.ButtonStyle.primary)
+    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_message(
+            self.extralink,
+            file=self.extrafile or discord.utils.MISSING,
+            ephemeral=True
+        )
+    
+    @discord.ui.button(label="Ignore", style=discord.ButtonStyle.secondary, row=1)
     async def ignore(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
@@ -66,7 +80,7 @@ class ReportActions(discord.ui.View):
 
         await self.delete_reports(ctx, action, egg.id)
     
-    @discord.ui.button(label="Mark NSFW", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Mark NSFW", style=discord.ButtonStyle.primary, row=1)
     async def mark_nsfw(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
@@ -80,7 +94,7 @@ class ReportActions(discord.ui.View):
         
         await self.delete_reports(ctx, action, egg.id)
     
-    @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger, row=1)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
@@ -91,7 +105,7 @@ class ReportActions(discord.ui.View):
         await self.delete_reports(ctx, action, egg.id)
         await utils.egg_delete(egg)
     
-    @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger, row=1)
     async def delete_ban(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
 
