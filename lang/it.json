@@ -7,18 +7,18 @@
                 "success": "Impostata la lingua \"**Italiano**\" con successo!"
             },
             "allow-user-lang": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
                 "success": "Modificato il permesso di utilizzare le lingue personali con successo (`{0}`)!"
             },
             "server-description": {
                 "success": "Impostata la descrizione del server:"
             },
             "privacy": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
                 "success": "Privacy del server impostata su `{0}` con successo."
             },
             "log": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
                 "missing_perms": "Non ho il permesso di scrivere i registri lì!",
                 "success": "Canale di registro Uova impostato su {0} con successo."
             }
@@ -30,8 +30,8 @@
                 "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
-                "not_found": "L'**Uovo n. {0}** non esiste.",
-                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "supported_only": "Puoi **solo** allegare **immagini**, **video**, o **audio**.",
                 "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato** (immagine, video, audio).",
                 "could_not_scan": "Non è stato possibile ottenere il contenuto multimediale per il controllo dei contenuti illegali.",
@@ -43,7 +43,7 @@
                 "title": "Uovo n. {0} {1}!",
                 "created": "creato",
                 "edited": "modificato",
-                "show_extra_attachment": "Mostra Allegato Extra"
+                "show_extra_attachment": "$common.show_extra_attachment"
             },
             "eggify": {
                 "ready": "Creare un **Uovo** a partire da questo messaggio?",
@@ -78,40 +78,40 @@
                 "button": {
                     "origin": "Unisciti al Server d'Origine",
                     "creator": "Visualizza il Profilo del Creatore",
-                    "show_extra_attachment": "Mostra Allegato Extra",
-                    "report": "Segnala"
+                    "show_extra_attachment": "$common.show_extra_attachment",
+                    "report": "$common.report"
                 }
             },
             "delete": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
-                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "ready": {
                     "title": "Elimina Uovo #{0}",
                     "question": "Sei sicuro di voler eliminare questo **Uovo**?",
-                    "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]",
-                    "link": "Link Allegato"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content",
+                    "link": "$common.ready.link"
                 },
                 "confirm": "Conferma Eliminazione",
-                "show_extra_attachment": "Mostra Allegato Extra",
-                "cancel": "Annulla",
+                "show_extra_attachment": "$common.show_extra_attachment",
+                "cancel": "$common.cancel",
                 "success": "L'**Uovo n. {0}** è stato eliminato con successo.",
                 "cancelled": "Eliminazione annullata."
             },
             "report": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "not_found": "$common.not_found",
                 "ready": {
                     "title": "Segnala l'Uovo n. {0}",
                     "question": "Sei sicuro di voler segnalare questo **Uovo**?",
-                    "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]",
-                    "link": "Link Allegato"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content",
+                    "link": "$common.ready.link"
                 },
                 "confirm": "Inizia Segnalazione",
-                "show_extra_attachment": "Mostra Allegato Extra",
-                "cancel": "Annulla",
+                "show_extra_attachment": "$common.show_extra_attachment",
+                "cancel": "$common.cancel",
                 "cancelled": "Segnalazione annullata.",
-                "title": "Segnala l'Uovo n. {0}",
+                "title": "$eggs.report.ready.title",
                 "rule": "Motivo della Segnalazione",
                 "rule_desc": "Quale regola infrange quest'Uovo?",
                 "rule_placeholder": "Seleziona il motivo della segnalazione...",
@@ -135,7 +135,7 @@
                 "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
                 "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
                 "empty": "Non ci sono **Uova** collezionate con questi criteri!",
-                "show_extra_attachment": "Mostra Allegato Extra",
+                "show_extra_attachment": "$common.show_extra_attachment",
                 "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
             },
             "leaderboard": {
@@ -204,16 +204,16 @@
             }
         },
         "log": {
-            "show_extra_attachment": "Mostra Allegato Extra",
+            "show_extra_attachment": "$common.show_extra_attachment",
             "mark_nsfw": "Segna come VM18",
             "delete": "Elimina",
-            "report": "Segnala",
+            "report": "$common.report",
             "marked_nsfw": "Segnato l'**Uovo n. {0}** come NSFW.",
             "deleted": "Eliminato l'**Uovo n. {0}**."
         },
         "mod": {
             "filter": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "not_found": "$common.not_found",
                 "unfiltered": "**Rimossi i filtri** dall'**Uovo n. {0}** con successo!\nOra può **tornare ad apparire** in questo server.",
                 "filtered": "**Filtrato** l'**Uovo n. {0}** con successo!\nOra **non potrà più apparire** in questo server."
             }
@@ -222,9 +222,21 @@
             "ping": {
                 "latency": "Ritardo"
             }
+        },
+        "common": {
+            "show_extra_attachment": "Mostra Allegato Extra",
+            "cancel": "Annulla",
+            "not_found": "L'**Uovo n. {0}** non esiste.",
+            "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+            "already": "L'impostazione è già giusta!",
+            "report": "Segnala",
+            "ready": {
+                "content": "Contenuto",
+                "no_content": "[Nessun contenuto]",
+                "link": "Link Allegato"
+            }
         }
     },
-
     "help": "aiuto",
     "help_description": "Ottieni informazioni riguardanti Server Eggs o un comando.",
     "help_about": "riguardo-a",

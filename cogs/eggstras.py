@@ -1,11 +1,9 @@
 import collections
 import random
-import typing
 
 import discord
 from discord import app_commands as app
 from discord.ext import commands
-from tortoise.functions import Count
 
 import utils
 import views
@@ -23,10 +21,9 @@ class Eggstras(commands.Cog):
     async def collected(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
         await ctx.response.defer()
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggstras/collected", lines)
+        lines, myloc = await self.bot.get_section(ctx, "eggstras/collected")
 
-        nsfw_allowed = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
+        nsfw_allowed = utils.channel_is_nsfw(ctx.channel)
 
         user, _ = await User.get_or_create(id=ctx.user.id)
 
@@ -63,19 +60,19 @@ class Eggstras(commands.Cog):
             if not collection:
                 await ctx.followup.send(myloc["empty"])
                 return
-        
+
         collection = collections.deque(collection)
         collection.rotate(random.randint(0, len(collection)))
 
         e, file, link, inline = await utils.get_egg_embed(self.bot, lines, collection[0])
+        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
 
         await ctx.followup.send(
             embed=e,
-            file=(file or discord.utils.MISSING) if inline else discord.utils.MISSING,
+            file=sfile,
             view=views.EggLoop(
                 self.bot, lines, myloc, ctx.user, collection,
-                file if not inline else None,
-                link if not inline else None
+                vfile, vlink
             ) if not check else discord.utils.MISSING
         )
 
@@ -85,67 +82,37 @@ class Eggstras(commands.Cog):
         allowed_contexts=app.AppCommandContext(guild=True, dm_channel=True, private_channel=True)
     )
 
-    async def make_leaderboard(self, ctx: discord.Interaction, lbtype: typing.Literal["collections", "creations"]):
+    async def _user_name(self, bot, user_id: int) -> str:
+        user = await utils.get_or_fetch_user(bot, user_id)
+
+        if user is None:
+            return f"User `{user_id}`"
+
+        return f"**{user.display_name}** ({user.name})"
+
+    async def _send_leaderboard(self, ctx: discord.Interaction, leaderboard: utils.Leaderboard, title_key: str, name_resolver, self_id: int):
         await ctx.response.defer()
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggstras/leaderboard", lines)
+        lines, myloc = await self.bot.get_section(ctx, "eggstras/leaderboard")
 
-        match lbtype:
-            case "collections":
-                field = "collected"
-            case "creations":
-                field = "eggs"
+        entries = await utils.render_entries(self.bot, leaderboard, self_id, name_resolver, myloc["you"])
 
-        collectors = await User.annotate(egg_count=Count(field)).order_by("-egg_count").limit(15).values("id", "egg_count")
-
-        author = await User.annotate(egg_count=Count(field)).filter(id=ctx.user.id).values("egg_count")
-        author_count = author[0]["egg_count"] if author else 0
-
-        higher_count = await User.annotate(egg_count=Count(field)).filter(egg_count__gt=author_count).count()
-        author_rank = higher_count + 1
-
-        entries = []
-        medals = {1: "🥇", 2: "🥈", 3: "🥉"}
-
-        for idx, row in enumerate(collectors, start=1):
-            uid = row["id"]
-            count = row["egg_count"]
-
-            user = self.bot.get_user(uid)
-            if user is None:
-                try:
-                    user = await self.bot.fetch_user(uid)
-                except (discord.NotFound, discord.HTTPException):
-                    user = None
-
-            name = f"**{user.display_name}** ({user.name})" if user else f"User `{uid}`"
-            prefix = medals.get(idx, f"`{idx}`")
-
-            mod = "*" if uid == ctx.user.id else ""
-            who = myloc["you"] if uid == ctx.user.id else ""
-
-            entries.append(f"{mod}{prefix} — {name}{who} — {f"{count:_}".replace("_", " ")}{mod}")
-        
-        if not any(row["id"] == ctx.user.id for row in collectors):
-            entries.append(f"*`{author_rank}` — **{ctx.user.display_name}** ({ctx.user.name}) — {f"{author_count:_}".replace("_", " ")}*")
-        
         e = discord.Embed(
-            title=myloc[lbtype],
+            title=myloc[title_key],
             color=discord.Color.blurple(),
             description="\n".join(entries)
         )
         utils.brand_embed(e, lines)
 
         await ctx.followup.send(embed=e)
-    
+
     @leaderboard.command(name="leaderboard_collections", description="leaderboard_collections_description")
     async def lb_collections(self, ctx: discord.Interaction):
-        await self.make_leaderboard(ctx, "collections")
-    
+        await self._send_leaderboard(ctx, utils.Leaderboard(User, "collected"), "collections", self._user_name, ctx.user.id)
+
     @leaderboard.command(name="leaderboard_creations", description="leaderboard_creations_description")
     async def lb_creations(self, ctx: discord.Interaction):
-        await self.make_leaderboard(ctx, "creations")
+        await self._send_leaderboard(ctx, utils.Leaderboard(User, "eggs"), "creations", self._user_name, ctx.user.id)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggstras(bot))

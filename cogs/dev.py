@@ -25,14 +25,12 @@ class Dev(commands.GroupCog):
     async def list_guilds(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
-        guilds = [guild for guild in self.bot.guilds]
-
-        guildstr = ""
-        for guild in guilds:
+        entries = []
+        for guild in self.bot.guilds:
             owner = await self.bot.fetch_user(guild.owner_id)
-            guildstr += f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})\n"
+            entries.append(f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})")
 
-        await ctx.followup.send(content=guildstr)
+        await ctx.followup.send(content="\n".join(entries))
     
     @app.command(name="unban", description="Unban a User from creating Eggs.")
     @app.describe(user="The User")

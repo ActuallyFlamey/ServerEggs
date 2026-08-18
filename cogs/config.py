@@ -22,8 +22,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await ctx.response.defer(ephemeral=True)
 
         if ctx.guild:
-            lines = await self.bot.fetch_lines(ctx)
-            myloc = self.bot.get_lines("config/lang", lines)
+            _, myloc = await self.bot.get_section(ctx, "config/lang")
 
             if code == "":
                 await ctx.followup.send(myloc["no_default"], ephemeral=True)
@@ -39,8 +38,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
             await User.update_or_create(defaults={ "lang": code }, id=ctx.user.id)
             self.bot.lang_cache[f"user_{ctx.user.id}"] = code
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/lang", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/lang")
 
         await ctx.followup.send(myloc["success"], ephemeral=True)
 
@@ -52,8 +50,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/allow-user-lang", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/allow-user-lang")
 
         cache_key = f"guild_{ctx.guild.id}_allowuserlang"
 
@@ -74,8 +71,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def server_description(self, ctx: discord.Interaction, desc: str):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/server-description", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/server-description")
 
         guild, _ = await Guild.update_or_create({ "description": desc }, id=ctx.guild.id)
 
@@ -89,8 +85,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def privacy(self, ctx: discord.Interaction, private: bool):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/privacy", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/privacy")
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
         has_invite = bool(guild.invite)
@@ -117,8 +112,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def log(self, ctx: discord.Interaction, channel: discord.TextChannel):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/log", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/log")
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
 

@@ -17,6 +17,39 @@ from schema import Guild, User
 from tortoise_config import TORTOISE_ORM
 
 
+def _resolve_lang_ref(value, root, seen):
+    if not isinstance(value, str) or not value.startswith("$"):
+        return value
+
+    if value in seen:
+        raise ValueError(f"Circular language reference: {value}")
+
+    seen.add(value)
+
+    node = root
+    for part in value[1:].split("."):
+        if not isinstance(node, dict) or part not in node:
+            raise KeyError(f"Unresolved language reference: {value}")
+        node = node[part]
+
+    return _resolve_lang_ref(node, root, seen)
+
+def _resolve_lang_refs(obj, root):
+    if isinstance(obj, dict):
+        return {key: _resolve_lang_refs(val, root) for key, val in obj.items()}
+    if isinstance(obj, list):
+        return [_resolve_lang_refs(val, root) for val in obj]
+
+    return _resolve_lang_ref(obj, root, set())
+
+def load_lines_sync(file):
+    with open(f"./lang/{file}", "r", encoding="utf-8") as lines:
+        data = json.load(lines)
+
+    data["lines"] = _resolve_lang_refs(data["lines"], data["lines"])
+
+    return data
+
 class ServerEggs(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
         super().__init__("", intents=discord.Intents.default())
@@ -26,10 +59,6 @@ class ServerEggs(commands.Bot):
 
     async def setup_hook(self):
         await Tortoise.init(config=TORTOISE_ORM)
-
-        def load_lines_sync(file):
-            with open(f"./lang/{file}", "r", encoding="utf-8") as lines:
-                return json.load(lines)
 
         for file in os.listdir("./lang"):
             if file.endswith(".json"):
@@ -79,6 +108,11 @@ class ServerEggs(commands.Bot):
     
     def get_lines(self, path: str, lines: dict):
         return utils.recursive_find(path, lines)
+
+    async def get_section(self, ctx: discord.Interaction, path: str):
+        lines = await self.fetch_lines(ctx)
+
+        return lines, self.get_lines(path, lines)
 
     async def close(self):
         await Tortoise.close_connections()
@@ -135,8 +169,7 @@ async def on_guild_remove(guild: discord.Guild):
 
 @bot.tree.error
 async def app_command_error(ctx: discord.Interaction, error):
-    lines = await bot.fetch_lines(ctx)
-    myloc = bot.get_lines("error", lines)
+    lines, myloc = await bot.get_section(ctx, "error")
 
     e = discord.Embed(title=myloc["title"], color=0xd62450, description=str(error))
     utils.brand_embed(e, lines)
@@ -167,20 +200,16 @@ async def app_command_error(ctx: discord.Interaction, error):
 ])
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
 async def help(ctx: discord.Interaction, about: str | None):
-    lines = await bot.fetch_lines(ctx)
-    myloc = bot.get_lines("help", lines)
+    lines, myloc = await bot.get_section(ctx, "help")
+
+    myloc = myloc["general"] if about is None else myloc[about]
+
+    e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
 
     if about is None:
-        myloc = myloc["general"]
-
-        e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
         e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
         e.add_field(name=myloc["beta"], value=myloc["beta_desc"], inline=False)
-    else:
-        myloc = myloc[about]
-
-        e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
 
     utils.brand_embed(e, lines)
 
@@ -191,8 +220,7 @@ async def help(ctx: discord.Interaction, about: str | None):
 async def eggify(ctx: discord.Interaction, message: discord.Message):
     await ctx.response.defer(ephemeral=True)
 
-    lines = await bot.fetch_lines(ctx)
-    myloc = bot.get_lines("eggs/eggify", lines)
+    lines, myloc = await bot.get_section(ctx, "eggs/eggify")
 
     file = message.attachments[0] if message.attachments else None
 
@@ -205,7 +233,7 @@ async def eggify(ctx: discord.Interaction, message: discord.Message):
         link = url_match.group(1)
         content = content[:url_match.start()].strip()
 
-    content = content[:4000] + ("…" if len(content) > 4000 else "") if content else None
+    content = utils.truncate(content, 4000)
 
     await ctx.followup.send(content=myloc["ready"], view=views.PreEggify(bot, lines, content, file, link), ephemeral=True)
 

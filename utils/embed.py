@@ -4,6 +4,23 @@ from discord.ext import commands
 import utils
 
 
+def channel_is_nsfw(channel) -> bool:
+    return bool(channel and hasattr(channel, "is_nsfw") and channel.is_nsfw())
+
+async def get_or_fetch_user(bot, user_id: int):
+    user = bot.get_user(user_id)
+
+    if user is not None:
+        return user
+
+    try:
+        return await bot.fetch_user(user_id)
+    except (discord.NotFound, discord.HTTPException):
+        return None
+
+def egg_title(egg, base: str) -> str:
+    return base + (" ⭐" if egg.secret else " ") + ("🌶️" if egg.nsfw else "")
+
 def brand_embed(e: discord.Embed, lines: dict | None = None):
     if lines is None:
         lines = {
@@ -34,20 +51,14 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
     myloc = bot.get_lines("eggs/get", lines)
 
     if creator is None:
-        creator = bot.get_user(egg.creator.id)
-
-        if creator is None:
-            try:
-                creator = await bot.fetch_user(egg.creator.id)
-            except discord.NotFound:
-                creator = None
+        creator = await get_or_fetch_user(bot, egg.creator.id)
 
     origin = bot.get_guild(egg.origin.id)
 
     color = get_egg_color(egg)
 
     e = discord.Embed(
-        title=myloc["eggn"].format(egg.id) + (" ⭐" if egg.secret else " ") + ("🌶️" if egg.nsfw else ""),
+        title=egg_title(egg, myloc["eggn"].format(egg.id)),
         color=color,
         description=egg.text
     )

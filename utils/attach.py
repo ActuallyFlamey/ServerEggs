@@ -147,10 +147,7 @@ def show_attachment(egg, embed: discord.Embed):
             embed.set_image(url=f"attachment://{filename}")
         else:
             inline = False
-    elif getattr(egg, "attach_link", None):
-        if not egg.attach_link.startswith(("http://", "https://")):
-            return None
-
+    elif getattr(egg, "attach_link", None) and egg.attach_link.startswith(("http://", "https://")):
         if get_content_type(egg.attach_link) == "image":
             embed.set_image(url=egg.attach_link)
         else:
@@ -158,6 +155,16 @@ def show_attachment(egg, embed: discord.Embed):
             inline = False
 
     return file, link, inline
+
+def attachment_kwargs(file, link, inline):
+    send_file = (file or discord.utils.MISSING) if inline else discord.utils.MISSING
+    view_file = file if not inline else None
+    view_link = link if not inline else None
+
+    return send_file, view_file, view_link
+
+async def send_extra(ctx: discord.Interaction, file, link):
+    await ctx.response.send_message(link, file=file or discord.utils.MISSING, ephemeral=True)
 
 EMBEDDABLE_MEDIA_HOSTS = (
     "youtube.com", "youtu.be",

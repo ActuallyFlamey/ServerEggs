@@ -17,8 +17,7 @@ class Mod(commands.Cog):
     async def filter_egg(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("mod/filter", lines)
+        _, myloc = await self.bot.get_section(ctx, "mod/filter")
 
         egg = await Egg.get_or_none(id=id)
         if not egg:
