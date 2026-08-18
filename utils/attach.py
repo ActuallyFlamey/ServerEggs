@@ -43,7 +43,7 @@ async def transcode(inbytes: bytes, to: str):
             args = ["-c:v", "libvpx-vp9", "-crf", "32", "-b:v", "0", "-c:a", "libopus", "-b:a", "64k"]
         case "ogg":
             args = ["-c:a", "libopus", "-b:a", "64k"]
-    
+
     try:
         cmd = ["ffmpeg", "-y", "-i", in_path] + args + [out_path]
         proc = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE)
@@ -52,7 +52,7 @@ async def transcode(inbytes: bytes, to: str):
         if proc.returncode != 0:
             print(f"ERROR: FFmpeg error: {stderr.decode(errors="replace")}")
             return None
-        
+
         def read():
             with open(out_path, "rb") as f:
                 return f.read()
@@ -96,7 +96,7 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
                         )
                     else:
                         img.save(file_path, "WEBP", quality=80)
-                
+
                 return file_hash
 
             file_hash = await asyncio.to_thread(save)
@@ -111,7 +111,7 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
             def save():
                 with open(file_path, "wb") as file:
                     file.write(converted_bytes)
-            
+
             await asyncio.to_thread(save)
 
     return file_path, file_hash

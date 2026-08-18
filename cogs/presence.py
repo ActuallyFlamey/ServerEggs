@@ -22,13 +22,13 @@ class Presence(commands.Cog):
         ])
 
         self.update_presence.start()
-    
+
     @tasks.loop(seconds=30)
     async def update_presence(self):
         presence = next(self.activities)
 
         await self.bot.change_presence(activity=discord.CustomActivity(name=presence.format(guilds=len(self.bot.guilds))))
-    
+
     @update_presence.before_loop
     async def before_update_presence(self):
         await self.bot.wait_until_ready()

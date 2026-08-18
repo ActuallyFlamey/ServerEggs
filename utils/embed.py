@@ -44,7 +44,7 @@ def get_egg_color(egg):
         color = discord.Color.gold()
     elif egg.nsfw:
         color = discord.Color.red()
-    
+
     return color
 
 async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, collections = None, collected = False, include_id = False):

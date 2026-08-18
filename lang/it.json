@@ -196,7 +196,7 @@
             },
             "config": {
                 "title": "Informazioni sul Configurare Server Eggs",
-                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Le **lingue specificate dagli utenti** dovrebbero essere **permesse** in questo server? Oppure va **imposta a tutti** la **lingua del server**?\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Ci si deve poter **unire** a questo server attraverso le **Uova create qui** o no?\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
+                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Permetti l'uso delle **lingue specificate dagli utenti** in questo server.\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Permetti a **chiunque** di **unirsi a questo server** attraverso le **Uova** create in esso.\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
             },
             "filter": {
                 "title": "Informazioni sul Filtrare Uova",
@@ -254,7 +254,7 @@
     "allow-user-lang": "permetti-lingua-personale",
     "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
     "allow-user-lang_allow": "permetti",
-    "allow-user-lang_allow_description": "Permettere l'utilizzo delle lingue personali in questo server?",
+    "allow-user-lang_allow_description": "Vuoi permettere l'utilizzo delle lingue personali in questo server.",
 
     "server-description": "descrizione-server",
     "server-description_description": "Imposta una descrizione accattivante del server che convinca la gente a unirsi.",
@@ -263,8 +263,8 @@
 
     "privacy": "privacy",
     "privacy_description": "Imposta la privacy del server.",
-    "privacy_private": "privato",
-    "privacy_private_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno?",
+    "privacy_public": "pubblico",
+    "privacy_public_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno.",
 
     "log": "registro",
     "log_description": "Imposta un canale da usare come registro delle Uova create qui.",
@@ -280,9 +280,9 @@
     "create_link": "link",
     "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
     "create_nsfw": "vm18",
-    "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
+    "create_nsfw_description": "L'Uovo ha un contenuto 18+.",
     "create_secret": "segreto",
-    "create_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
+    "create_secret_description": "L'Uovo deve apparire solo casualmente.",
 
     "lay": "deponi",
 
@@ -309,9 +309,9 @@
     "edit_link": "link",
     "edit_link_description": "Il nuovo allegato da includere con l'Uovo in forma di URL.",
     "edit_nsfw": "vm18",
-    "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
+    "edit_nsfw_description": "L'Uovo ha un contenuto 18+",
     "edit_secret": "segreto",
-    "edit_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
+    "edit_secret_description": "L'Uovo deve apparire solo casualmente.",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",
@@ -328,9 +328,9 @@
     "collected_check": "controlla",
     "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
     "collected_nsfw": "solo-vm18",
-    "collected_nsfw_description": "Filtra la tua collezione per \"solo VM18\".",
+    "collected_nsfw_description": "Vuoi filtrare la tua collezione per \"solo VM18\".",
     "collected_secret": "solo-segreti",
-    "collected_secret_description": "Filtra la tua collezione per \"solo segreti\".",
+    "collected_secret_description": "Vuoi filtrare la tua collezione per \"solo segreti\".",
 
     "leaderboard": "classifica",
     "leaderboard_description": "Vedi le classifiche per varie statistiche",

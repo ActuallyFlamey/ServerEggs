@@ -8,7 +8,7 @@ from schema import Egg, Guild
 class Mod(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
+
     @app.command(name="filter", description="filter_description")
     @app.rename(id="filter_id")
     @app.describe(id="filter_id_description")
@@ -23,7 +23,7 @@ class Mod(commands.Cog):
         if not egg:
             await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
             return
-        
+
         guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
         current_state = await guild.filtered.filter(id=egg.id).exists()

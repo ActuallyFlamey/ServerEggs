@@ -27,19 +27,19 @@ async def render_entries(bot, leaderboard: Leaderboard, self_id: int, name_resol
     top = await leaderboard.top()
     rank, count = await leaderboard.rank_of(self_id)
 
-    async def row(index: int, entity_id: int, entity_count: int, *, self_row: bool, in_list: bool) -> str:
+    async def row(index: int, entity_id: int, entity_count: int, *, self_row: bool) -> str:
         name = await name_resolver(bot, entity_id)
         prefix = MEDALS.get(index, f"`{index}`")
         marker = "*" if self_row else ""
-        suffix = self_suffix if (self_row and in_list) else ""
+        suffix = self_suffix if self_row else ""
         return f"{marker}{prefix} — {name}{suffix} — {format_count(entity_count)}{marker}"
 
     entries = [
-        await row(index, entry["id"], entry["egg_count"], self_row=entry["id"] == self_id, in_list=True)
+        await row(index, entry["id"], entry["egg_count"], self_row=entry["id"] == self_id)
         for index, entry in enumerate(top, start=1)
     ]
 
     if not any(entry["id"] == self_id for entry in top):
-        entries.append(await row(rank, self_id, count, self_row=True, in_list=False))
+        entries.append(await row(rank, self_id, count, self_row=True))
 
     return entries

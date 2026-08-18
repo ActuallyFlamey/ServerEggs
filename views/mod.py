@@ -30,7 +30,7 @@ class ReportActions(AttachmentView):
                     view=None
                 )
             except discord.HTTPException:
-                pass 
+                pass
 
             await report.delete()
 
@@ -43,7 +43,7 @@ class ReportActions(AttachmentView):
             return False
 
         return True
-    
+
     @discord.ui.button(label="Ignore", style=discord.ButtonStyle.secondary, row=1)
     async def ignore(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
@@ -51,7 +51,7 @@ class ReportActions(AttachmentView):
         egg = await self.report.egg
 
         await self.delete_reports(ctx, "Ignore", egg.id)
-    
+
     @discord.ui.button(label="Mark NSFW", style=discord.ButtonStyle.primary, row=1)
     async def mark_nsfw(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
@@ -61,9 +61,9 @@ class ReportActions(AttachmentView):
         if not egg.nsfw:
             egg.nsfw = True
             await egg.save(update_fields=["nsfw"])
-        
+
         await self.delete_reports(ctx, "Mark NSFW", egg.id)
-    
+
     @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger, row=1)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()
@@ -72,7 +72,7 @@ class ReportActions(AttachmentView):
 
         await self.delete_reports(ctx, "Delete", egg.id)
         await utils.egg_delete(egg)
-    
+
     @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger, row=1)
     async def delete_ban(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer()

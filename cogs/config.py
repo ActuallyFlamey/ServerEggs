@@ -78,11 +78,11 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await ctx.followup.send(myloc["success"] + "\n" + guild.description, ephemeral=True)
 
     @app.command(name="privacy", description="privacy_description")
-    @app.rename(private="privacy_private")
-    @app.describe(private="privacy_private_description")
+    @app.rename(public="privacy_public")
+    @app.describe(public="privacy_public_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
-    async def privacy(self, ctx: discord.Interaction, private: bool):
+    async def privacy(self, ctx: discord.Interaction, public: bool):
         await ctx.response.defer(ephemeral=True)
 
         _, myloc = await self.bot.get_section(ctx, "config/privacy")
@@ -90,20 +90,20 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         guild = await Guild.get_or_none(id=ctx.guild.id)
         has_invite = bool(guild.invite)
 
-        if (has_invite and not private) or (not has_invite and private):
+        if (has_invite and public) or (not has_invite and not public):
             await ctx.followup.send(myloc["already"], ephemeral=True)
             return
 
         invite = None
-        if not private:
+        if public:
             inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
             invite = inviteobj.url
 
         guild.invite = invite
         await guild.save(update_fields=["invite"])
 
-        await ctx.followup.send(myloc["success"].format(private), ephemeral=True)
-    
+        await ctx.followup.send(myloc["success"].format(public), ephemeral=True)
+
     @app.command(name="log", description="log_description")
     @app.rename(channel="log_channel")
     @app.describe(channel="log_channel_description")
@@ -119,12 +119,12 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         if channel.id == guild.logch:
             await ctx.followup.send(myloc["already"], ephemeral=True)
             return
-        
+
         perms = channel.permissions_for(ctx.guild.me)
         if not (perms.view_channel and perms.send_messages and perms.embed_links):
             await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
             return
-        
+
         guild.logch = channel.id
         await guild.save(update_fields=["logch"])
 

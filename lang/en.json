@@ -196,7 +196,7 @@
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Should **user-specified languages** be **allowed** in this server? Or should the **server language** be **enforced**?\n  - `allow` parameter: True or False.\n- `/config privacy`: Should this server be **joinable** through **Eggs created here** or not?\n  - `private` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -255,7 +255,7 @@
     "allow-user-lang": "allow-user-lang",
     "allow-user-lang_description": "Changes the setting on allowing user languages in this server.",
     "allow-user-lang_allow": "allow",
-    "allow-user-lang_allow_description": "Allow the usage of user languages in this server?",
+    "allow-user-lang_allow_description": "User languages should be allowed in this server.",
 
     "server-description": "server-description",
     "server-description_description": "Set an enticing server description to convince people to join.",
@@ -264,8 +264,8 @@
 
     "privacy": "privacy",
     "privacy_description": "Set the privacy of the server.",
-    "privacy_private": "private",
-    "privacy_private_description": "Should this server be accessible from the Eggs created in it?",
+    "privacy_public": "public",
+    "privacy_public_description": "This server should be accessible through Eggs created in it.",
 
     "log": "log",
     "log_description": "Set a log channel for Eggs created here.",
@@ -281,9 +281,9 @@
     "create_link": "link",
     "create_link_description": "The attachment included with the Egg as a URL.",
     "create_nsfw": "nsfw",
-    "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "create_nsfw_description": "This Egg should be marked as NSFW.",
     "create_secret": "secret",
-    "create_secret_description": "Whether this Egg should only appear randomly.",
+    "create_secret_description": "This Egg should only appear randomly.",
 
     "lay": "lay",
 
@@ -310,9 +310,9 @@
     "edit_link": "link",
     "edit_link_description": "The new attachment included with the Egg as a URL.",
     "edit_nsfw": "nsfw",
-    "edit_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "edit_nsfw_description": "This Egg should be marked as NSFW.",
     "edit_secret": "secret",
-    "edit_secret_description": "Whether this Egg should only appear randomly.",
+    "edit_secret_description": "This Egg should only appear randomly.",
 
     "report": "report",
     "report_description": "Report an Egg.",
@@ -329,9 +329,9 @@
     "collected_check": "check",
     "collected_check_description": "Check if you've collected a specific Egg ID.",
     "collected_nsfw": "only-nsfw",
-    "collected_nsfw_description": "Filter your collection by \"NSFW only\".",
+    "collected_nsfw_description": "You want to filter your collection by \"NSFW only\".",
     "collected_secret": "only-secret",
-    "collected_secret_description": "Filter your collection by \"secret only\".",
+    "collected_secret_description": "You want to filter your collection by \"secret only\".",
 
     "leaderboard": "leaderboard",
     "leaderboard_description": "View leaderboards for various stats.",

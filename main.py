@@ -110,7 +110,7 @@ class ServerEggs(commands.Bot):
         lang = await self.get_lang(ctx)
 
         return self.locales.get(lang, self.locales["en"])["lines"]
-    
+
     def get_lines(self, path: str, lines: dict):
         return utils.recursive_find(path, lines)
 
@@ -145,7 +145,7 @@ async def on_guild_join(guild: discord.Guild):
     )
     e.add_field(
         name="What to do now",
-        value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy private:True`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`."
+        value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy public:False`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`."
     )
     e.add_field(
         name="For Server Managers",

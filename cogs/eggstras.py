@@ -88,7 +88,7 @@ class Eggstras(commands.Cog):
         if user is None:
             return f"User `{user_id}`"
 
-        return f"**{user.display_name}** ({user.name})"
+        return f"**{user.display_name}** ({discord.utils.escape_markdown(user.name, as_needed=False)})"
 
     async def _send_leaderboard(self, ctx: discord.Interaction, leaderboard: utils.Leaderboard, title_key: str, name_resolver, self_id: int):
         await ctx.response.defer()
