@@ -14,7 +14,7 @@ class Presence(commands.Cog):
             "Could I offer you an /egg in these trying times?",
             "Eggify any message by right-clicking or pressing it!",
             "Giving random Eggs in {guilds} servers!",
-            "Enjoying this public beta?",
+            "Donate at ko-fi.com/hexablue",
             "Surprisingly not about DELTARUNE.",
             "I like my Eggs open-source.",
             "Support at discord.gg/G9vfEZGZnT",

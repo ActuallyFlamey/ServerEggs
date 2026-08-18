@@ -25,7 +25,7 @@
         },
         "eggs": {
             "create_edit": {
-                "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
+                "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un allegato, o entrambi.",
                 "empty_edit": "Non hai specificato alcuna modifica.",
                 "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
@@ -159,8 +159,8 @@
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
                 "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
-                "beta": "Server Eggs è in Beta!",
-                "beta_desc": "Siccome **Server Eggs** è in **beta**, tutti i dati di questa beta verranno eliminati una volta finita."
+                "donate": "Sostieni Server Eggs",
+                "donate_desc": "Puoi **sostenere lo sviluppo** di **Server Eggs** donando al **[Ko-fi di HexaBlue](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "Informazioni sul Creare Uova",

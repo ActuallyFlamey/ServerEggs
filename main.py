@@ -125,7 +125,7 @@ async def on_ready():
     bot.launch_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
     logch = bot.get_channel(int(os.getenv("DEVELOPER_LOG_CHANNEL")))
-    await logch.send(f"**Server Eggs** is **REBORN** on **discord.py {discord.__version__}**")
+    await logch.send(f"**Server Eggs** has started on **discord.py {discord.__version__}**")
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
@@ -209,7 +209,7 @@ async def help(ctx: discord.Interaction, about: str | None):
     if about is None:
         e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
-        e.add_field(name=myloc["beta"], value=myloc["beta_desc"], inline=False)
+        e.add_field(name=myloc["donate"], value=myloc["donate_desc"], inline=False)
 
     utils.brand_embed(e, lines)
 

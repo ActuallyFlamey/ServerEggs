@@ -159,8 +159,8 @@
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
                 "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` parameter **adds text** to the **Egg**.\n  - The `file` parameter **adds an attachment** as a file.\n  - The `link` parameter **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`.",
-                "beta": "Server Eggs is in Beta!",
-                "beta_desc": "Because **Server Eggs** is in **beta**, all data from this beta will be deleted once it ends."
+                "donate": "Support Server Eggs",
+                "donate_desc": "You can **support the development** of **Server Eggs** by donating to **[HexaBlue's Ko-fi](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "About Creating Eggs",
