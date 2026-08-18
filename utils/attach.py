@@ -233,7 +233,7 @@ async def resolve_media_url(url: str) -> str | None:
 
                 html_text = await response.text()
 
-                candidates = {"video": None, "audio": None, "image": None}
+                candidates = {"video": None, "audio": None, "image": None, "gif": None}
 
                 for tag in re.findall(r"<meta[^>]+>", html_text, re.IGNORECASE):
                     prop_match = re.search(r'(?:property|name|itemprop)=[\'"]([^\'"]+)[\'"]', tag, re.IGNORECASE)
@@ -261,13 +261,13 @@ async def resolve_media_url(url: str) -> str | None:
                         if not candidates["audio"]:
                             candidates["audio"] = media_link
 
-                    elif prop in ("og:image", "og:image:url", "og:image:secure_url", "twitter:image", "twitter:image:src") and not candidates["image"]:
+                    elif prop in ("og:image", "og:image:url", "og:image:secure_url", "twitter:image", "twitter:image:src"):
+                        if not candidates["image"]:
                             candidates["image"] = media_link
+                        if not candidates["gif"] and re.search(r"\.gif(?:[?#].*)?$", media_link, re.IGNORECASE):
+                            candidates["gif"] = media_link
 
-                if candidates["image"] and re.search(r"\.gif(?:[?#].*)?$", candidates["image"], re.IGNORECASE):
-                    return candidates["image"]
-
-                return candidates["video"] or candidates["audio"] or candidates["image"]
+                return candidates["gif"] or candidates["video"] or candidates["audio"] or candidates["image"]
 
         except (aiohttp.ClientError, asyncio.TimeoutError, UnicodeDecodeError) as e:
             print(f"ERROR: Failed resolving {url}: {e}")
