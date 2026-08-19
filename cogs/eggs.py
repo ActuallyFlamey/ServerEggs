@@ -37,9 +37,14 @@ class Eggs(commands.Cog):
 
         lines, myloc = await self.bot.get_section(ctx, "eggs/create_edit")
 
-        if text is None and file is None and link is None and nsfw is None and secret is None:
-            await ctx.followup.send(myloc["empty_create"] if not id else myloc["empty_edit"])
-            return
+        if not id:
+            if text is None and file is None and link is None:
+                await ctx.followup.send(myloc["empty_create"])
+                return
+        else:
+            if text is None and file is None and link is None and secret is None and nsfw is None:
+                await ctx.followup.send(myloc["empty_edit"])
+                return
 
         if nsfw and not utils.channel_is_nsfw(ctx.channel):
             await ctx.followup.send(myloc["no_nsfw"])
