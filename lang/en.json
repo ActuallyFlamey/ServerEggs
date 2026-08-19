@@ -15,6 +15,7 @@
             },
             "privacy": {
                 "already": "$common.already",
+                "missing_perms": "**Server Eggs** is missing the **Create Invite** permission, which is required for this operation.",
                 "success": "Server privacy successfully set to `{0}`."
             },
             "log": {

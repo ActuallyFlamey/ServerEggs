@@ -96,8 +96,12 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
 
         invite = None
         if public:
-            inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
-            invite = inviteobj.url
+            try:
+                inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
+                invite = inviteobj.url
+            except discord.errors.Forbidden:
+                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
+                return
 
         guild.invite = invite
         await guild.save(update_fields=["invite"])

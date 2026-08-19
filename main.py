@@ -134,9 +134,14 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
-    invite = await guild.rules_channel.create_invite() if guild.rules_channel else await guild.text_channels[0].create_invite()
+    invite_url = None
+    try:
+        invite = await guild.rules_channel.create_invite() if guild.rules_channel else await guild.text_channels[0].create_invite()
+        invite_url = invite.url
+    except discord.errors.Forbidden:
+        pass
 
-    await Guild.update_or_create(defaults={ "invite": invite.url }, id=guild.id)
+    await Guild.update_or_create(defaults={ "invite": invite_url }, id=guild.id)
 
     e = discord.Embed(
         title="Server Eggs",
@@ -151,6 +156,11 @@ async def on_guild_join(guild: discord.Guild):
         name="For Server Managers",
         value="**Not always** is an **Egg worth reporting** to the global **Egg Moderators**.\nIf you feel like it's not appropriate for your members, you can simply **stop it** from **appearing here** by using `/filter`."
     )
+    if invite_url is None:
+        e.add_field(
+            name="WARNING: No Invite Permission",
+            value="**Server Eggs** was invited without **Create Invite** permissions. This means your server is now considered private.\nIf you do not want this, **grant the permission** and run `/config privacy public:True`."
+        )
     utils.brand_embed(e)
 
     systemch = guild.system_channel
