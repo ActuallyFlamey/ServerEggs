@@ -150,16 +150,19 @@ async def on_guild_join(guild: discord.Guild):
     )
     e.add_field(
         name="What to do now",
-        value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy public:False`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`."
+        value="- Set an **enticing description** for your server with `/config server-description`.\n- If you **don't want strangers** to join this server through the Eggs, use `/config privacy public:False`.\n- Set your **language** with `/config lang`, if it's **not English**.\n- If you want to **enforce your server language**, use `/config allow-user-lang allow:False`.\n- If you want to **keep track of Egg creations and edits**, use `/config log`.",
+        inline=False
     )
     e.add_field(
         name="For Server Managers",
-        value="**Not always** is an **Egg worth reporting** to the global **Egg Moderators**.\nIf you feel like it's not appropriate for your members, you can simply **stop it** from **appearing here** by using `/filter`."
+        value="**Not always** is an **Egg worth reporting** to the global **Egg Moderators**.\nIf you feel like it's not appropriate for your members, you can simply **stop it** from **appearing here** by using `/filter`.",
+        inline=False
     )
     if invite_url is None:
         e.add_field(
             name="WARNING: No Invite Permission",
-            value="**Server Eggs** was invited without **Create Invite** permissions. This means your server is now considered private.\nIf you do not want this, **grant the permission** and run `/config privacy public:True`."
+            value="**Server Eggs** was invited without **Create Invite** permissions. This means your server is now considered private.\nIf you do not want this, **grant the permission** and run `/config privacy public:True`.",
+            inline=False
         )
     utils.brand_embed(e)
 
