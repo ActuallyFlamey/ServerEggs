@@ -1,9 +1,10 @@
 import asyncio
+import html
 import io
-import logging
 import mimetypes
 import os
 import re
+from urllib.parse import urlparse
 
 import aiohttp
 import discord
@@ -13,20 +14,34 @@ from PIL import Image
 
 dotenv.load_dotenv()
 
-logger = logging.getLogger("eggsmedia")
+SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp)(?:[?#].*)?$'
 
-SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp|mp4|webm|mov)(?:[?#].*)?$'
+def get_content_type(file: discord.Attachment | str) -> str | None:
+    if isinstance(file, discord.Attachment):
+        content_type = file.content_type
+    else:
+        clean_name = file.split("?")[0].split("#")[0]
+        guessed = mimetypes.guess_type(clean_name)[0]
+        content_type = guessed if guessed else ""
+
+    if not content_type or not content_type.startswith("image"):
+        return None
+
+    return "image"
 
 async def process_attachment(attach: discord.Attachment, prebytes: bytes | None):
     attach_bytes = prebytes if prebytes else await attach.read()
 
-    file_hash = []
-    file_path = f"{os.getenv('MEDIA_PATH')}/{attach.id}.webp"
+    media_dir = os.getenv('MEDIA_PATH')
+
+    if get_content_type(attach) != "image":
+        return None
+
+    file_path = f"{media_dir}/{attach.id}.webp"
 
     def save():
         with Image.open(io.BytesIO(attach_bytes)) as img:
-            img_hash = str(imagehash.average_hash(img))
-            file_hash.append(img_hash)
+            file_hash = str(imagehash.average_hash(img))
 
             if getattr(img, "is_animated", False):
                 img.save(
@@ -41,9 +56,11 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
             else:
                 img.save(file_path, "WEBP", quality=80)
 
-    await asyncio.to_thread(save)
+            return file_hash
 
-    return file_path, file_hash[0]
+    file_hash = await asyncio.to_thread(save)
+
+    return file_path, file_hash
 
 async def url_to_file(url: str) -> discord.File | None:
     file = None
@@ -52,8 +69,11 @@ async def url_to_file(url: str) -> discord.File | None:
         async with aiohttp.ClientSession() as session, session.get(url, timeout=10) as res:
             if res.status == 200:
                 filebytes = await res.read()
-                with io.BytesIO(filebytes) as stream:
-                    file = discord.File(stream)
+
+                parsed_path = urlparse(url).path
+                filename = os.path.basename(parsed_path) or "media.jpg"
+
+                return discord.File(io.BytesIO(filebytes), filename=filename)
     except (aiohttp.ClientError, asyncio.TimeoutError):
         pass
 
@@ -67,99 +87,67 @@ def show_attachment(egg, embed: discord.Embed):
 
         file = discord.File(egg.attach_path, filename=filename)
 
-        embed.set_image(url=f"attachment://{filename}")
-    elif getattr(egg, "attach_link", None):
-        if not egg.attach_link.startswith(("http://", "https://")):
-            return None
-
-        embed.set_image(url=egg.attach_link)
+        if get_content_type(filename) == "image":
+            embed.set_image(url=f"attachment://{filename}")
+    elif getattr(egg, "attach_link", None) and egg.attach_link.startswith(("http://", "https://")):
+        if get_content_type(egg.attach_link) == "image":
+            embed.set_image(url=egg.attach_link)
 
     return file
 
-async def scan_csam(file: discord.File) -> (bool, bytes):
-    scanbytes = file.fp.read()
-    file.fp.seek(0)
-
-    api_user = os.getenv("ARACHNID_USER")
-    api_password = os.getenv("ARACHNID_PASSWORD")
-
-    if not api_user or not api_password:
-        print("[Warning] Arachnid Shield credentials missing. Skipping CSAM scan.")
-        return False, scanbytes
-
-    endpoint = "https://shield.projectarachnid.com/v1/media"
-    auth = aiohttp.BasicAuth(api_user, api_password)
-
-    content_type, _ = mimetypes.guess_type(file.filename)
-    headers = {"Content-Type": content_type or "application/octet-stream"}
-
-    try:
-        async with aiohttp.ClientSession() as session, session.post(endpoint, auth=auth, data=scanbytes, headers=headers, timeout=15) as response:
-            if response.status == 200:
-                data = await response.json()
-
-                classification = data.get("classification", "")
-
-                if classification in ["csam", "harmful-abusive-material"]:
-                    logger.critical(f"HARMFUL CONTENT DETECTED: {classification}")
-                    return True, None
-
-                return False, scanbytes
-            else:
-                print(f"Arachnid Shield API Error: HTTP {response.status} {response.text}")
-                return False, scanbytes
-    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
-        print(f"Arachnid Shield API connection failed: {e}")
-        return False, scanbytes
-
-# this function was heavily assisted by Gemini 3.1 Pro
-# this function is also genuinely made of crystal. touch it too hard and it will break. i hate parsing links.
 async def resolve_media_url(url: str) -> str | None:
     if not url.startswith(("http://", "https://")):
         return None
 
     if re.search(SUPPORTED_FILETYPE_REGEX, url, re.IGNORECASE):
         if "tenor.com" in url.lower():
-            tenor_id_match = re.search(r'tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/', url)
-            if tenor_id_match:
-                return f"https://c.tenor.com/{tenor_id_match.group(1)}/tenor.gif"
+            m = re.search(r"tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/", url)
+            if m:
+                return f"https://c.tenor.com/{m.group(1)}/tenor.gif"
         return url
 
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discord.com)",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     }
 
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(url, headers=headers, timeout=20) as response:
                 if response.status != 200:
-                    print(f"[Debug] HTTP {response.status} for {url}")
                     return None
-                    
-                html = await response.text()
 
-                meta_tags = re.findall(r'<meta[^>]+>', html, re.IGNORECASE)
-                
-                for tag in meta_tags:
-                    if re.search(r'(?:property|name|itemprop)=[\'"](?:og:video|og:image|twitter:image)[\'"]', tag, re.IGNORECASE):
+                html_text = await response.text()
 
-                        content_match = re.search(r'content=[\'"]([^\'"]+)[\'"]', tag, re.IGNORECASE)
-                        if content_match:
-                            extracted = content_match.group(1)
+                candidates = {"image": None, "gif": None}
 
-                            if re.search(SUPPORTED_FILETYPE_REGEX, extracted, re.IGNORECASE):
+                for tag in re.findall(r"<meta[^>]+>", html_text, re.IGNORECASE):
+                    prop_match = re.search(r'(?:property|name|itemprop)=[\'"]([^\'"]+)[\'"]', tag, re.IGNORECASE)
+                    cont_match = re.search(r'content=[\'"]([^\'"]+)[\'"]', tag, re.IGNORECASE)
 
-                                if "tenor.com" in extracted.lower():
-                                    tenor_id_match = re.search(r'tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/', extracted)
-                                    if tenor_id_match:
-                                        extracted = f"https://c.tenor.com/{tenor_id_match.group(1)}/tenor.gif"
+                    if not prop_match or not cont_match:
+                        continue
 
-                                return extracted
-                                
-                print(f"[Debug] Got 200 OK, but no valid media meta tag found for {url}")
+                    prop = prop_match.group(1).lower()
+                    media_link = html.unescape(cont_match.group(1).strip())
+
+                    if "tenor.com" in media_link.lower():
+                        m = re.search(r"tenor\.com/(?:m/)?([a-zA-Z0-9_-]+)/", media_link)
+                        if m:
+                            media_link = f"https://c.tenor.com/{m.group(1)}/tenor.gif"
+
+                    if not re.search(SUPPORTED_FILETYPE_REGEX, media_link, re.IGNORECASE):
+                        continue
+
+                    if prop in ("og:image", "og:image:url", "og:image:secure_url", "twitter:image", "twitter:image:src"):
+                        if not candidates["image"]:
+                            candidates["image"] = media_link
+                        if not candidates["gif"] and re.search(r"\.gif(?:[?#].*)?$", media_link, re.IGNORECASE):
+                            candidates["gif"] = media_link
+
+                return candidates["gif"] or candidates["image"]
 
         except (aiohttp.ClientError, asyncio.TimeoutError, UnicodeDecodeError) as e:
-            print(f"[Debug] Exception resolving {url}: {e.__class__.__name__} - {e!s}")
+            print(f"ERROR: Failed resolving {url}: {e}")
 
     return None

@@ -14,7 +14,7 @@ class Presence(commands.Cog):
             "Could I offer you an /egg in these trying times?",
             "Eggify any message by right-clicking or pressing it!",
             "Giving random Eggs in {guilds} servers!",
-            "Enjoying this public beta?",
+            "Donate at ko-fi.com/hexablue",
             "Surprisingly not about DELTARUNE.",
             "I like my Eggs open-source.",
             "Support at discord.gg/G9vfEZGZnT",
@@ -22,13 +22,13 @@ class Presence(commands.Cog):
         ])
 
         self.update_presence.start()
-    
+
     @tasks.loop(seconds=30)
     async def update_presence(self):
         presence = next(self.activities)
 
         await self.bot.change_presence(activity=discord.CustomActivity(name=presence.format(guilds=len(self.bot.guilds))))
-    
+
     @update_presence.before_loop
     async def before_update_presence(self):
         await self.bot.wait_until_ready()

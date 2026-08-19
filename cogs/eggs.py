@@ -1,8 +1,6 @@
-import os
 import random
 
 import discord
-import dotenv
 from discord import app_commands as app
 from discord.ext import commands
 
@@ -10,21 +8,17 @@ import utils
 import views
 from schema import Egg, Guild, User
 
-dotenv.load_dotenv()
 
 class Eggs(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
+
     async def manage_check(self, ctx: discord.Interaction, egg):
         creatorchk = ctx.user.id == egg.creator.id
 
         modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
 
-        devguild = self.bot.get_guild(int(os.getenv("DEVELOPER_GUILD_ID")))
-        modrole = devguild.get_role(int(os.getenv("MOD_ROLE_ID")))
-        devguilduser = await devguild.fetch_member(ctx.user.id)
-        globalmodchk = any(role.id == modrole.id for role in devguilduser.roles)
+        globalmodchk = await utils.is_global_mod(self.bot, ctx.user.id)
 
         return creatorchk or modchk or globalmodchk
 
@@ -41,18 +35,13 @@ class Eggs(commands.Cog):
         if not ctx.response.is_done():
             await ctx.response.defer()
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggs/create_edit", lines)
+        lines, myloc = await self.bot.get_section(ctx, "eggs/create_edit")
 
         if text is None and file is None and link is None and nsfw is None and secret is None:
-            if not id:
-                await ctx.followup.send(myloc["empty_create"])
-            else:
-                await ctx.followup.send(myloc["empty_edit"])
+            await ctx.followup.send(myloc["empty_create"] if not id else myloc["empty_edit"])
             return
 
-        is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
-        if nsfw and not is_channel_nsfw:
+        if nsfw and not utils.channel_is_nsfw(ctx.channel):
             await ctx.followup.send(myloc["no_nsfw"])
             return
 
@@ -67,26 +56,24 @@ class Eggs(commands.Cog):
 
         egg = None
         if id:
-            egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
+            egg = await Egg.get_with_related(id)
 
             if not egg:
                 await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
                 return
 
-            manageable = await self.manage_check(ctx, egg)
-
-            if not manageable:
+            if not await self.manage_check(ctx, egg):
                 await ctx.followup.send(myloc["cannot"], ephemeral=True)
                 return
 
         trimtext = None
         if text is not None:
             text = text.strip() or None
-            trimtext = text[:4000] + ("…" if text and len(text) > 4000 else "") if text else None
+            trimtext = utils.truncate(text, 4000)
 
         attach_path = attach_hash = attach_link = scanfile = attach_bytes = None
         if file:
-            if not file.content_type or not file.content_type.startswith("image/"):
+            if utils.get_content_type(file) != "image":
                 await ctx.followup.send(myloc["images_only"])
                 return
 
@@ -102,10 +89,13 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["could_not_scan"])
                 return
 
+        processing = await ctx.followup.send(myloc["processing"])
+
         if scanfile:
             scan, attach_bytes = await utils.scan_csam(scanfile)
+
             if scan:
-                await ctx.followup.send(myloc["illegal"])
+                await processing.edit(content=myloc["illegal"])
 
                 user.banned = True
                 await user.save()
@@ -114,6 +104,9 @@ class Eggs(commands.Cog):
 
         if file:
             attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
+            if not attach_path:
+                await processing.edit(content=myloc["convert_failed"])
+                return
 
         check_text = trimtext if text is not None else (egg.text if id else None)
         check_hash = attach_hash if file else (None if link else (egg.attach_hash if id else None))
@@ -122,13 +115,14 @@ class Eggs(commands.Cog):
         existing = await Egg.filter(text=check_text, attach_hash=check_hash, attach_link=check_link).first()
 
         if existing and (not id or existing.id != id):
-            if attach_path and os.path.exists(attach_path):
-                os.remove(attach_path)
+            utils.safe_remove(attach_path)
 
-            await ctx.followup.send(myloc["duplicate"].format(existing.id))
+            await processing.edit(content=myloc["duplicate"].format(existing.id))
             return
 
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id) if ctx.guild else (None, None)
+        guild = None
+        if ctx.guild:
+            guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
         if not id:
             egg = await Egg.create(
@@ -142,8 +136,8 @@ class Eggs(commands.Cog):
                 origin=guild
             )
         else:
-            if (file or link) and egg.attach_path and os.path.exists(egg.attach_path):
-                os.remove(egg.attach_path)
+            if (file or link):
+                utils.safe_remove(egg.attach_path)
 
             if text is not None: egg.text = trimtext
             if file is not None or link is not None:
@@ -159,21 +153,21 @@ class Eggs(commands.Cog):
         if ctx.guild: await utils.log_egg(self.bot, lines, guild, egg, creator, ctx.user, bool(id))
 
         e = discord.Embed(
-            title=myloc["title"]
-                .format(
-                    egg.id,
-                    format(myloc["created"] if not id else myloc["edited"])
-                )
-                + (" ⭐" if egg.secret else " ")
-                + ("🌶️" if egg.nsfw else ""),
+            title=utils.egg_title(egg, myloc["title"].format(egg.id, myloc["created"] if not id else myloc["edited"])),
             color=utils.get_egg_color(egg),
             description=egg.text
         )
         utils.brand_embed(e, lines)
 
-        out_file = utils.show_attachment(egg, e)
+        resfile = utils.show_attachment(egg, e)
 
-        await ctx.followup.send(embed=e, file=out_file or discord.utils.MISSING)
+        attachments = [resfile] if resfile else []
+
+        await processing.edit(
+            content=None,
+            embed=e,
+            attachments=attachments
+        )
 
     @app.command(name="create", description="create_description")
     @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
@@ -210,15 +204,14 @@ class Eggs(commands.Cog):
     async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
         await ctx.response.defer()
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggs/get", lines)
+        lines, myloc = await self.bot.get_section(ctx, "eggs/get")
 
-        is_channel_nsfw = ctx.channel.is_nsfw() if ctx.channel and hasattr(ctx.channel, "is_nsfw") else False
+        is_channel_nsfw = utils.channel_is_nsfw(ctx.channel)
 
         collected = False
-        
+
         if id is not None:
-            egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
+            egg = await Egg.get_with_related(id)
 
             if not egg:
                 await ctx.followup.send(myloc["not_found"].format(id))
@@ -261,21 +254,14 @@ class Eggs(commands.Cog):
             if not await user.collected.filter(id=egg.id).exists():
                 await user.collected.add(egg)
                 collected = True
-        
+
         collections = await egg.collectors.all().count()
 
-        creator = self.bot.get_user(egg.creator.id)
+        creator = await utils.get_or_fetch_user(self.bot, egg.creator.id)
 
-        if creator is None:
-            try:
-                creator = await self.bot.fetch_user(egg.creator.id)
-            except discord.NotFound:
-                creator = None
-
-        e, file = await utils.get_egg_embed(self.bot, lines, egg, creator)
+        e, file = await utils.get_egg_embed(self.bot, lines, egg, creator, collections, collected)
 
         await ctx.followup.send(
-            myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
             embed=e,
             file=file or discord.utils.MISSING,
             view=views.GetEgg(self.bot, lines, egg, creator)
@@ -314,63 +300,54 @@ class Eggs(commands.Cog):
     ):
         await self.create_or_edit(ctx, id, text, file, link, nsfw, secret)
 
-    @app.command(name="report", description="report_description")
-    @app.rename(id="report_id")
-    @app.describe(id="report_id_description")
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def report(self, ctx: discord.Interaction, id: int):
-        await ctx.response.defer(ephemeral=True)
+    def _confirm_embed(self, lines: dict, myloc: dict, egg, color: discord.Color):
+        text = utils.truncate(egg.text, 1023)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggs/report", lines)
-
-        egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
-
-        if not egg:
-            await ctx.followup.send(myloc["not_found"].format(id))
-            return
-
-        text = egg.text[:1023] + ("…" if len(egg.text) > 1023 else "") if egg.text else None
-
-        e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=discord.Color.red(), description=myloc["ready"]["question"])
+        e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=color, description=myloc["ready"]["question"])
         e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
         utils.brand_embed(e, lines)
 
         file = utils.show_attachment(egg, e)
 
-        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.PreReportEgg(self.bot, lines, egg), ephemeral=True)
+        return e, file
+
+    async def _confirm_flow(self, ctx: discord.Interaction, path: str, id: int, color: discord.Color, view_class, *, check_manage: bool = False):
+        await ctx.response.defer(ephemeral=True)
+
+        lines, myloc = await self.bot.get_section(ctx, path)
+
+        egg = await Egg.get_with_related(id)
+
+        if not egg:
+            await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
+            return
+
+        if check_manage and not await self.manage_check(ctx, egg):
+            await ctx.followup.send(myloc["cannot"], ephemeral=True)
+            return
+
+        e, file = self._confirm_embed(lines, myloc, egg, color)
+
+        await ctx.followup.send(
+            embed=e,
+            file=file or discord.utils.MISSING,
+            view=view_class(self.bot, lines, egg),
+            ephemeral=True
+        )
+
+    @app.command(name="report", description="report_description")
+    @app.rename(id="report_id")
+    @app.describe(id="report_id_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def report(self, ctx: discord.Interaction, id: int):
+        await self._confirm_flow(ctx, "eggs/report", id, discord.Color.red(), views.PreReportEgg)
 
     @app.command(name="delete", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def delete(self, ctx: discord.Interaction, id: int):
-        await ctx.response.defer(ephemeral=True)
-
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("eggs/delete", lines)
-
-        egg = await Egg.get_or_none(id=id).prefetch_related("creator", "origin")
-
-        if not egg:
-            await ctx.followup.send(content=myloc["not_found"].format(id), ephemeral=True)
-            return
-
-        manageable = await self.manage_check(ctx, egg)
-
-        if not manageable:
-            await ctx.followup.send(content=myloc["cannot"], ephemeral=True)
-            return
-
-        text = egg.text[:1023] + ("…" if len(egg.text) > 1023 else "") if egg.text else None
-
-        e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=discord.Color.blurple(), description=myloc["ready"]["question"])
-        e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
-        utils.brand_embed(e, lines)
-
-        file = utils.show_attachment(egg, e)
-
-        await ctx.followup.send(embed=e, file=file or discord.utils.MISSING, view=views.DeleteEgg(self.bot, lines, egg), ephemeral=True)
+        await self._confirm_flow(ctx, "eggs/delete", id, discord.Color.blurple(), views.DeleteEgg, check_manage=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

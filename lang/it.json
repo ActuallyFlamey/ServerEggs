@@ -7,34 +7,37 @@
                 "success": "Impostata la lingua \"**Italiano**\" con successo!"
             },
             "allow-user-lang": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
                 "success": "Modificato il permesso di utilizzare le lingue personali con successo (`{0}`)!"
             },
             "server-description": {
                 "success": "Impostata la descrizione del server:"
             },
             "privacy": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
+                "missing_perms": "A **Server Eggs** manca il permesso **Creare Invito**, che è necessario per questa operazione.",
                 "success": "Privacy del server impostata su `{0}` con successo."
             },
             "log": {
-                "already": "L'impostazione è già giusta!",
+                "already": "$common.already",
                 "missing_perms": "Non ho il permesso di scrivere i registri lì!",
                 "success": "Canale di registro Uova impostato su {0} con successo."
             }
         },
         "eggs": {
             "create_edit": {
-                "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un'immagine, o entrambi.",
+                "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un allegato, o entrambi.",
                 "empty_edit": "Non hai specificato alcuna modifica.",
                 "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
-                "not_found": "L'**Uovo n. {0}** non esiste.",
-                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "images_only": "**Solo le immagini** sono ammesse come allegato *al momento*. Riprova.",
                 "invalid_url": "Il parametro `link` specificato *non* porta a nessun **formato multimediale supportato**.\nRicorda, per ora **solo immagini**!",
                 "could_not_scan": "Non è stato possibile ottenere il contenuto multimediale per il controllo dei contenuti illegali.",
+                "processing": "Stiamo elaborando il tuo **Uovo**...\n-# Potrebbe volerci un po'! Stiamo solo controllando che tu non abbia allegato niente di illegale.",
+                "convert_failed": "Non è stato possibile elaborare il tuo **allegato**. Potrebbe essere danneggiato o usare un formato non supportato.",
                 "illegal": "**RILEVATI CONTENUTI ILLEGALI**. Ti è appena stato **tolto il permesso** di creare o modificare **Uova**.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
                 "log": "**{0}** ({1}) ha {2} l'**Uovo #{3}**",
@@ -62,6 +65,7 @@
                 "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
                 "filtered": "L'**Uovo n. {0}** esiste, ma i moderatori di **{1}** hanno deciso di **bloccarlo** dall'apparire qui.\nRiprova **altrove**, tipo un **server diverso** o **i miei DM**.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
+                "collection_status": "Stato Collezionamento",
                 "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
                 "collections": "L'**Uovo n. {0}** è stato collezionato **{1} volte**.",
                 "eggn": "Uovo n. {0}",
@@ -74,35 +78,35 @@
                 "button": {
                     "origin": "Unisciti al Server d'Origine",
                     "creator": "Visualizza il Profilo del Creatore",
-                    "report": "Segnala"
+                    "report": "$common.report"
                 }
             },
             "delete": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
-                "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "ready": {
                     "title": "Elimina Uovo #{0}",
                     "question": "Sei sicuro di voler eliminare questo **Uovo**?",
-                    "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content"
                 },
                 "confirm": "Conferma Eliminazione",
-                "cancel": "Annulla",
+                "cancel": "$common.cancel",
                 "success": "L'**Uovo n. {0}** è stato eliminato con successo.",
                 "cancelled": "Eliminazione annullata."
             },
             "report": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "not_found": "$common.not_found",
                 "ready": {
                     "title": "Segnala l'Uovo n. {0}",
                     "question": "Sei sicuro di voler segnalare questo **Uovo**?",
-                    "content": "Contenuto",
-                    "no_content": "[Nessun contenuto]"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content"
                 },
                 "confirm": "Inizia Segnalazione",
-                "cancel": "Annulla",
+                "cancel": "$common.cancel",
                 "cancelled": "Segnalazione annullata.",
-                "title": "Segnala l'Uovo n. {0}",
+                "title": "$eggs.report.ready.title",
                 "rule": "Motivo della Segnalazione",
                 "rule_desc": "Quale regola infrange quest'Uovo?",
                 "rule_placeholder": "Seleziona il motivo della segnalazione...",
@@ -149,8 +153,8 @@
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
                 "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
-                "beta": "Server Eggs è in Beta!",
-                "beta_desc": "Siccome **Server Eggs** è in **beta**, tutti i dati di questa beta verranno eliminati una volta finita."
+                "donate": "Sostieni Server Eggs",
+                "donate_desc": "Puoi **sostenere lo sviluppo** di **Server Eggs** donando al **[Ko-fi di HexaBlue](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "Informazioni sul Creare Uova",
@@ -186,7 +190,7 @@
             },
             "config": {
                 "title": "Informazioni sul Configurare Server Eggs",
-                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Le **lingue specificate dagli utenti** dovrebbero essere **permesse** in questo server? Oppure va **imposta a tutti** la **lingua del server**?\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Ci si deve poter **unire** a questo server attraverso le **Uova create qui** o no?\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
+                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Permetti l'uso delle **lingue specificate dagli utenti** in questo server.\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Permetti a **chiunque** di **unirsi a questo server** attraverso le **Uova** create in esso.\n  - Parametro `pubblico`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare."
             },
             "filter": {
                 "title": "Informazioni sul Filtrare Uova",
@@ -196,13 +200,13 @@
         "log": {
             "mark_nsfw": "Segna come VM18",
             "delete": "Elimina",
-            "report": "Segnala",
+            "report": "$common.report",
             "marked_nsfw": "Segnato l'**Uovo n. {0}** come NSFW.",
             "deleted": "Eliminato l'**Uovo n. {0}**."
         },
         "mod": {
             "filter": {
-                "not_found": "L'**Uovo n. {0}** non esiste.",
+                "not_found": "$common.not_found",
                 "unfiltered": "**Rimossi i filtri** dall'**Uovo n. {0}** con successo!\nOra può **tornare ad apparire** in questo server.",
                 "filtered": "**Filtrato** l'**Uovo n. {0}** con successo!\nOra **non potrà più apparire** in questo server."
             }
@@ -211,9 +215,19 @@
             "ping": {
                 "latency": "Ritardo"
             }
+        },
+        "common": {
+            "cancel": "Annulla",
+            "not_found": "L'**Uovo n. {0}** non esiste.",
+            "cannot": "Non sei autorizzato a gestire quest'**Uovo**.",
+            "already": "L'impostazione è già giusta!",
+            "report": "Segnala",
+            "ready": {
+                "content": "Contenuto",
+                "no_content": "[Nessun contenuto]"
+            }
         }
     },
-
     "help": "aiuto",
     "help_description": "Ottieni informazioni riguardanti Server Eggs o un comando.",
     "help_about": "riguardo-a",
@@ -231,7 +245,7 @@
     "allow-user-lang": "permetti-lingua-personale",
     "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
     "allow-user-lang_allow": "permetti",
-    "allow-user-lang_allow_description": "Permettere l'utilizzo delle lingue personali in questo server?",
+    "allow-user-lang_allow_description": "Vuoi permettere l'utilizzo delle lingue personali in questo server.",
 
     "server-description": "descrizione-server",
     "server-description_description": "Imposta una descrizione accattivante del server che convinca la gente a unirsi.",
@@ -240,8 +254,8 @@
 
     "privacy": "privacy",
     "privacy_description": "Imposta la privacy del server.",
-    "privacy_private": "privato",
-    "privacy_private_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno?",
+    "privacy_public": "pubblico",
+    "privacy_public_description": "Questo server dovrebbe essere accessibile dalle Uova create al suo interno.",
 
     "log": "registro",
     "log_description": "Imposta un canale da usare come registro delle Uova create qui.",
@@ -257,9 +271,9 @@
     "create_link": "link",
     "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
     "create_nsfw": "vm18",
-    "create_nsfw_description": "Se l'Uovo ha un contenuto 18+.",
+    "create_nsfw_description": "L'Uovo ha un contenuto 18+.",
     "create_secret": "segreto",
-    "create_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
+    "create_secret_description": "L'Uovo deve apparire solo casualmente.",
 
     "lay": "deponi",
 
@@ -286,9 +300,9 @@
     "edit_link": "link",
     "edit_link_description": "Il nuovo allegato da includere con l'Uovo in forma di URL.",
     "edit_nsfw": "vm18",
-    "edit_nsfw_description": "Se l'Uovo ha un contenuto 18+",
+    "edit_nsfw_description": "L'Uovo ha un contenuto 18+",
     "edit_secret": "segreto",
-    "edit_secret_description": "Se quest'Uovo deve apparire solo casualmente.",
+    "edit_secret_description": "L'Uovo deve apparire solo casualmente.",
 
     "report": "segnala",
     "report_description": "Segnala un Uovo.",
@@ -305,9 +319,9 @@
     "collected_check": "controlla",
     "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
     "collected_nsfw": "solo-vm18",
-    "collected_nsfw_description": "Filtra la tua collezione per \"solo VM18\".",
+    "collected_nsfw_description": "Vuoi filtrare la tua collezione per \"solo VM18\".",
     "collected_secret": "solo-segreti",
-    "collected_secret_description": "Filtra la tua collezione per \"solo segreti\".",
+    "collected_secret_description": "Vuoi filtrare la tua collezione per \"solo segreti\".",
 
     "leaderboard": "classifica",
     "leaderboard_description": "Vedi le classifiche per varie statistiche",

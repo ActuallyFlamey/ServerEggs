@@ -26,9 +26,9 @@ class ModLogActions(discord.ui.View):
         if not self.egg.nsfw:
             self.egg.nsfw = True
             await self.egg.save(update_fields=["nsfw"])
-        
+
         await ctx.followup.send(self.myloc["marked_nsfw"].format(self.egg.id), ephemeral=True)
-    
+
     @discord.ui.button(style=discord.ButtonStyle.danger)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):
         await ctx.response.defer(ephemeral=True)

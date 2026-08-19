@@ -25,17 +25,15 @@ class Dev(commands.GroupCog):
     async def list_guilds(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
-        guilds = [guild for guild in self.bot.guilds]
-
-        guildstr = ""
-        for guild in guilds:
+        entries = []
+        for guild in self.bot.guilds:
             owner = await self.bot.fetch_user(guild.owner_id)
-            guildstr += f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})\n"
+            entries.append(f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})")
 
-        await ctx.followup.send(content=guildstr)
-    
+        await ctx.followup.send(content="\n".join(entries))
+
     @app.command(name="unban", description="Unban a User from creating Eggs.")
-    @app.describe(user="The User")
+    @app.describe(user="The User to unban.")
     @app.check(is_dev)
     async def unban(self, ctx: discord.Interaction, user: discord.User):
         await ctx.response.defer()
@@ -45,16 +43,16 @@ class Dev(commands.GroupCog):
         if db_user is None:
             await ctx.followup.send(content="User not found.")
             return
-        
+
         if not db_user.banned:
             await ctx.followup.send(content="User is not banned.")
             return
-        
+
         db_user.banned = False
         await db_user.save(update_fields=["banned"])
 
         await ctx.followup.send(content=f"Unbanned user {db_user.id}.")
-    
+
     @app.command(name="new-reports", description="Link to the top of the report queue.")
     @app.check(is_dev)
     async def new_reports(self, ctx: discord.Interaction):
@@ -70,13 +68,29 @@ class Dev(commands.GroupCog):
         message = reportch.get_partial_message(oldest_report.log_message_id)
 
         await ctx.followup.send(content=message.jump_url)
-    
+
     @app.command(name="reload", description="Reload a Cog.")
     @app.check(is_dev)
     async def reload_cog(self, ctx: discord.Interaction, cog: str):
+        await ctx.response.defer()
+
         await self.bot.reload_extension(f"cogs.{cog}")
 
-        await ctx.response.send_message(f"Reloaded `{cog}` module successfully.")
+        await ctx.followup.send(f"Reloaded `{cog}` module successfully.")
+
+    @app.command(name="sync", description="Sync the Command Tree.")
+    @app.describe(devguildonly="Only sync for the DEVELOPER_GUILD.")
+    @app.check(is_dev)
+    async def sync(self, ctx: discord.Interaction, devguildonly: bool = False):
+        await ctx.response.defer()
+
+        if devguildonly:
+            synced = await self.bot.tree.sync(guild=DEVELOPER_GUILD)
+            await ctx.followup.send(f"Synced {len(synced)} guild command(s).")
+        else:
+            synced_global = await self.bot.tree.sync()
+            synced_guild = await self.bot.tree.sync(guild=DEVELOPER_GUILD)
+            await ctx.followup.send(f"Synced {len(synced_global)} global and {len(synced_guild)} guild command(s).")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Dev(bot), guild=DEVELOPER_GUILD)

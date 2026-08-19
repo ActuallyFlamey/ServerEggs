@@ -22,8 +22,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await ctx.response.defer(ephemeral=True)
 
         if ctx.guild:
-            lines = await self.bot.fetch_lines(ctx)
-            myloc = self.bot.get_lines("config/lang", lines)
+            _, myloc = await self.bot.get_section(ctx, "config/lang")
 
             if code == "":
                 await ctx.followup.send(myloc["no_default"], ephemeral=True)
@@ -39,8 +38,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
             await User.update_or_create(defaults={ "lang": code }, id=ctx.user.id)
             self.bot.lang_cache[f"user_{ctx.user.id}"] = code
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/lang", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/lang")
 
         await ctx.followup.send(myloc["success"], ephemeral=True)
 
@@ -52,8 +50,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/allow-user-lang", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/allow-user-lang")
 
         cache_key = f"guild_{ctx.guild.id}_allowuserlang"
 
@@ -74,41 +71,43 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def server_description(self, ctx: discord.Interaction, desc: str):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/server-description", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/server-description")
 
         guild, _ = await Guild.update_or_create({ "description": desc }, id=ctx.guild.id)
 
         await ctx.followup.send(myloc["success"] + "\n" + guild.description, ephemeral=True)
 
     @app.command(name="privacy", description="privacy_description")
-    @app.rename(private="privacy_private")
-    @app.describe(private="privacy_private_description")
+    @app.rename(public="privacy_public")
+    @app.describe(public="privacy_public_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
-    async def privacy(self, ctx: discord.Interaction, private: bool):
+    async def privacy(self, ctx: discord.Interaction, public: bool):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/privacy", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/privacy")
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
         has_invite = bool(guild.invite)
 
-        if (has_invite and not private) or (not has_invite and private):
+        if (has_invite and public) or (not has_invite and not public):
             await ctx.followup.send(myloc["already"], ephemeral=True)
             return
 
         invite = None
-        if not private:
-            inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
-            invite = inviteobj.url
+        if public:
+            try:
+                inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
+                invite = inviteobj.url
+            except discord.errors.Forbidden:
+                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
+                return
 
         guild.invite = invite
         await guild.save(update_fields=["invite"])
 
-        await ctx.followup.send(myloc["success"].format(private), ephemeral=True)
-    
+        await ctx.followup.send(myloc["success"].format(public), ephemeral=True)
+
     @app.command(name="log", description="log_description")
     @app.rename(channel="log_channel")
     @app.describe(channel="log_channel_description")
@@ -117,20 +116,19 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def log(self, ctx: discord.Interaction, channel: discord.TextChannel):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("config/log", lines)
+        _, myloc = await self.bot.get_section(ctx, "config/log")
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
 
         if channel.id == guild.logch:
             await ctx.followup.send(myloc["already"], ephemeral=True)
             return
-        
+
         perms = channel.permissions_for(ctx.guild.me)
         if not (perms.view_channel and perms.send_messages and perms.embed_links):
             await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
             return
-        
+
         guild.logch = channel.id
         await guild.save(update_fields=["logch"])
 

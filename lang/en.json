@@ -7,18 +7,19 @@
                 "success": "Successfully switched language to \"**English**\"!"
             },
             "allow-user-lang": {
-                "already": "The setting is already correct!",
+                "already": "$common.already",
                 "success": "Successfully modified the setting regarding usage of user languages (`{0}`)!"
             },
             "server-description": {
                 "success": "Successfully set server description to:"
             },
             "privacy": {
-                "already": "The setting is already correct!",
+                "already": "$common.already",
+                "missing_perms": "**Server Eggs** is missing the **Create Invite** permission, which is required for this operation.",
                 "success": "Server privacy successfully set to `{0}`."
             },
             "log": {
-                "already": "The setting is already correct!",
+                "already": "$common.already",
                 "missing_perms": "I don't have permission to write logs there!",
                 "success": "Log channel successfully set to {0}."
             }
@@ -30,11 +31,13 @@
                 "no_nsfw": "Cannot create or edit a **NSFW Egg** in a **SFW channel**.",
                 "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "banned": "You are **banned** from creating and editing **Egg**s.\nAppealing is not possible *at this time*.",
-                "not_found": "**Egg #{0}** does not exist.",
-                "cannot": "You don't have permission to manage this **Egg**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "images_only": "**Only images** are supported as an attachment *at this time*. Try again.",
                 "invalid_url": "The specified `link` parameter does *not* resolve to any **supported media format**.\nRemember, for now it's **images only**!",
                 "could_not_scan": "Failed to retrieve the media for the harmful content scan.",
+                "processing": "Processing your **Egg**...\n-# This may take a while! We're just checking you didn't attach anything illegal.",
+                "convert_failed": "Failed to process your **attachment**. It may be corrupted or use an unsupported format.",
                 "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
                 "log": "**{0}** ({1}) {2} **Egg #{3}**",
@@ -62,7 +65,8 @@
                 "secret": "**Egg #{0}** is secret!\nYou can only find it randomly...",
                 "filtered": "**Egg #{0}** exists, but **{1}**'s moderators have decided to **block it** from showing up here.\nTry again **somewhere else**, like a **different server** or **my DMs**.",
                 "no_egg": "Could not find any **Egg**s.",
-                "collected": "**Egg #{0}** has been **collected**!\nIt has now been collected **{1} times**.\n-# Check your collected **Egg**s with `/collected`!",
+                "collection_status": "Collection Status",
+                "collected": "You have **collected** **Egg #{0}**!\nIt has now been collected **{1} times**.\n-# Check your collected **Egg**s with `/collected`!",
                 "collections": "**Egg #{0}** was collected **{1} times**.",
                 "eggn": "Egg #{0}",
                 "creator": "Created by",
@@ -74,35 +78,35 @@
                 "button": {
                     "origin": "Join Origin Server",
                     "creator": "View Creator Profile",
-                    "report": "Report"
+                    "report": "$common.report"
                 }
             },
             "delete": {
-                "not_found": "**Egg #{0}** does not exist.",
-                "cannot": "You don't have permission to manage this **Egg**.",
+                "not_found": "$common.not_found",
+                "cannot": "$common.cannot",
                 "ready": {
                     "title": "Delete Egg #{0}",
                     "question": "Are you sure you want to delete this **Egg**?",
-                    "content": "Content",
-                    "no_content": "[No content]"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content"
                 },
                 "confirm": "Confirm Deletion",
-                "cancel": "Cancel",
+                "cancel": "$common.cancel",
                 "success": "**Egg #{0}** was deleted successfully.",
                 "cancelled": "Deletion cancelled."
             },
             "report": {
-                "not_found": "**Egg #{0}** does not exist.",
+                "not_found": "$common.not_found",
                 "ready": {
                     "title": "Report Egg #{0}",
                     "question": "Are you sure you want to report this **Egg**?",
-                    "content": "Content",
-                    "no_content": "[No content]"
+                    "content": "$common.ready.content",
+                    "no_content": "$common.ready.no_content"
                 },
                 "confirm": "Start Report",
-                "cancel": "Cancel",
+                "cancel": "$common.cancel",
                 "cancelled": "Report cancelled.",
-                "title": "Report Egg #{0}",
+                "title": "$eggs.report.ready.title",
                 "rule": "Report Reason",
                 "rule_desc": "Which rule is this Egg breaking?",
                 "rule_placeholder": "Select the report reason...",
@@ -149,8 +153,8 @@
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
                 "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` parameter **adds text** to the **Egg**.\n  - The `file` parameter **adds an attachment** as a file.\n  - The `link` parameter **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`.",
-                "beta": "Server Eggs is in Beta!",
-                "beta_desc": "Because **Server Eggs** is in **beta**, all data from this beta will be deleted once it ends."
+                "donate": "Support Server Eggs",
+                "donate_desc": "You can **support the development** of **Server Eggs** by donating to **[HexaBlue's Ko-fi](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "About Creating Eggs",
@@ -186,7 +190,7 @@
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Should **user-specified languages** be **allowed** in this server? Or should the **server language** be **enforced**?\n  - `allow` parameter: True or False.\n- `/config privacy`: Should this server be **joinable** through **Eggs created here** or not?\n  - `private` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -196,13 +200,13 @@
         "log": {
             "mark_nsfw": "Mark NSFW",
             "delete": "Delete",
-            "report": "Report",
+            "report": "$common.report",
             "marked_nsfw": "Marked **Egg #{0}** as NSFW.",
             "deleted": "Deleted **Egg #{0}**."
         },
         "mod": {
             "filter": {
-                "not_found": "**Egg #{0}** does not exist.",
+                "not_found": "$common.not_found",
                 "unfiltered": "Successfully **unfiltered** **Egg #{0}**.\nIt can now **appear again** in this server.",
                 "filtered": "Successfully **filtered** **Egg #{0}**.\nIt will **no longer appear** in this server."
             }
@@ -211,6 +215,17 @@
             "ping": {
                 "latency": "Latency"
             }
+        },
+        "common": {
+            "cancel": "Cancel",
+            "not_found": "**Egg #{0}** does not exist.",
+            "cannot": "You don't have permission to manage this **Egg**.",
+            "already": "The setting is already correct!",
+            "report": "Report",
+            "ready": {
+                "content": "Content",
+                "no_content": "[No content]"
+            }
         }
     },
 
@@ -218,10 +233,10 @@
     "help_description": "Get info about Server Eggs or a command.",
     "help_about": "about",
     "help_about_description": "The command to get information about.",
-    
+
     "config": "config",
     "config_description": "Configuration commands.",
-    
+
     "lang": "lang",
     "lang_description": "Sets the response language. In servers, you must have the Manage Server permission.",
     "lang_language": "language",
@@ -231,7 +246,7 @@
     "allow-user-lang": "allow-user-lang",
     "allow-user-lang_description": "Changes the setting on allowing user languages in this server.",
     "allow-user-lang_allow": "allow",
-    "allow-user-lang_allow_description": "Allow the usage of user languages in this server?",
+    "allow-user-lang_allow_description": "User languages should be allowed in this server.",
 
     "server-description": "server-description",
     "server-description_description": "Set an enticing server description to convince people to join.",
@@ -240,8 +255,8 @@
 
     "privacy": "privacy",
     "privacy_description": "Set the privacy of the server.",
-    "privacy_private": "private",
-    "privacy_private_description": "Should this server be accessible from the Eggs created in it?",
+    "privacy_public": "public",
+    "privacy_public_description": "This server should be accessible through Eggs created in it.",
 
     "log": "log",
     "log_description": "Set a log channel for Eggs created here.",
@@ -257,9 +272,9 @@
     "create_link": "link",
     "create_link_description": "The attachment included with the Egg as a URL.",
     "create_nsfw": "nsfw",
-    "create_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "create_nsfw_description": "This Egg should be marked as NSFW.",
     "create_secret": "secret",
-    "create_secret_description": "Whether this Egg should only appear randomly.",
+    "create_secret_description": "This Egg should only appear randomly.",
 
     "lay": "lay",
 
@@ -286,9 +301,9 @@
     "edit_link": "link",
     "edit_link_description": "The new attachment included with the Egg as a URL.",
     "edit_nsfw": "nsfw",
-    "edit_nsfw_description": "Whether the Egg should be marked as NSFW.",
+    "edit_nsfw_description": "This Egg should be marked as NSFW.",
     "edit_secret": "secret",
-    "edit_secret_description": "Whether this Egg should only appear randomly.",
+    "edit_secret_description": "This Egg should only appear randomly.",
 
     "report": "report",
     "report_description": "Report an Egg.",
@@ -305,9 +320,9 @@
     "collected_check": "check",
     "collected_check_description": "Check if you've collected a specific Egg ID.",
     "collected_nsfw": "only-nsfw",
-    "collected_nsfw_description": "Filter your collection by \"NSFW only\".",
+    "collected_nsfw_description": "You want to filter your collection by \"NSFW only\".",
     "collected_secret": "only-secret",
-    "collected_secret_description": "Filter your collection by \"secret only\".",
+    "collected_secret_description": "You want to filter your collection by \"secret only\".",
 
     "leaderboard": "leaderboard",
     "leaderboard_description": "View leaderboards for various stats.",

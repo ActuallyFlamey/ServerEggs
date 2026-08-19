@@ -8,7 +8,7 @@ from schema import Egg, Guild
 class Mod(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
+
     @app.command(name="filter", description="filter_description")
     @app.rename(id="filter_id")
     @app.describe(id="filter_id_description")
@@ -17,14 +17,13 @@ class Mod(commands.Cog):
     async def filter_egg(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 
-        lines = await self.bot.fetch_lines(ctx)
-        myloc = self.bot.get_lines("mod/filter", lines)
+        _, myloc = await self.bot.get_section(ctx, "mod/filter")
 
         egg = await Egg.get_or_none(id=id)
         if not egg:
             await ctx.followup.send(myloc["not_found"].format(id), ephemeral=True)
             return
-        
+
         guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
         current_state = await guild.filtered.filter(id=egg.id).exists()

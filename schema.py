@@ -22,6 +22,10 @@ class Egg(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     edited_at = fields.DatetimeField(auto_now=True)
 
+    @classmethod
+    async def get_with_related(cls, id):
+        return await cls.get_or_none(id=id).prefetch_related("creator", "origin")
+
 class Guild(Model):
     id = fields.BigIntField(primary_key=True, generated=False, unique=True, db_index=True)
 
