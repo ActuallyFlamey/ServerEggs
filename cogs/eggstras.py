@@ -1,4 +1,5 @@
 import collections
+import difflib
 import random
 import re
 import unicodedata
@@ -7,6 +8,7 @@ import discord
 from discord import app_commands as app
 from discord.ext import commands
 from tortoise.expressions import Q
+from tortoise.transactions import in_transaction
 
 import utils
 import views
@@ -34,6 +36,36 @@ for start, end in EMOJI_RANGES:
         for _word in name.lower().split():
             EMOJI_ALIASES.setdefault(_word, set()).add(chr(code))
 
+ACCENT_RANGES = (
+    (0x00C0, 0x024F),
+    (0x1E00, 0x1EFF),
+)
+
+ACCENT_VARIANTS = {}
+for start, end in ACCENT_RANGES:
+    for code in range(start, end + 1):
+        ch = chr(code)
+        base = unicodedata.normalize("NFD", ch)
+        if len(base) > 1:
+            ACCENT_VARIANTS.setdefault(base[0], set()).add(ch)
+
+ACCENT_BASE = {variant: base for base, variants in ACCENT_VARIANTS.items() for variant in variants}
+
+def fold_accents(text: str) -> str:
+    decomposed = unicodedata.normalize("NFD", text)
+    return "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
+
+def accent_pattern(text: str) -> str:
+    out = []
+    for ch in text:
+        base = ACCENT_BASE.get(ch, ch)
+        variants = ACCENT_VARIANTS.get(base)
+        if variants:
+            out.append("[" + "".join(sorted(variants | {base})) + "]")
+        else:
+            out.append(re.escape(ch))
+    return "".join(out)
+
 def normalize(text: str) -> str:
     text = CUSTOM_EMOJI_RE.sub(r"\1", text)
     text = LINK_RE.sub(r"\1 \2", text)
@@ -48,7 +80,7 @@ def normalize(text: str) -> str:
                 continue
         out.append(ch)
 
-    return "".join(out).lower()
+    return fold_accents("".join(out)).lower()
 
 def expand(text: str) -> set[str]:
     terms = {text}
@@ -67,6 +99,48 @@ def expand(text: str) -> set[str]:
         terms.update(EMOJI_ALIASES.get(word, ()))
 
     return terms
+
+FUZZY_MIN_WORD = 4
+FUZZY_CUTOFF = 0.7
+
+def fuzzy_score(query: str, text: str) -> float:
+    qwords = [w for w in re.findall(r"[a-z0-9']+", query.lower()) if len(w) >= FUZZY_MIN_WORD]
+
+    if not qwords:
+        return 0.0
+
+    twords = re.findall(r"[a-z0-9']+", text.lower())
+
+    if not twords:
+        return 0.0
+
+    return max(
+        difflib.SequenceMatcher(None, q, t).ratio()
+        for q in qwords
+        for t in twords
+    )
+
+FUZZY_LIMIT = 50
+FUZZY_THRESHOLD = 0.2
+
+async def fuzzy_ids(query: str, guild_id: int | None = None, filter_nsfw: bool = False) -> list[int]:
+    where = ["secret = false"]
+
+    if filter_nsfw:
+        where.append("nsfw = false")
+
+    if guild_id is not None:
+        where.append(f"id NOT IN (SELECT egg_id FROM guild_filtered_eggs WHERE guild_id = {guild_id})")
+
+    literal = query.replace("'", "''")
+
+    sql = f"SELECT id FROM egg WHERE {' AND '.join(where)} AND text %> '{literal}' ORDER BY text <->> '{literal}' LIMIT {FUZZY_LIMIT}"
+
+    async with in_transaction() as tx:
+        await tx.execute_query(f"SELECT set_config('pg_trgm.word_similarity_threshold', '{FUZZY_THRESHOLD}', true)")
+        _, rows = await tx.execute_query(sql)
+
+    return [row[0] for row in rows]
 
 class Eggstras(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -167,36 +241,47 @@ class Eggstras(commands.Cog):
             await ctx.followup.send(myloc["empty"].format(text))
             return
 
-        sql = Q(text__icontains=query)
-        for alt in expand(query) - {query}:
-            sql |= Q(text__icontains=alt)
-
-        q = Egg.all().prefetch_related("creator", "origin").filter(sql)
-        q = q.filter(secret=False)
+        base = Egg.all().prefetch_related("creator", "origin")
+        base = base.filter(secret=False)
         if not nsfw_allowed:
-            q = q.filter(nsfw=False)
+            base = base.filter(nsfw=False)
 
         if ctx.guild:
             filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
             if filtered:
-                q = q.filter(id__not_in=filtered)
-
-        eggs = await q
+                base = base.filter(id__not_in=filtered)
 
         norm_query = normalize(query)
 
-        eggs = [egg for egg in eggs if norm_query in normalize(egg.text or "")]
+        sql = Q(text__iposix_regex=accent_pattern(query))
+        for alt in expand(query) - {query}:
+            sql |= Q(text__icontains=alt)
 
-        if not eggs:
-            await ctx.followup.send(myloc["empty"].format(query))
-            return
+        eggs = [egg for egg in await base.filter(sql) if norm_query in normalize(egg.text or "")]
 
-        eggs.sort(key=lambda egg: (
-            normalize(egg.text or "") != norm_query,
-            not normalize(egg.text or "").startswith(norm_query),
-            len(egg.text or ""),
-            egg.id,
-        ))
+        if eggs:
+            eggs.sort(key=lambda egg: (
+                normalize(egg.text or "") != norm_query,
+                not normalize(egg.text or "").startswith(norm_query),
+                len(egg.text or ""),
+                egg.id,
+            ))
+        else:
+            ids = await fuzzy_ids(query, ctx.guild.id if ctx.guild else None, not nsfw_allowed)
+
+            if ids:
+                fetched = {egg.id: egg for egg in await base.filter(id__in=ids)}
+
+                scored = [(fuzzy_score(query, normalize(egg.text or "")), egg) for egg in fetched.values()]
+                scored = [(score, egg) for score, egg in scored if score >= FUZZY_CUTOFF]
+                scored.sort(key=lambda item: (-item[0], len(item[1].text or ""), item[1].id))
+                eggs = [egg for _, egg in scored]
+            else:
+                eggs = []
+
+            if not eggs:
+                await ctx.followup.send(myloc["empty"].format(query))
+                return
 
         loop = collections.deque(eggs)
 
