@@ -326,6 +326,8 @@
     "delete_id": "id",
     "delete_id_description": "L'ID dell'Uovo da eliminare.",
 
+    "crack": "rompi",
+
     "collected": "collezione",
     "collected_description": "Osserva la tua collezione di Uova, o controlla se hai già collezionato un Uovo specifico.",
     "collected_check": "controlla",

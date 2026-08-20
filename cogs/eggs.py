@@ -367,6 +367,13 @@ class Eggs(commands.Cog):
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def delete(self, ctx: discord.Interaction, id: int):
         await self._confirm_flow(ctx, "eggs/delete", id, discord.Color.blurple(), views.DeleteEgg, check_manage=True)
+    
+    @app.command(name="crack", description="delete_description")
+    @app.rename(id="delete_id")
+    @app.describe(id="delete_id_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def crack(self, ctx: discord.Interaction, id: int):
+        await self._confirm_flow(ctx, "eggs/delete", id, discord.Color.blurple(), views.DeleteEgg, check_manage=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

@@ -327,6 +327,8 @@
     "delete_id": "id",
     "delete_id_description": "The ID of the Egg to delete.",
 
+    "crack": "crack",
+
     "collected": "collected",
     "collected_description": "View your Egg collection, or check if you've collected a specific Egg.",
     "collected_check": "check",
