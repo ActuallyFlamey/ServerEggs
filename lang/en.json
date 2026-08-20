@@ -323,7 +323,7 @@
     "egg": "egg",
 
     "nsfw": "nsfw",
-    "nsfw_description": "Get a random NSFW Egg (Questionable or Explicit).",
+    "nsfw_description": "Get a random Explicit Egg.",
 
     "edit": "edit",
     "edit_description": "Edit an Egg that you're allowed to manage.",
