@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
 
-import utils
 import views
 
-from .embed import get_egg_embed
+from . import attach, embed
 
 
 async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.User, actor: discord.User, edit: bool = False):
@@ -14,8 +13,8 @@ async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.U
 
     if not logch: return
 
-    e, file, link, inline = await get_egg_embed(bot, lines, egg, creator)
-    sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+    e, file, link, inline = await embed.get_egg_embed(bot, lines, egg, creator)
+    sfile, vfile, vlink = attach.attachment_kwargs(file, link, inline)
 
     await logch.send(
         myloc["log"].format(

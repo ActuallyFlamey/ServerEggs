@@ -12,7 +12,7 @@ from tortoise.transactions import in_transaction
 
 import utils
 import views
-from schema import Egg, User
+from schema import Egg, Guild, Rating, User
 
 CUSTOM_EMOJI_RE = re.compile(r"<a?:(\w+):\d+>")
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]*)\)")
@@ -123,11 +123,12 @@ def fuzzy_score(query: str, text: str) -> float:
 FUZZY_LIMIT = 50
 FUZZY_THRESHOLD = 0.2
 
-async def fuzzy_ids(query: str, guild_id: int | None = None, filter_nsfw: bool = False) -> list[int]:
+async def fuzzy_ids(query: str, guild_id: int | None = None, allowed_ratings: list[Rating] | None = None) -> list[int]:
     where = ["secret = false"]
 
-    if filter_nsfw:
-        where.append("nsfw = false")
+    if allowed_ratings:
+        values = ", ".join(f"'{rating.value if hasattr(rating, 'value') else rating}'" for rating in allowed_ratings)
+        where.append(f"rating IN ({values})")
 
     if guild_id is not None:
         where.append(f"id NOT IN (SELECT egg_id FROM guild_filtered_eggs WHERE guild_id = {guild_id})")
@@ -146,12 +147,14 @@ class Eggstras(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def egg_loop(self, ctx: discord.Interaction, mode: str, check: int | None, nsfw: bool | None, secret: bool | None):
+    async def egg_loop(self, ctx: discord.Interaction, mode: str, check: int | None, rating: Rating | None, secret: bool | None):
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggstras/loop")
 
-        nsfw_allowed = utils.channel_is_nsfw(ctx.channel)
+        guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
+
+        allowed = utils.channel_ratings(guild, ctx.channel)
 
         user, _ = await User.get_or_create(id=ctx.user.id)
 
@@ -168,23 +171,22 @@ class Eggstras(commands.Cog):
                 await ctx.followup.send(myloc[f"not_{mode}"].format(check))
                 return
 
-            if egg.nsfw and not nsfw_allowed:
-                await ctx.followup.send(myloc["nsfw_id_in_sfw"].format(check))
+            if egg.rating not in allowed:
+                await ctx.followup.send(myloc["rating_not_allowed"].format(check))
                 return
 
             loop = [egg]
         else:
             query = field.all().prefetch_related("creator", "origin")
 
-            if not nsfw_allowed:
-                if nsfw:
-                    await ctx.followup.send(myloc["nsfw_in_sfw"])
-                    return
+            if rating is not None and rating not in allowed:
+                await ctx.followup.send(myloc["rating_not_allowed_filter"])
+                return
 
-                query = query.filter(nsfw=False)
+            query = query.filter(rating__in=allowed)
 
-            if nsfw:
-                query = query.filter(nsfw=True)
+            if rating is not None:
+                query = query.filter(rating=rating)
 
             if secret:
                 query = query.filter(secret=True)
@@ -211,18 +213,28 @@ class Eggstras(commands.Cog):
         )
 
     @app.command(name="collected", description="collected_description")
-    @app.rename(check="collected_check", nsfw="collected_nsfw", secret="collected_secret")
-    @app.describe(check="collected_check_description", nsfw="collected_nsfw_description", secret="collected_secret_description")
+    @app.rename(check="collected_check", rating="collected_rating", secret="collected_secret")
+    @app.describe(check="collected_check_description", rating="collected_rating_description", secret="collected_secret_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def collected(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
-        await self.egg_loop(ctx, "collected", check, nsfw, secret)
+    async def collected(self, ctx: discord.Interaction, check: int | None, rating: Rating | None, secret: bool | None):
+        await self.egg_loop(ctx, "collected", check, rating, secret)
 
     @app.command(name="my-eggs", description="my-eggs_description")
-    @app.rename(check="my-eggs_check", nsfw="my-eggs_nsfw", secret="my-eggs_secret")
-    @app.describe(check="my-eggs_check_description", nsfw="my-eggs_nsfw_description", secret="my-eggs_secret_description")
+    @app.rename(check="my-eggs_check", rating="my-eggs_rating", secret="my-eggs_secret")
+    @app.describe(check="my-eggs_check_description", rating="my-eggs_rating_description", secret="my-eggs_secret_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def my_eggs(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
-        await self.egg_loop(ctx, "created", check, nsfw, secret)
+    async def my_eggs(self, ctx: discord.Interaction, check: int | None, rating: Rating | None, secret: bool | None):
+        await self.egg_loop(ctx, "created", check, rating, secret)
 
     @app.command(name="search", description="search_description")
     @app.rename(text="search_text")
@@ -233,7 +245,9 @@ class Eggstras(commands.Cog):
 
         lines, myloc = await self.bot.get_section(ctx, "eggstras/search")
 
-        nsfw_allowed = utils.channel_is_nsfw(ctx.channel)
+        guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
+
+        allowed = utils.channel_ratings(guild, ctx.channel)
 
         query = text.strip()
 
@@ -243,8 +257,7 @@ class Eggstras(commands.Cog):
 
         base = Egg.all().prefetch_related("creator", "origin")
         base = base.filter(secret=False)
-        if not nsfw_allowed:
-            base = base.filter(nsfw=False)
+        base = base.filter(rating__in=allowed)
 
         if ctx.guild:
             filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
@@ -267,7 +280,7 @@ class Eggstras(commands.Cog):
                 egg.id,
             ))
         else:
-            ids = await fuzzy_ids(query, ctx.guild.id if ctx.guild else None, not nsfw_allowed)
+            ids = await fuzzy_ids(query, ctx.guild.id if ctx.guild else None, allowed)
 
             if ids:
                 fetched = {egg.id: egg for egg in await base.filter(id__in=ids)}

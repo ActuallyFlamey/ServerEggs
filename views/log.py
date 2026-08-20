@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import utils
 
-from .base import AttachmentView
+from .base import AttachmentView, RatingModal
 from .eggs import ReportEgg
 
 
@@ -15,20 +15,14 @@ class ModLogActions(AttachmentView):
         self.myloc = bot.get_lines("log", lines)
         self.egg = egg
 
-        self.mark_nsfw.label = self.myloc["mark_nsfw"]
+        self.change_rating.label = self.myloc["change_rating"]
         self.delete.label = self.myloc["delete"]
         self.report.label = self.myloc["report"]
         self.setup_extra(self.myloc["show_extra_attachment"], hide_if_missing=True)
 
     @discord.ui.button(style=discord.ButtonStyle.primary, row=1)
-    async def mark_nsfw(self, ctx: discord.Interaction, button: discord.ui.Button):
-        await ctx.response.defer(ephemeral=True)
-
-        if not self.egg.nsfw:
-            self.egg.nsfw = True
-            await self.egg.save(update_fields=["nsfw"])
-
-        await ctx.followup.send(self.myloc["marked_nsfw"].format(self.egg.id), ephemeral=True)
+    async def change_rating(self, ctx: discord.Interaction, button: discord.ui.Button):
+        await ctx.response.send_modal(RatingModal(self.bot.get_lines("rating", self.lines), self.egg))
 
     @discord.ui.button(style=discord.ButtonStyle.danger, row=1)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):

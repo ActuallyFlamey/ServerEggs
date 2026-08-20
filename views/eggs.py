@@ -7,7 +7,7 @@ from discord.ext import commands
 from tortoise.exceptions import IntegrityError
 
 import utils
-from schema import Report, User
+from schema import Rating, Report, User
 
 from .base import AttachmentView
 from .mod import ReportActions
@@ -70,20 +70,27 @@ class Eggify(discord.ui.Modal):
             component=discord.ui.Checkbox()
         )
 
-        self.nsfw = discord.ui.Label(
-            text=self.myloc["nsfw"],
-            description=self.myloc["nsfw_desc"],
-            component=discord.ui.Checkbox()
+        self.rating = discord.ui.Label(
+            text=self.myloc["rating"],
+            description=self.myloc["rating_desc"],
+            component=discord.ui.Select(
+                placeholder=self.myloc["rating_placeholder"],
+                options=[
+                    discord.SelectOption(label=self.myloc["rating_safe"], value=Rating.SAFE.value),
+                    discord.SelectOption(label=self.myloc["rating_questionable"], value=Rating.QUESTIONABLE.value),
+                    discord.SelectOption(label=self.myloc["rating_explicit"], value=Rating.EXPLICIT.value),
+                ]
+            )
         )
 
         self.add_item(self.eggtext)
-        self.add_item(self.nsfw)
+        self.add_item(self.rating)
 
     async def on_submit(self, ctx: discord.Interaction):
         await ctx.response.edit_message(content=self.myloc["success"], view=None)
 
         cog = self.bot.get_cog("Eggs")
-        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, self.nsfw.component.value, self.secret.component.value)
+        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, Rating(self.rating.component.values[0]), self.secret.component.value)
 
 class GetEgg(AttachmentView):
     def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User, file=None, link=None):
@@ -285,7 +292,7 @@ class ReportEgg(discord.ui.Modal):
                 file=sfile,
                 view=ReportActions(
                     self.bot, report, reporter,
-                    vfile, vlink
+                    vfile, vlink, lines=self.lines
                 )
             )
 

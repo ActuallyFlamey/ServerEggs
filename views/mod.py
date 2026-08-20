@@ -4,16 +4,17 @@ from discord.ext import commands
 import utils
 from schema import Egg, Report
 
-from .base import AttachmentView
+from .base import AttachmentView, RatingModal
 
 
 class ReportActions(AttachmentView):
-    def __init__(self, bot: commands.Bot, report, reporter, file=None, link=None):
+    def __init__(self, bot: commands.Bot, report, reporter, file=None, link=None, lines=None):
         super().__init__(bot, file, link, timeout=None)
 
         self.bot = bot
         self.report = report
         self.reporter = reporter
+        self.lines = lines
 
         self.setup_extra("Show Extra Attachment", hide_if_missing=True)
 
@@ -52,17 +53,14 @@ class ReportActions(AttachmentView):
 
         await self.delete_reports(ctx, "Ignore", egg.id)
 
-    @discord.ui.button(label="Mark NSFW", style=discord.ButtonStyle.primary, row=1)
-    async def mark_nsfw(self, ctx: discord.Interaction, button: discord.ui.Button):
-        await ctx.response.defer()
-
+    @discord.ui.button(label="Change Rating", style=discord.ButtonStyle.primary, row=1)
+    async def change_rating(self, ctx: discord.Interaction, button: discord.ui.Button):
         egg = await self.report.egg
 
-        if not egg.nsfw:
-            egg.nsfw = True
-            await egg.save(update_fields=["nsfw"])
+        await ctx.response.send_modal(RatingModal(self.bot.get_lines("rating", self.lines), egg, after_set=self._after_rating))
 
-        await self.delete_reports(ctx, "Mark NSFW", egg.id)
+    async def _after_rating(self, ctx: discord.Interaction, egg: Egg, rating):
+        await self.delete_reports(ctx, f"Change Rating to {rating.value}", egg.id)
 
     @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger, row=1)
     async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):

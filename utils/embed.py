@@ -1,25 +1,20 @@
 import discord
 from discord.ext import commands
 
-import utils
+from schema import Rating
 
+from . import attach, misc
 
-def channel_is_nsfw(channel) -> bool:
-    return bool(channel and hasattr(channel, "is_nsfw") and channel.is_nsfw())
-
-async def get_or_fetch_user(bot, user_id: int):
-    user = bot.get_user(user_id)
-
-    if user is not None:
-        return user
-
-    try:
-        return await bot.fetch_user(user_id)
-    except (discord.NotFound, discord.HTTPException):
-        return None
 
 def egg_title(egg, base: str) -> str:
-    return base + (" ⭐" if egg.secret else " ") + ("🌶️" if egg.nsfw else "")
+    if egg.rating == Rating.EXPLICIT:
+        marker = "🌶️"
+    elif egg.rating == Rating.QUESTIONABLE:
+        marker = "⚠️"
+    else:
+        marker = ""
+
+    return base + (" ⭐" if egg.secret else " ") + marker
 
 def brand_embed(e: discord.Embed, lines: dict | None = None):
     if lines is None:
@@ -38,12 +33,14 @@ def brand_embed(e: discord.Embed, lines: dict | None = None):
 def get_egg_color(egg):
     color = discord.Color.blurple()
 
-    if egg.secret and egg.nsfw:
+    if egg.secret and egg.rating == Rating.EXPLICIT:
         color = discord.Color.fuchsia()
     elif egg.secret:
         color = discord.Color.gold()
-    elif egg.nsfw:
+    elif egg.rating == Rating.EXPLICIT:
         color = discord.Color.red()
+    elif egg.rating == Rating.QUESTIONABLE:
+        color = discord.Color.orange()
 
     return color
 
@@ -51,7 +48,7 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
     myloc = bot.get_lines("eggs/get", lines)
 
     if creator is None:
-        creator = await get_or_fetch_user(bot, egg.creator.id)
+        creator = await misc.get_or_fetch_user(bot, egg.creator.id)
 
     origin = bot.get_guild(egg.origin.id)
 
@@ -80,8 +77,8 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
             inline=False
         )
 
-    utils.brand_embed(e, lines)
+    brand_embed(e, lines)
 
-    file, link, inline = utils.show_attachment(egg, e)
+    file, link, inline = attach.show_attachment(egg, e)
 
     return e, file, link, inline

@@ -28,7 +28,7 @@
             "create_edit": {
                 "empty_create": "Cannot create an **empty Egg**.\nPlease try again and include some text, an attachment, or both.",
                 "empty_edit": "You didn't specify any edits.",
-                "no_nsfw": "Cannot create or edit a **NSFW Egg** in a **SFW channel**.",
+                "rating_not_allowed": "Cannot create or edit an **Egg** with this **rating** in this channel.",
                 "toomanyattach": "You may not use both `file` and `link` at the same time.\nChoose between the two.",
                 "banned": "You are **banned** from creating and editing **Egg**s.\nAppealing is not possible *at this time*.",
                 "not_found": "$common.not_found",
@@ -57,13 +57,17 @@
                 "text_placeholder": "Insert the Egg text here...",
                 "secret": "Mark as Secret",
                 "secret_desc": "Make this Egg only obtainable randomly?",
-                "nsfw": "Mark as NSFW",
-                "nsfw_desc": "Is this Egg NSFW? Failing to label correctly will result in punishment.",
+                "rating": "$rating.rating",
+                "rating_desc": "$rating.rating_desc",
+                "rating_placeholder": "$rating.rating_placeholder",
+                "rating_safe": "$rating.safe",
+                "rating_questionable": "$rating.questionable",
+                "rating_explicit": "$rating.explicit",
                 "success": "Created an **Egg** from this message."
             },
             "get": {
                 "not_found": "**Egg #{0}** was not found.",
-                "nsfw_id_in_sfw": "**Egg #{0}** was found, but it's NSFW.\nTry your query again **in a NSFW channel**.",
+                "rating_not_allowed": "**Egg #{0}** was found, but its **rating** isn't allowed in this channel.",
                 "secret": "**Egg #{0}** is secret!\nYou can only find it randomly...",
                 "filtered": "**Egg #{0}** exists, but **{1}**'s moderators have decided to **block it** from showing up here.\nTry again **somewhere else**, like a **different server** or **my DMs**.",
                 "no_egg": "Could not find any **Egg**s.",
@@ -135,8 +139,8 @@
             "loop": {
                 "not_collected": "You haven't collected **Egg #{0}**.",
                 "not_created": "You aren't the creator of **Egg #{0}**.",
-                "nsfw_id_in_sfw": "You have **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
-                "nsfw_in_sfw": "You can't filter by \"**NSFW only**\" in a **SFW channel**.",
+                "rating_not_allowed": "You have **Egg #{0}**, but its **rating** isn't allowed in this channel.\nTry again **in a NSFW channel**.",
+                "rating_not_allowed_filter": "You can't filter by this **rating** in this channel.",
                 "empty": "No **Egg**s with this criteria!",
                 "show_extra_attachment": "$common.show_extra_attachment",
                 "not_yours": "$common.not_yours"
@@ -166,13 +170,13 @@
                 "about": "What are Eggs?",
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
-                "how_desc": "- To **create an Egg**, use `/create` in a server.\n  - The `text` parameter **adds text** to the **Egg**.\n  - The `file` parameter **adds an attachment** as a file.\n  - The `link` parameter **adds an attachment** as a URL.\n  - *In NSFW channels*, you can create a **NSFW Egg** and mark it with `nsfw:True`.\n- To **receive** an Egg, use `/get`.",
+                "how_desc": "- To **create an Egg**, use `/create` in a server.\n- To **receive** an Egg, use `/get`.",
                 "donate": "Support Server Eggs",
                 "donate_desc": "You can **support the development** of **Server Eggs** by donating to **[HexaBlue's Ko-fi](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "About Creating Eggs",
-                "desc": "**Commands**: `/create`, `/lay`\n\nUsing these commands, you may **create an Egg**. The **Egg** you create will then be available **anywhere that Server Eggs is**.\n\n**Parameters**:\n- `text`: [Optional] Add **text** to the **Egg**.\n  - It will appear as the description of the Embed.\n- `file`: [Optional] Add an **attachment** to the **Egg**, as a file.\n- `link`: [Optional] Add an **attachment** to the **Egg**, as a URL.\n  - Useful if you want to use GIF providers such as Klipy.\n  - ***Note**: You may not use both `file` and `link` at the same time.*\n- `secret`: [Optional] Mark an **Egg** as **Secret**!\n  - This means that it **won't be possible** to view this **Egg** by ID: only randomly!\n- `nsfw`: [Optional] *(in NSFW channels only)* Mark an **Egg** as **NSFW**.\n  - This means that it will **only be shown** in **NSFW channels**."
+                "desc": "**Commands**: `/create`, `/lay`\n\nUsing these commands, you may **create an Egg**. The **Egg** you create will then be available **anywhere that Server Eggs is**.\n\n**Parameters**:\n- `text`: [Optional] Add **text** to the **Egg**.\n  - It will appear as the description of the Embed.\n- `file`: [Optional] Add an **attachment** to the **Egg**, as a file.\n- `link`: [Optional] Add an **attachment** to the **Egg**, as a URL.\n  - Useful if you want to use GIF providers such as Klipy.\n  - ***Note**: You may not use both `file` and `link` at the same time.*\n- `secret`: [Optional] Mark an **Egg** as **Secret**!\n  - This means that it **won't be possible** to view this **Egg** by ID: only randomly!\n- `rating`: [Optional] The **content rating** of the **Egg**.\n  - `Safe`, `Questionable`, or `Explicit`.\n    - **More explicit ratings** are only allowed in **NSFW channels**. It depends on the server's settings."
             },
             "get": {
                 "title": "About Obtaining Eggs",
@@ -192,11 +196,11 @@
             },
             "eggify": {
                 "title": "About Eggifying Messages",
-                "desc": "You may **turn a message into an Egg** by right-clicking it (or holding it, on mobile), going to the *Apps* menu, and choosing ***Eggify***.\nFrom there, you can **modify the text** (by default, it'll be the *original message's content*), and **mark it as Secret** and/or **NSFW**."
+                "desc": "You may **turn a message into an Egg** by right-clicking it (or holding it, on mobile), going to the *Apps* menu, and choosing ***Eggify***.\nFrom there, you can **modify the text** (by default, it'll be the *original message's content*), set its **Secret** status, and choose its **rating**."
             },
             "collected": {
                 "title": "About Egg Collections",
-                "desc": "**Commands**: `/collected`\n\nUsing this command, you can **view your Egg collection**, which is comprised of all the **Egg**s you found randomly. Alternatively, you may also use the `check` parameter to see if you have collected a specific **Egg**.\n\n**Parameters**:\n- `check`: [Optional] The ID of an **Egg**, to see if you've collected it.\n- `only-secret`: [Optional] Filters your collection, and shows you only the **Secret Egg**s you've found.\n- `only-nsfw`: [Optional] *(in NSFW channels only)* Filters your collection, and shows you only the **NSFW Egg**s you've found."
+                "desc": "**Commands**: `/collected`\n\nUsing this command, you can **view your Egg collection**, which is comprised of all the **Egg**s you found randomly. Alternatively, you may also use the `check` parameter to see if you have collected a specific **Egg**.\n\n**Parameters**:\n- `check`: [Optional] The ID of an **Egg**, to see if you've collected it.\n- `rating`: [Optional] Filters your collection by a specific **rating**.\n- `only-secret`: [Optional] Filters your collection, and shows you only the **Secret Egg**s you've found."
             },
             "leaderboard": {
                 "title": "About Leaderboards",
@@ -213,10 +217,9 @@
         },
         "log": {
             "show_extra_attachment": "$common.show_extra_attachment",
-            "mark_nsfw": "Mark NSFW",
+            "change_rating": "$rating.title",
             "delete": "Delete",
             "report": "$common.report",
-            "marked_nsfw": "Marked **Egg #{0}** as NSFW.",
             "deleted": "Deleted **Egg #{0}**."
         },
         "mod": {
@@ -230,6 +233,16 @@
             "ping": {
                 "latency": "Latency"
             }
+        },
+        "rating": {
+            "title": "Change Rating",
+            "rating": "Rating",
+            "rating_desc": "Which content rating should this Egg have? Failing to label correctly will result in punishment.",
+            "rating_placeholder": "Select the rating...",
+            "safe": "Safe",
+            "questionable": "Questionable",
+            "explicit": "Explicit",
+            "success": "Changed **Egg #{0}**'s rating to **{1}**."
         },
         "common": {
             "show_extra_attachment": "Show Extra Attachment",
@@ -289,14 +302,18 @@
     "create_file_description": "The attachment included with the Egg as a file.",
     "create_link": "link",
     "create_link_description": "The attachment included with the Egg as a URL.",
-    "create_nsfw": "nsfw",
-    "create_nsfw_description": "This Egg should be marked as NSFW.",
+    "create_rating": "rating",
+    "create_rating_description": "The content rating of the Egg.",
     "create_secret": "secret",
     "create_secret_description": "This Egg should only appear randomly.",
 
     "lay": "lay",
 
     "eggify": "Eggify",
+
+    "rating_safe": "Safe",
+    "rating_questionable": "Questionable",
+    "rating_explicit": "Explicit",
 
     "get": "get",
     "get_description": "Get an Egg.",
@@ -306,7 +323,7 @@
     "egg": "egg",
 
     "nsfw": "nsfw",
-    "nsfw_description": "Get a NSFW Egg.",
+    "nsfw_description": "Get a random NSFW Egg (Questionable or Explicit).",
 
     "edit": "edit",
     "edit_description": "Edit an Egg that you're allowed to manage.",
@@ -318,8 +335,8 @@
     "edit_file_description": "The new attachment included with the Egg as a file.",
     "edit_link": "link",
     "edit_link_description": "The new attachment included with the Egg as a URL.",
-    "edit_nsfw": "nsfw",
-    "edit_nsfw_description": "This Egg should be marked as NSFW.",
+    "edit_rating": "rating",
+    "edit_rating_description": "The content rating of the Egg.",
     "edit_secret": "secret",
     "edit_secret_description": "This Egg should only appear randomly.",
 
@@ -339,8 +356,8 @@
     "collected_description": "View your Egg collection, or check if you've collected a specific Egg.",
     "collected_check": "check",
     "collected_check_description": "Check if you've collected a specific Egg ID.",
-    "collected_nsfw": "only-nsfw",
-    "collected_nsfw_description": "You want to filter your collection by \"NSFW only\".",
+    "collected_rating": "rating",
+    "collected_rating_description": "You want to filter your collection by a specific rating.",
     "collected_secret": "only-secret",
     "collected_secret_description": "You want to filter your collection by \"secret only\".",
 
@@ -348,8 +365,8 @@
     "my-eggs_description": "View your created Eggs, or check a specific Egg you created.",
     "my-eggs_check": "check",
     "my-eggs_check_description": "Check if you've created a specific Egg ID.",
-    "my-eggs_nsfw": "only-nsfw",
-    "my-eggs_nsfw_description": "You want to filter your creations by \"NSFW only\".",
+    "my-eggs_rating": "rating",
+    "my-eggs_rating_description": "You want to filter your creations by a specific rating.",
     "my-eggs_secret": "only-secret",
     "my-eggs_secret_description": "You want to filter your creations by \"secret only\".",
 

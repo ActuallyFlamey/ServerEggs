@@ -28,7 +28,7 @@
             "create_edit": {
                 "empty_create": "Non è possibile creare un **Uovo vuoto**.\nProva di nuovo includendo un testo, un allegato, o entrambi.",
                 "empty_edit": "Non hai specificato alcuna modifica.",
-                "no_nsfw": "Non è possibile creare o modificare un **Uovo vietato ai minori** in un **canale per tutte le età**.",
+                "rating_not_allowed": "Non è possibile creare o modificare un **Uovo** con questa **classificazione** in questo canale.",
                 "toomanyattach": "Non puoi usare sia `file` che `link` allo stesso tempo.\nScegli tra i due.",
                 "banned": "Ti è stato **tolto il permesso** di creare o modificare **Uova**.\n*Al momento* non è possibile fare ricorso.",
                 "not_found": "$common.not_found",
@@ -57,13 +57,17 @@
                 "text_placeholder": "Inserisci il testo dell'Uovo qui...",
                 "secret": "Segna come Segreto",
                 "secret_desc": "Fare sì che questo Uovo sia ottenibile solo casualmente?",
-                "nsfw": "Segna come VM18",
-                "nsfw_desc": "Questo Uovo è vietato ai minori? La mancata etichettatura corretta comporterà una sanzione.",
+                "rating": "$rating.rating",
+                "rating_desc": "$rating.rating_desc",
+                "rating_placeholder": "$rating.rating_placeholder",
+                "rating_safe": "$rating.safe",
+                "rating_questionable": "$rating.questionable",
+                "rating_explicit": "$rating.explicit",
                 "success": "Created an **Egg** from this message."
             },
             "get": {
                 "not_found": "**Uovo n. {0}** non trovato.",
-                "nsfw_id_in_sfw": "Ho trovato l'**Uovo n. {0}**, ma è vietato ai minori.\nRiprova **in un canale per maggiorenni**.",
+                "rating_not_allowed": "Ho trovato l'**Uovo n. {0}**, ma la sua **classificazione** non è permessa in questo canale.",
                 "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
                 "filtered": "L'**Uovo n. {0}** esiste, ma i moderatori di **{1}** hanno deciso di **bloccarlo** dall'apparire qui.\nRiprova **altrove**, tipo un **server diverso** o **i miei DM**.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
@@ -135,8 +139,8 @@
             "loop": {
                 "not_collected": "Non hai {1} l'**Uovo n. {0}**.",
                 "not_created": "Non hai creato tu l'**Uovo n. {0}**.",
-                "nsfw_id_in_sfw": "Hai l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
-                "nsfw_in_sfw": "Non puoi filtrare per \"**solo VM18**\" in un **canale per tutte le età**.",
+                "rating_not_allowed": "Hai l'**Uovo n. {0}**, ma la sua **classificazione** non è permessa in questo canale.",
+                "rating_not_allowed_filter": "Non puoi filtrare per questa **classificazione** in questo canale.",
                 "empty": "Non ci sono **Uova** con questi criteri!",
                 "show_extra_attachment": "$common.show_extra_attachment",
                 "not_yours": "$common.not_yours"
@@ -166,13 +170,13 @@
                 "about": "Cosa sono le Uova?",
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
-                "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n  - Il parametro `testo` **aggiunge un testo** all'Uovo.\n  - Il parametro `file` **aggiunge un allegato** come file.\n  - Il parametro `link` **aggiunge un allegato** come URL.\n  - *Nei canali VM18*, puoi creare un **Uovo VM18** e segnarlo come `vm18:True`.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
+                "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
                 "donate": "Sostieni Server Eggs",
                 "donate_desc": "Puoi **sostenere lo sviluppo** di **Server Eggs** donando al **[Ko-fi di HexaBlue](https://ko-fi.com/hexablue)**"
             },
             "create": {
                 "title": "Informazioni sul Creare Uova",
-                "desc": "**Comandi**: `/crea`, `/deponi`\n\nCon questi comandi, puoi **creare un Uovo**. L'**Uovo** che crei sarà poi disponibile **ovunque ci sia Server Eggs**.\n\n**Parametri**:\n- `testo`: [Facoltativo] Aggiungi un **testo** all'**Uovo**.\n  - Apparirà come descrizione dell'Embed.\n- `file`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come file.\n- `link`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come URL.\n  - Utile se vuoi usare librerie di GIF come Klipy.\n  - ***Nota**: Non puoi usare sia `file` che `link` allo stesso tempo.*\n- `segreto`: [Facoltativo] Segna un **Uovo** come **Segreto**!\n  - Significa che **non sarà possibile** vedere quest'**Uovo** con l'ID: solo casualmente!\n- `vm18`: [Facoltativo] *(solo nei canali vietati ai minori)* Segna un **Uovo** come **vietato ai minori**.\n  - Significà che **verra mostrato solo** nei **canali vietati ai minori**."
+                "desc": "**Comandi**: `/crea`, `/deponi`\n\nCon questi comandi, puoi **creare un Uovo**. L'**Uovo** che crei sarà poi disponibile **ovunque ci sia Server Eggs**.\n\n**Parametri**:\n- `testo`: [Facoltativo] Aggiungi un **testo** all'**Uovo**.\n  - Apparirà come descrizione dell'Embed.\n- `file`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come file.\n- `link`: [Facoltativo] Aggiungi un **allegato** all'**Uovo**, come URL.\n  - Utile se vuoi usare librerie di GIF come Klipy.\n  - ***Nota**: Non puoi usare sia `file` che `link` allo stesso tempo.*\n- `segreto`: [Facoltativo] Segna un **Uovo** come **Segreto**!\n  - Significa che **non sarà possibile** vedere quest'**Uovo** con l'ID: solo casualmente!\n- `classificazione`: [Facoltativo] La **classificazione del contenuto** dell'**Uovo**.\n  - `Per tutti`, `Dubbioso` o `Esplicito`.\n    - Le **classificazioni più esplicite** sono permesse solo nei **canali vietati ai minori**. Dipende dalle impostazioni del server."
             },
             "get": {
                 "title": "Informazioni sull'Ottenere Uova",
@@ -192,11 +196,11 @@
             },
             "eggify": {
                 "title": "Informazioni sull'Uov-izzare i Messaggi",
-                "desc": "Puoi **trasformare un messaggio in un Uovo** cliccandolo col tasto destro (o premendolo, da disp. mobile), andando sul menu *App*, e scegliendo ***Uov-izza***.\nDa lì, puoi **modificare il testo** (di base, sarà il *contenuto del messaggio originale*), e **segnarlo come Segreto** e/o **vietato ai minori**."
+                "desc": "Puoi **trasformare un messaggio in un Uovo** cliccandolo col tasto destro (o premendolo, da disp. mobile), andando sul menu *App*, e scegliendo ***Uov-izza***.\nDa lì, puoi **modificare il testo** (di base, sarà il *contenuto del messaggio originale*), impostare il suo **stato Segreto** e scegliere la sua **classificazione**."
             },
             "collected": {
                 "title": "Informazioni sulle Collezioni di Uova",
-                "desc": "**Comandi**: `/collezione`\n\nCon questo comando, puoi **vedere la tua collezione di Uova**, che è composta da tutte le **Uova** che hai trovato casualmente. Alternativamente, puoi usare il parametro `controlla` per vedere se hai collezionato un **Uovo** specifico.\n\n**Parametri**:\n- `controlla`: [Facoltativo] L'ID di un **Uovo**, per vedere se l'hai collezionato.\n- `solo-segreti`: [Facoltativo] Filtra la tua collezione, e ti mostra solo le **Uova Segrete** che hai trovato.\n- `solo-vm18`: [Facoltativo] *(solo nei canali vietati ai minori)* Filtra la tua collezione, e ti mostra solo le **Uova vietate ai minori** che hai trovato."
+                "desc": "**Comandi**: `/collezione`\n\nCon questo comando, puoi **vedere la tua collezione di Uova**, che è composta da tutte le **Uova** che hai trovato casualmente. Alternativamente, puoi usare il parametro `controlla` per vedere se hai collezionato un **Uovo** specifico.\n\n**Parametri**:\n- `controlla`: [Facoltativo] L'ID di un **Uovo**, per vedere se l'hai collezionato.\n- `classificazione`: [Facoltativo] Filtra la tua collezione per una **classificazione** specifica.\n- `solo-segreti`: [Facoltativo] Filtra la tua collezione, e ti mostra solo le **Uova Segrete** che hai trovato."
             },
             "leaderboard": {
                 "title": "Informazioni sulle Classifiche",
@@ -213,10 +217,9 @@
         },
         "log": {
             "show_extra_attachment": "$common.show_extra_attachment",
-            "mark_nsfw": "Segna come VM18",
+            "change_rating": "$rating.title",
             "delete": "Elimina",
             "report": "$common.report",
-            "marked_nsfw": "Segnato l'**Uovo n. {0}** come NSFW.",
             "deleted": "Eliminato l'**Uovo n. {0}**."
         },
         "mod": {
@@ -230,6 +233,16 @@
             "ping": {
                 "latency": "Ritardo"
             }
+        },
+        "rating": {
+            "title": "Cambia Classificazione",
+            "rating": "Classificazione",
+            "rating_desc": "Che classificazione del contenuto deve avere questo Uovo? La mancata etichettatura corretta comporterà una sanzione.",
+            "rating_placeholder": "Seleziona la classificazione...",
+            "safe": "Sicuro",
+            "questionable": "Dubbio",
+            "explicit": "Esplicito",
+            "success": "Classificazione dell'**Uovo n. {0}** cambiata a **{1}**."
         },
         "common": {
             "show_extra_attachment": "Mostra Allegato Extra",
@@ -288,14 +301,18 @@
     "create_file_description": "L'allegato da includere con l'Uovo in forma di file.",
     "create_link": "link",
     "create_link_description": "L'allegato da includere con l'Uovo in forma di URL.",
-    "create_nsfw": "vm18",
-    "create_nsfw_description": "L'Uovo ha un contenuto 18+.",
+    "create_rating": "classificazione",
+    "create_rating_description": "La classificazione del contenuto dell'Uovo.",
     "create_secret": "segreto",
     "create_secret_description": "L'Uovo deve apparire solo casualmente.",
 
     "lay": "deponi",
 
     "eggify": "Uov-izza",
+
+    "rating_safe": "Per tutti",
+    "rating_questionable": "Dubbioso",
+    "rating_explicit": "Esplicito (18+)",
 
     "get": "ricevi",
     "get_description": "Ricevi un Uovo.",
@@ -305,7 +322,7 @@
     "egg": "uovo",
 
     "nsfw": "vm18",
-    "nsfw_description": "Ricevi un Uovo vietato ai minori.",
+    "nsfw_description": "Ricevi un Uovo casuale di classificazione \"Esplicito\".",
 
     "edit": "modifica",
     "edit_description": "Modifica un Uovo che ti è permesso gestire.",
@@ -317,8 +334,8 @@
     "edit_file_description": "Il nuovo allegato da includere con l'Uovo in forma di file.",
     "edit_link": "link",
     "edit_link_description": "Il nuovo allegato da includere con l'Uovo in forma di URL.",
-    "edit_nsfw": "vm18",
-    "edit_nsfw_description": "L'Uovo ha un contenuto 18+",
+    "edit_rating": "classificazione",
+    "edit_rating_description": "La classificazione del contenuto dell'Uovo.",
     "edit_secret": "segreto",
     "edit_secret_description": "L'Uovo deve apparire solo casualmente.",
 
@@ -338,8 +355,8 @@
     "collected_description": "Osserva la tua collezione di Uova, o controlla se hai già collezionato un Uovo specifico.",
     "collected_check": "controlla",
     "collected_check_description": "Controlla l'ID di un Uovo per vedere se l'hai già collezionato.",
-    "collected_nsfw": "solo-vm18",
-    "collected_nsfw_description": "Vuoi filtrare la tua collezione per \"solo VM18\".",
+    "collected_rating": "classificazione",
+    "collected_rating_description": "Vuoi filtrare la tua collezione per una classificazione specifica.",
     "collected_secret": "solo-segreti",
     "collected_secret_description": "Vuoi filtrare la tua collezione per \"solo segreti\".",
 
@@ -347,8 +364,8 @@
     "my-eggs_description": "Osserva le Uova che hai creato, o controlla un Uovo specifico creato da te.",
     "my-eggs_check": "controlla",
     "my-eggs_check_description": "Controlla l'ID di un Uovo per vedere se l'hai creato tu.",
-    "my-eggs_nsfw": "solo-vm18",
-    "my-eggs_nsfw_description": "Vuoi filtrare le tue creazioni per \"solo VM18\".",
+    "my-eggs_rating": "classificazione",
+    "my-eggs_rating_description": "Vuoi filtrare le tue creazioni per una classificazione specifica.",
     "my-eggs_secret": "solo-segreti",
     "my-eggs_secret_description": "Vuoi filtrare le tue creazioni per \"solo segreti\".",
 

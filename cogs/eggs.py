@@ -6,7 +6,7 @@ from discord.ext import commands
 
 import utils
 import views
-from schema import Egg, Guild, User
+from schema import Egg, Guild, Rating, User
 
 
 class Eggs(commands.Cog):
@@ -29,9 +29,11 @@ class Eggs(commands.Cog):
         text: str | None = None,
         file: discord.Attachment | None = None,
         link: str | None = None,
-        nsfw: bool | None = None,
+        rating: Rating | None = None,
         secret: bool | None = None
     ):
+        rating = utils.coerce_rating(rating)
+
         if not ctx.response.is_done():
             await ctx.response.defer()
 
@@ -42,12 +44,16 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["empty_create"])
                 return
         else:
-            if text is None and file is None and link is None and secret is None and nsfw is None:
+            if text is None and file is None and link is None and secret is None and rating is None:
                 await ctx.followup.send(myloc["empty_edit"])
                 return
 
-        if nsfw and not utils.channel_is_nsfw(ctx.channel):
-            await ctx.followup.send(myloc["no_nsfw"])
+        guild = None
+        if ctx.guild:
+            guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+
+        if rating is not None and rating not in utils.channel_ratings(guild, ctx.channel):
+            await ctx.followup.send(myloc["rating_not_allowed"])
             return
 
         if file and link:
@@ -132,17 +138,13 @@ class Eggs(commands.Cog):
             await processing.edit(content=myloc["duplicate"].format(existing.id))
             return
 
-        guild = None
-        if ctx.guild:
-            guild, _ = await Guild.get_or_create(id=ctx.guild.id)
-
         if not id:
             egg = await Egg.create(
                 text=trimtext,
                 attach_path=attach_path,
                 attach_hash=attach_hash,
                 attach_link=attach_link,
-                nsfw=nsfw or False,
+                rating=rating or Rating.SAFE,
                 secret=secret or False,
                 creator=user,
                 origin=guild
@@ -156,7 +158,7 @@ class Eggs(commands.Cog):
                 egg.attach_path = attach_path
                 egg.attach_hash = attach_hash
                 egg.attach_link = attach_link
-            if nsfw is not None: egg.nsfw = nsfw
+            if rating is not None: egg.rating = rating
             if secret is not None: egg.secret = secret
 
             await egg.save()
@@ -184,8 +186,13 @@ class Eggs(commands.Cog):
         )
 
     @app.command(name="create", description="create_description")
-    @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw", secret="create_secret")
-    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description", secret="create_secret_description")
+    @app.rename(text="create_text", file="create_file", link="create_link", rating="create_rating", secret="create_secret")
+    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", rating="create_rating_description", secret="create_secret_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def create(
@@ -194,14 +201,19 @@ class Eggs(commands.Cog):
         text: str | None,
         file: discord.Attachment | None,
         link: str | None,
-        nsfw: bool | None,
+        rating: Rating | None,
         secret: bool | None
     ):
-        await self.create_or_edit(ctx, None, text, file, link, nsfw, secret)
+        await self.create_or_edit(ctx, None, text, file, link, rating, secret)
 
     @app.command(name="lay", description="create_description")
-    @app.rename(text="create_text", file="create_file", link="create_link", nsfw="create_nsfw")
-    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", nsfw="create_nsfw_description")
+    @app.rename(text="create_text", file="create_file", link="create_link", rating="create_rating")
+    @app.describe(text="create_text_description", file="create_file_description", link="create_link_description", rating="create_rating_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def lay(
@@ -210,17 +222,19 @@ class Eggs(commands.Cog):
         text: str | None,
         file: discord.Attachment | None,
         link: str | None,
-        nsfw: bool | None,
+        rating: Rating | None,
         secret: bool | None
     ):
-        await self.create_or_edit(ctx, None, text, file, link, nsfw, secret)
+        await self.create_or_edit(ctx, None, text, file, link, rating, secret)
 
     async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggs/get")
 
-        is_channel_nsfw = utils.channel_is_nsfw(ctx.channel)
+        guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
+
+        allowed = utils.channel_ratings(guild, ctx.channel)
 
         collected = False
 
@@ -231,8 +245,8 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["not_found"].format(id))
                 return
 
-            if egg.nsfw and not is_channel_nsfw:
-                await ctx.followup.send(myloc["nsfw_id_in_sfw"].format(id))
+            if egg.rating not in allowed:
+                await ctx.followup.send(myloc["rating_not_allowed"].format(id))
                 return
 
             if egg.secret:
@@ -251,9 +265,9 @@ class Eggs(commands.Cog):
                     eggs = eggs.filter(id__not_in=filtered)
 
             if only_nsfw:
-                eggs = eggs.filter(nsfw=True)
-            elif not is_channel_nsfw:
-                eggs = eggs.filter(nsfw=False)
+                eggs = eggs.filter(rating=Rating.EXPLICIT)
+            else:
+                eggs = eggs.filter(rating__in=allowed)
 
             count = await eggs.count()
 
@@ -301,8 +315,13 @@ class Eggs(commands.Cog):
         await self._get(ctx, None, True)
 
     @app.command(name="edit", description="edit_description")
-    @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", nsfw="edit_nsfw", secret="edit_secret")
-    @app.describe(id="edit_id_description", text="edit_text_description", file="edit_file_description", link="edit_link_description", nsfw="edit_nsfw_description", secret="edit_secret_description")
+    @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", rating="edit_rating", secret="edit_secret")
+    @app.describe(id="edit_id_description", text="edit_text_description", file="edit_file_description", link="edit_link_description", rating="edit_rating_description", secret="edit_secret_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def edit(
         self,
@@ -310,10 +329,10 @@ class Eggs(commands.Cog):
         id: int, text: str | None,
         file: discord.Attachment | None,
         link: str | None,
-        nsfw: bool | None,
+        rating: Rating | None,
         secret: bool | None
     ):
-        await self.create_or_edit(ctx, id, text, file, link, nsfw, secret)
+        await self.create_or_edit(ctx, id, text, file, link, rating, secret)
 
     def _confirm_embed(self, lines: dict, myloc: dict, egg, color: discord.Color):
         text = utils.truncate(egg.text, 1023)

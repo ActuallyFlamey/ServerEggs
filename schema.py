@@ -1,8 +1,20 @@
-from tortoise import fields
-from tortoise.models import Model
+from enum import StrEnum
+
+from tortoise import fields, models
 
 
-class Egg(Model):
+class Rating(StrEnum):
+    SAFE = "SAFE"
+    QUESTIONABLE = "QUESTIONABLE"
+    EXPLICIT = "EXPLICIT"
+
+def default_ratings() -> dict:
+    return {
+        "normal": [Rating.SAFE, Rating.QUESTIONABLE],
+        "nsfw": [Rating.SAFE, Rating.QUESTIONABLE, Rating.EXPLICIT]
+    }
+
+class Egg(models.Model):
     id = fields.IntField(primary_key=True)
 
     text = fields.TextField(null=True)
@@ -10,7 +22,7 @@ class Egg(Model):
     attach_hash = fields.CharField(64, null=True, index=True)
     attach_link = fields.TextField(null=True)
 
-    nsfw = fields.BooleanField(default=False)
+    rating = fields.CharEnumField(enum_type=Rating, default=Rating.SAFE)
 
     secret = fields.BooleanField(default=False)
 
@@ -26,7 +38,7 @@ class Egg(Model):
     async def get_with_related(cls, id):
         return await cls.get_or_none(id=id).prefetch_related("creator", "origin")
 
-class Guild(Model):
+class Guild(models.Model):
     id = fields.BigIntField(primary_key=True, generated=False, unique=True, db_index=True)
 
     description = fields.TextField(null=True)
@@ -35,13 +47,15 @@ class Guild(Model):
     lang = fields.CharField(5, default="en")
     allow_user_lang = fields.BooleanField(default=True)
 
+    ratings = fields.JSONField(default=default_ratings)
+
     logch = fields.BigIntField(null=True)
 
     filtered: fields.ManyToManyField["Egg"] = fields.ManyToManyField("eggs.Egg", related_name="filtered_in", through="guild_filtered_eggs")
 
     eggs = fields.ReverseRelation["Egg"]
 
-class User(Model):
+class User(models.Model):
     id = fields.BigIntField(primary_key=True, generated=False, unique=True, db_index=True)
 
     lang = fields.CharField(5, default="")
@@ -52,7 +66,7 @@ class User(Model):
     eggs = fields.ReverseRelation["Egg"]
     reports = fields.ReverseRelation["Report"]
 
-class Report(Model):
+class Report(models.Model):
     id = fields.BigIntField(primary_key=True)
 
     egg = fields.ForeignKeyField("eggs.Egg", "reports")
