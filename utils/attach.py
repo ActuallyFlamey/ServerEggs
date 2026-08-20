@@ -189,7 +189,7 @@ EMBEDDABLE_MEDIA_HOSTS = (
     "fxtwitter.com", "fixupx.com", "fxbsky.app",
     "vxtwitter.com", "fixvx.com",
     "girlcockx.com",
-    "instagram.com", "kkinstagram.com"
+    "instagram.com", "kkinstagram.com",
     "tiktok.com",
     "twitch.tv",
     "bsky.app",
