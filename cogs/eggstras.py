@@ -1,14 +1,72 @@
 import collections
 import random
+import re
+import unicodedata
 
 import discord
 from discord import app_commands as app
 from discord.ext import commands
+from tortoise.expressions import Q
 
 import utils
 import views
-from schema import User
+from schema import Egg, User
 
+CUSTOM_EMOJI_RE = re.compile(r"<a?:(\w+):\d+>")
+LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]*)\)")
+AUTOLINK_RE = re.compile(r"<(\w+://[^>]+)>")
+
+EMOJI_RANGES = (
+    (0x1F000, 0x1FAFF),
+    (0x2600, 0x27BF),
+    (0x2B00, 0x2BFF),
+)
+
+def is_emoji(code: int) -> bool:
+    return any(start <= code <= end for start, end in EMOJI_RANGES)
+
+EMOJI_ALIASES = {}
+for start, end in EMOJI_RANGES:
+    for code in range(start, end + 1):
+        name = unicodedata.name(chr(code), None)
+        if not name:
+            continue
+        for _word in name.lower().split():
+            EMOJI_ALIASES.setdefault(_word, set()).add(chr(code))
+
+def normalize(text: str) -> str:
+    text = CUSTOM_EMOJI_RE.sub(r"\1", text)
+    text = LINK_RE.sub(r"\1 \2", text)
+    text = AUTOLINK_RE.sub(r"\1", text)
+
+    out = []
+    for ch in text:
+        if is_emoji(ord(ch)):
+            name = unicodedata.name(ch, "")
+            if name:
+                out.append(name)
+                continue
+        out.append(ch)
+
+    return "".join(out).lower()
+
+def expand(text: str) -> set[str]:
+    terms = {text}
+
+    terms.update(CUSTOM_EMOJI_RE.findall(text))
+
+    for ch in text:
+        if is_emoji(ord(ch)):
+            terms.add(ch)
+            name = unicodedata.name(ch, "")
+            if name:
+                terms.add(name)
+                terms.update(name.lower().split())
+
+    for word in re.findall(r"[a-z0-9']+", text.lower()):
+        terms.update(EMOJI_ALIASES.get(word, ()))
+
+    return terms
 
 class Eggstras(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -91,6 +149,68 @@ class Eggstras(commands.Cog):
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def my_eggs(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
         await self.egg_loop(ctx, "created", check, nsfw, secret)
+
+    @app.command(name="search", description="search_description")
+    @app.rename(text="search_text")
+    @app.describe(text="search_text_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def search(self, ctx: discord.Interaction, text: str):
+        await ctx.response.defer()
+
+        lines, myloc = await self.bot.get_section(ctx, "eggstras/search")
+
+        nsfw_allowed = utils.channel_is_nsfw(ctx.channel)
+
+        query = text.strip()
+
+        if not query:
+            await ctx.followup.send(myloc["empty"].format(text))
+            return
+
+        sql = Q(text__icontains=query)
+        for alt in expand(query) - {query}:
+            sql |= Q(text__icontains=alt)
+
+        q = Egg.all().prefetch_related("creator", "origin").filter(sql)
+        q = q.filter(secret=False)
+        if not nsfw_allowed:
+            q = q.filter(nsfw=False)
+
+        if ctx.guild:
+            filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
+            if filtered:
+                q = q.filter(id__not_in=filtered)
+
+        eggs = await q
+
+        norm_query = normalize(query)
+
+        eggs = [egg for egg in eggs if norm_query in normalize(egg.text or "")]
+
+        if not eggs:
+            await ctx.followup.send(myloc["empty"].format(query))
+            return
+
+        eggs.sort(key=lambda egg: (
+            normalize(egg.text or "") != norm_query,
+            not normalize(egg.text or "").startswith(norm_query),
+            len(egg.text or ""),
+            egg.id,
+        ))
+
+        loop = collections.deque(eggs)
+
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, loop[0])
+        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+
+        await ctx.followup.send(
+            embed=e,
+            file=sfile,
+            view=views.EggLoop(
+                self.bot, lines, myloc, ctx.user, loop,
+                vfile, vlink
+            )
+        )
 
     leaderboard = app.Group(
         name="leaderboard",

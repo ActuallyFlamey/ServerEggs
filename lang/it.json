@@ -139,7 +139,12 @@
                 "nsfw_in_sfw": "Non puoi filtrare per \"**solo VM18**\" in un **canale per tutte le età**.",
                 "empty": "Non ci sono **Uova** con questi criteri!",
                 "show_extra_attachment": "$common.show_extra_attachment",
-                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare il loop delle **Uova**."
+                "not_yours": "$common.not_yours"
+            },
+            "search": {
+                "empty": "Nessun **Uovo** corrisponde alla tua ricerca per **\"{0}\"**.",
+                "show_extra_attachment": "$common.show_extra_attachment",
+                "not_yours": "$common.not_yours"
             },
             "leaderboard": {
                 "you": " **__[TU]__**",
@@ -237,7 +242,8 @@
                 "content": "Contenuto",
                 "no_content": "[Nessun contenuto]",
                 "link": "Link Allegato"
-            }
+            },
+            "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare il loop delle **Uova**."
         }
     },
     "help": "aiuto",
@@ -345,6 +351,11 @@
     "my-eggs_nsfw_description": "Vuoi filtrare le tue creazioni per \"solo VM18\".",
     "my-eggs_secret": "solo-segreti",
     "my-eggs_secret_description": "Vuoi filtrare le tue creazioni per \"solo segreti\".",
+
+    "search": "cerca",
+    "search_description": "Cerca un Uovo dal suo testo.",
+    "search_text": "testo",
+    "search_text_description": "Il testo da cercare.",
 
     "leaderboard": "classifica",
     "leaderboard_description": "Vedi le classifiche per varie statistiche",
