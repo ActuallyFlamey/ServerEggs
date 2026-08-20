@@ -132,13 +132,14 @@
             }
         },
         "eggstras": {
-            "collected": {
+            "loop": {
                 "not_collected": "You haven't collected **Egg #{0}**.",
-                "nsfw_id_in_sfw": "You have collected **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
-                "nsfw_in_sfw": "You can't filter your collection by \"**NSFW only**\" in a **SFW channel**.",
-                "empty": "No collected **Egg**s with this criteria!",
+                "not_created": "You aren't the creator of **Egg #{0}**.",
+                "nsfw_id_in_sfw": "You have **Egg #{0}**, but it's NSFW, and can't be shown here.\nTry again **in a NSFW channel**.",
+                "nsfw_in_sfw": "You can't filter by \"**NSFW only**\" in a **SFW channel**.",
+                "empty": "No **Egg**s with this criteria!",
                 "show_extra_attachment": "$common.show_extra_attachment",
-                "not_yours": "Only the **original command user** can read through the collection."
+                "not_yours": "Only the **original command user** can read through the **Egg** loop."
             },
             "leaderboard": {
                 "you": " **__[YOU]__**",
@@ -334,6 +335,15 @@
     "collected_nsfw_description": "You want to filter your collection by \"NSFW only\".",
     "collected_secret": "only-secret",
     "collected_secret_description": "You want to filter your collection by \"secret only\".",
+
+    "my-eggs": "my-eggs",
+    "my-eggs_description": "View your created Eggs, or check a specific Egg you created.",
+    "my-eggs_check": "check",
+    "my-eggs_check_description": "Check if you've created a specific Egg ID.",
+    "my-eggs_nsfw": "only-nsfw",
+    "my-eggs_nsfw_description": "You want to filter your creations by \"NSFW only\".",
+    "my-eggs_secret": "only-secret",
+    "my-eggs_secret_description": "You want to filter your creations by \"secret only\".",
 
     "leaderboard": "leaderboard",
     "leaderboard_description": "View leaderboards for various stats.",

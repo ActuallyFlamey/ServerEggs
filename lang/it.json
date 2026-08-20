@@ -132,13 +132,14 @@
             }
         },
         "eggstras": {
-            "collected": {
-                "not_collected": "Non hai collezionato l'**Uovo n. {0}**.",
-                "nsfw_id_in_sfw": "Hai collezionato l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
-                "nsfw_in_sfw": "Non puoi filtrare la tua collezione per \"**solo VM18**\" in un **canale per tutte le età**.",
-                "empty": "Non ci sono **Uova** collezionate con questi criteri!",
+            "loop": {
+                "not_collected": "Non hai {1} l'**Uovo n. {0}**.",
+                "not_created": "Non hai creato tu l'**Uovo n. {0}**.",
+                "nsfw_id_in_sfw": "Hai l'**Uovo n. {0}**, ma è vietato ai minori, e non può essere mostrato qui.\nRiprova **in un canale per maggiorenni**.",
+                "nsfw_in_sfw": "Non puoi filtrare per \"**solo VM18**\" in un **canale per tutte le età**.",
+                "empty": "Non ci sono **Uova** con questi criteri!",
                 "show_extra_attachment": "$common.show_extra_attachment",
-                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare la collezione."
+                "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare il loop delle **Uova**."
             },
             "leaderboard": {
                 "you": " **__[TU]__**",
@@ -333,6 +334,15 @@
     "collected_nsfw_description": "Vuoi filtrare la tua collezione per \"solo VM18\".",
     "collected_secret": "solo-segreti",
     "collected_secret_description": "Vuoi filtrare la tua collezione per \"solo segreti\".",
+
+    "my-eggs": "le-mie-uova",
+    "my-eggs_description": "Osserva le Uova che hai creato, o controlla un Uovo specifico creato da te.",
+    "my-eggs_check": "controlla",
+    "my-eggs_check_description": "Controlla l'ID di un Uovo per vedere se l'hai creato tu.",
+    "my-eggs_nsfw": "solo-vm18",
+    "my-eggs_nsfw_description": "Vuoi filtrare le tue creazioni per \"solo VM18\".",
+    "my-eggs_secret": "solo-segreti",
+    "my-eggs_secret_description": "Vuoi filtrare le tue creazioni per \"solo segreti\".",
 
     "leaderboard": "classifica",
     "leaderboard_description": "Vedi le classifiche per varie statistiche",

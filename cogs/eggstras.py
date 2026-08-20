@@ -14,33 +14,35 @@ class Eggstras(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app.command(name="collected", description="collected_description")
-    @app.rename(check="collected_check", nsfw="collected_nsfw", secret="collected_secret")
-    @app.describe(check="collected_check_description", nsfw="collected_nsfw_description", secret="collected_secret_description")
-    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def collected(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
+    async def egg_loop(self, ctx: discord.Interaction, mode: str, check: int | None, nsfw: bool | None, secret: bool | None):
         await ctx.response.defer()
 
-        lines, myloc = await self.bot.get_section(ctx, "eggstras/collected")
+        lines, myloc = await self.bot.get_section(ctx, "eggstras/loop")
 
         nsfw_allowed = utils.channel_is_nsfw(ctx.channel)
 
         user, _ = await User.get_or_create(id=ctx.user.id)
 
+        match mode:
+            case "collected":
+                field = user.collected
+            case "created":
+                field = user.eggs
+
         if check is not None:
-            egg = await user.collected.filter(id=check).prefetch_related("creator", "origin").first()
+            egg = await field.filter(id=check).prefetch_related("creator", "origin").first()
 
             if not egg:
-                await ctx.followup.send(myloc["not_collected"].format(check))
+                await ctx.followup.send(myloc[f"not_{mode}"].format(check))
                 return
 
             if egg.nsfw and not nsfw_allowed:
                 await ctx.followup.send(myloc["nsfw_id_in_sfw"].format(check))
                 return
 
-            collection = [egg]
+            loop = [egg]
         else:
-            query = user.collected.all().prefetch_related("creator", "origin")
+            query = field.all().prefetch_related("creator", "origin")
 
             if not nsfw_allowed:
                 if nsfw:
@@ -55,26 +57,40 @@ class Eggstras(commands.Cog):
             if secret:
                 query = query.filter(secret=True)
 
-            collection = await query
+            loop = await query
 
-            if not collection:
+            if not loop:
                 await ctx.followup.send(myloc["empty"])
                 return
 
-        collection = collections.deque(collection)
-        collection.rotate(random.randint(0, len(collection)))
+        eggs = collections.deque(loop)
+        eggs.rotate(random.randint(0, len(eggs)))
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, collection[0])
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, eggs[0])
         sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
 
         await ctx.followup.send(
             embed=e,
             file=sfile,
             view=views.EggLoop(
-                self.bot, lines, myloc, ctx.user, collection,
+                self.bot, lines, myloc, ctx.user, eggs,
                 vfile, vlink
             ) if not check else discord.utils.MISSING
         )
+
+    @app.command(name="collected", description="collected_description")
+    @app.rename(check="collected_check", nsfw="collected_nsfw", secret="collected_secret")
+    @app.describe(check="collected_check_description", nsfw="collected_nsfw_description", secret="collected_secret_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def collected(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
+        await self.egg_loop(ctx, "collected", check, nsfw, secret)
+
+    @app.command(name="my-eggs", description="my-eggs_description")
+    @app.rename(check="my-eggs_check", nsfw="my-eggs_nsfw", secret="my-eggs_secret")
+    @app.describe(check="my-eggs_check_description", nsfw="my-eggs_nsfw_description", secret="my-eggs_secret_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def my_eggs(self, ctx: discord.Interaction, check: int | None, nsfw: bool | None, secret: bool | None):
+        await self.egg_loop(ctx, "created", check, nsfw, secret)
 
     leaderboard = app.Group(
         name="leaderboard",
