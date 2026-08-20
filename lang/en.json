@@ -132,8 +132,8 @@
                 "rule_desc": "Which rule is this Egg breaking?",
                 "rule_placeholder": "Select the report reason...",
                 "rules": {
-                    "unmarkednsfw": "Unmarked NSFW",
-                    "unmarkednsfw_desc": "This Egg contains NSFW content, but isn't marked as NSFW.",
+                    "bad_rating": "Wrong Content Rating",
+                    "bad_rating_desc": "This Egg's content rating (Safe/Questionable/Explicit) is incorrect.",
                     "hateful": "Hateful/Violent Speech",
                     "hateful_desc": "This Egg promotes hatred towards any marginalized group.",
                     "other": "Other (specify)",

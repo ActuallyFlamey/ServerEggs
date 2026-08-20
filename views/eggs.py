@@ -240,7 +240,7 @@ class ReportEgg(discord.ui.Modal):
             component=discord.ui.Select(
                 placeholder=self.myloc["rule_placeholder"],
                 options=[
-                    discord.SelectOption(label=self.myloc["rules"]["unmarkednsfw"], description=self.myloc["rules"]["unmarkednsfw_desc"]),
+                    discord.SelectOption(label=self.myloc["rules"]["bad_rating"], description=self.myloc["rules"]["bad_rating_desc"]),
                     discord.SelectOption(label=self.myloc["rules"]["hateful"], description=self.myloc["rules"]["hateful_desc"]),
                     discord.SelectOption(label=self.myloc["rules"]["other"], description=self.myloc["rules"]["other_desc"]),
                 ]

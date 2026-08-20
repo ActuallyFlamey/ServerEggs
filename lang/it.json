@@ -132,8 +132,8 @@
                 "rule_desc": "Quale regola infrange quest'Uovo?",
                 "rule_placeholder": "Seleziona il motivo della segnalazione...",
                 "rules": {
-                    "unmarkednsfw": "Contenuto VM18 non contrassegnato",
-                    "unmarkednsfw_desc": "Questo Uovo contiene contenuti vietati ai minori, ma non è contrassegnato come tale.",
+                    "bad_rating": "Classificazione dei Contenuti Sbagliata",
+                    "bad_rating_desc": "La classificazione (Per tutti / Dubbioso / Esplicito) di questo Uovo è sbagliata.",
                     "hateful": "Divulgazione di Odio/Violenza",
                     "hateful_desc": "Questo Uovo promuove odio verso una qualsiasi minoranza.",
                     "other": "Altro (specifica)",
