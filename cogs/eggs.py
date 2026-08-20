@@ -293,7 +293,7 @@ class Eggs(commands.Cog):
         await ctx.followup.send(
             embed=e,
             file=sfile,
-            view=views.GetEgg(self.bot, lines, egg, creator, vfile, vlink)
+            view=views.GetEgg(self.bot, lines, egg, guild, creator, vfile, vlink)
         )
 
     @app.command(name="get", description="get_description")

@@ -46,6 +46,7 @@ class Guild(models.Model):
 
     lang = fields.CharField(5, default="en")
     allow_user_lang = fields.BooleanField(default=True)
+    view_join_button = fields.BooleanField(default=True)
 
     ratings = fields.JSONField(default=default_ratings)
 

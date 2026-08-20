@@ -22,6 +22,16 @@
                 "already": "$common.already",
                 "missing_perms": "I don't have permission to write logs there!",
                 "success": "Log channel successfully set to {0}."
+            },
+            "allowed-ratings": {
+                "already": "$common.already",
+                "no_changes": "Non hai specificato alcuna modifica.",
+                "no_explicit_in_normal": "You may not allow **Explicit** **Egg**s in **SFW channels**.",
+                "success": "Applied your changes successfully."
+            },
+            "join-button": {
+                "already": "$common.already",
+                "success": "Successfully set viewability of the \"Join Origin Server\" button to `{0}`."
             }
         },
         "eggs": {
@@ -208,7 +218,7 @@
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -293,6 +303,32 @@
     "log_description": "Set a log channel for Eggs created here.",
     "log_channel": "channel",
     "log_channel_description": "The channel to log new Eggs to.",
+
+    "allowed-ratings": "allowed-ratings",
+    "allowed-ratings_description": "Settings to allow certain ratings in certain channels.",
+
+    "allowed-ratings_normal": "normal",
+    "allowed-ratings_normal_description": "Changes the allowed ratings in SFW channels.",
+    "allowed-ratings_normal_s": "safe",
+    "allowed-ratings_normal_s_description": "You want to allow Safe-rated Eggs.",
+    "allowed-ratings_normal_q": "questionable",
+    "allowed-ratings_normal_q_description": "You want to allow Questionable-rated Eggs.",
+    "allowed-ratings_normal_e": "explicit",
+    "allowed-ratings_normal_e_description": "You want to allow Explicit-rated Eggs.",
+
+    "allowed-ratings_nsfw": "nsfw",
+    "allowed-ratings_nsfw_description": "Changes the allowed ratings in NSFW channels.",
+    "allowed-ratings_nsfw_s": "safe",
+    "allowed-ratings_nsfw_s_description": "You want to allow Safe-rated Eggs.",
+    "allowed-ratings_nsfw_q": "questionable",
+    "allowed-ratings_nsfw_q_description": "You want to allow Questionable-rated Eggs.",
+    "allowed-ratings_nsfw_e": "explicit",
+    "allowed-ratings_nsfw_e_description": "You want to allow Explicit-rated Eggs.",
+
+    "join-button": "join-button",
+    "join-button_description": "Changes the viewability of the \"Join Origin Server\" button on Eggs.",
+    "join-button_viewable": "viewable",
+    "join-button_viewable_description": "You want the button to be viewable.",
 
     "create": "create",
     "create_description": "Create an Egg.",

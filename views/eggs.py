@@ -93,14 +93,14 @@ class Eggify(discord.ui.Modal):
         await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, Rating(self.rating.component.values[0]), self.secret.component.value)
 
 class GetEgg(AttachmentView):
-    def __init__(self, bot: commands.Bot, lines: dict, egg, creator: discord.User, file=None, link=None):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, guild, creator: discord.User, file=None, link=None):
         super().__init__(bot, file, link, timeout=None)
 
         self.lines = lines
         self.myloc = bot.get_lines("eggs/get", lines)
         self.egg = egg
 
-        if egg.origin.invite is not None:
+        if egg.origin.invite is not None and (guild.view_join_button if guild else True):
             self.add_item(
                 discord.ui.Button(
                     label=self.myloc["button"]["origin"],

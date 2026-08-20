@@ -2,7 +2,7 @@ import discord
 from discord import app_commands as app
 from discord.ext import commands
 
-from schema import Guild, User
+from schema import Guild, Rating, User, default_ratings
 
 
 class Config(commands.GroupCog, group_name="config", group_description="config_description"):
@@ -87,7 +87,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
 
         _, myloc = await self.bot.get_section(ctx, "config/privacy")
 
-        guild = await Guild.get_or_none(id=ctx.guild.id)
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
         has_invite = bool(guild.invite)
 
         if (has_invite and public) or (not has_invite and not public):
@@ -118,7 +118,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
 
         _, myloc = await self.bot.get_section(ctx, "config/log")
 
-        guild = await Guild.get_or_none(id=ctx.guild.id)
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
         if channel.id == guild.logch:
             await ctx.followup.send(myloc["already"], ephemeral=True)
@@ -133,6 +133,92 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await guild.save(update_fields=["logch"])
 
         await ctx.followup.send(myloc["success"].format(channel.mention), ephemeral=True)
+
+    allowed_ratings = app.Group(
+        name="allowed-ratings",
+        description="allowed-ratings_description",
+        allowed_contexts=app.AppCommandContext(guild=True, dm_channel=False, private_channel=False)
+    )
+
+    async def set_allowed_ratings(self, ctx: discord.Interaction, group: str, safe: bool | None, questionable: bool | None, explicit: bool | None):
+        await ctx.response.defer(ephemeral=True)
+
+        _, myloc = await self.bot.get_section(ctx, "config/allowed-ratings")
+
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+
+        changes = {
+            Rating.SAFE: safe,
+            Rating.QUESTIONABLE: questionable,
+            Rating.EXPLICIT: explicit,
+        }
+
+        if all(value is None for value in changes.values()):
+            await ctx.followup.send(myloc["no_changes"], ephemeral=True)
+            return
+
+        if group == "normal" and changes[Rating.EXPLICIT] is True:
+            await ctx.followup.send(myloc["no_explicit_in_normal"], ephemeral=True)
+            return
+
+        if not guild.ratings:
+            guild.ratings = default_ratings()
+
+        setting = set(guild.ratings.get(group, []))
+
+        for rating, value in changes.items():
+            if value is None:
+                continue
+
+            if value:
+                setting.add(rating)
+            else:
+                setting.discard(rating)
+
+        setting = [rating for rating in (Rating.SAFE, Rating.QUESTIONABLE, Rating.EXPLICIT) if rating in setting]
+
+        if guild.ratings.get(group) == setting:
+            await ctx.followup.send(myloc["already"], ephemeral=True)
+            return
+
+        guild.ratings[group] = setting
+        await guild.save(update_fields=["ratings"])
+
+        await ctx.followup.send(myloc["success"], ephemeral=True)
+
+    @allowed_ratings.command(name="allowed-ratings_normal", description="allowed-ratings_normal_description")
+    @app.rename(safe="allowed-ratings_normal_s", questionable="allowed-ratings_normal_q", explicit="allowed-ratings_normal_e")
+    @app.describe(safe="allowed-ratings_normal_s_description", questionable="allowed-ratings_normal_q_description", explicit="allowed-ratings_normal_e_description")
+    @app.checks.has_permissions(manage_guild=True)
+    async def allowed_ratings_normal(self, ctx: discord.Interaction, safe: bool | None, questionable: bool | None, explicit: bool | None):
+        await self.set_allowed_ratings(ctx, "normal", safe, questionable, explicit)
+
+    @allowed_ratings.command(name="allowed-ratings_nsfw", description="allowed-ratings_nsfw_description")
+    @app.rename(safe="allowed-ratings_nsfw_s", questionable="allowed-ratings_nsfw_q", explicit="allowed-ratings_nsfw_e")
+    @app.describe(safe="allowed-ratings_nsfw_s_description", questionable="allowed-ratings_nsfw_q_description", explicit="allowed-ratings_nsfw_e_description")
+    @app.checks.has_permissions(manage_guild=True)
+    async def allowed_ratings_nsfw(self, ctx: discord.Interaction, safe: bool | None, questionable: bool | None, explicit: bool | None):
+        await self.set_allowed_ratings(ctx, "nsfw", safe, questionable, explicit)
+    
+    @app.command(name="join-button", description="join-button_description")
+    @app.rename(viewable="join-button_viewable")
+    @app.describe(viewable="join-button_viewable_description")
+    @app.checks.has_permissions(manage_guild=True)
+    async def join_button(self, ctx: discord.Interaction, viewable: bool):
+        await ctx.response.defer(ephemeral=True)
+
+        _, myloc = await self.bot.get_section(ctx, "config/join-button")
+
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+
+        if guild.view_join_button == viewable:
+            await ctx.followup.send(myloc["already"], ephemeral=True)
+            return
+        
+        guild.view_join_button = viewable
+        await guild.save(update_fields=["view_join_button"])
+
+        await ctx.followup.send(myloc["success"].format(viewable), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Config(bot))
