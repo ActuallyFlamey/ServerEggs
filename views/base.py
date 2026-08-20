@@ -47,9 +47,10 @@ class AttachmentView(discord.ui.View):
         await utils.send_extra(ctx, self.extrafile, self.extralink)
 
 class RatingModal(discord.ui.Modal):
-    def __init__(self, myloc: dict, egg):
+    def __init__(self, myloc: dict, egg, *, after_set=None):
         self.myloc = myloc
         self.egg = egg
+        self.after_set = after_set
 
         self.names = {
             Rating.SAFE: self.myloc["safe"],
@@ -85,3 +86,6 @@ class RatingModal(discord.ui.Modal):
         await self.egg.save(update_fields=["rating"])
 
         await ctx.followup.send(self.myloc["success"].format(self.egg.id, self.names[rating]), ephemeral=True)
+
+        if self.after_set:
+            await self.after_set(ctx, self.egg, rating)
