@@ -265,11 +265,9 @@ class Eggs(commands.Cog):
                 await user.collected.add(egg)
                 collected = True
 
-        collections = await egg.collectors.all().count()
-
         creator = await utils.get_or_fetch_user(self.bot, egg.creator.id)
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator, collections, collected)
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator, collected)
         sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
 
         await ctx.followup.send(

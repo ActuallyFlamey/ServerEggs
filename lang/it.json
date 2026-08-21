@@ -127,6 +127,8 @@
                 "collection_status": "Stato Collezionamento",
                 "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
                 "collections": "L'**Uovo n. {0}** è stato collezionato **{1} volte**.",
+                "battle_wins": "Vittorie in Battaglia",
+                "wins": "L'**Uovo n. {0}** ha vinto **{1} battaglie**.",
                 "eggn": "Uovo n. {0}",
                 "creator": "Creato da",
                 "unknown_creator": "Utente Sconosciuto {0}",

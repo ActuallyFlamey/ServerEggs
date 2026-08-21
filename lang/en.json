@@ -127,6 +127,8 @@
                 "collection_status": "Collection Status",
                 "collected": "You have **collected** **Egg #{0}**!\nIt has now been collected **{1} times**.\n-# Check your collected **Egg**s with `/collected`!",
                 "collections": "**Egg #{0}** was collected **{1} times**.",
+                "battle_wins": "Battle Wins",
+                "wins": "**Egg #{0}** has won **{1} battles**.",
                 "eggn": "Egg #{0}",
                 "creator": "Created by",
                 "unknown_creator": "Unknown User {0}",

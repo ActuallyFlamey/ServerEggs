@@ -44,7 +44,7 @@ def get_egg_color(egg):
 
     return color
 
-async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, collections = None, collected = False, include_id = False):
+async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, collected = False, include_id = False):
     myloc = bot.get_lines("eggs/get", lines)
 
     if creator is None:
@@ -70,12 +70,19 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
             {f"**{myloc["origin_desc"]}**: {egg.origin.description}" if egg.origin.description is not None else ""}
         """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id)
     )
-    if collections is not None:
-        e.add_field(
-            name=myloc["collection_status"],
-           value=myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
-            inline=False
-        )
+
+    collections = await egg.collectors.all().count()
+    wins = await egg.battle_wins.all().count()
+
+    e.add_field(
+        name=myloc["collection_status"],
+        value=myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
+        inline=False
+    )
+    e.add_field(
+        name=myloc["battle_wins"],
+        value=myloc["wins"].format(egg.id, wins)
+    )
 
     brand_embed(e, lines)
 

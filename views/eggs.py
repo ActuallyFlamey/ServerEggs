@@ -283,7 +283,7 @@ class ReportEgg(discord.ui.Modal):
 
             reportch = self.bot.get_channel(int(os.getenv("REPORT_CHANNEL")))
 
-            e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, None, False, True)
+            e, file, link, inline = await utils.get_egg_embed(self.bot, self.lines, self.egg, None, False, True)
             sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
 
             msg = await reportch.send(
