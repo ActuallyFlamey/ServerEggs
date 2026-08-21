@@ -364,5 +364,9 @@ class Eggstras(commands.Cog):
     async def lb_battles(self, ctx: discord.Interaction):
         await self._send_leaderboard(ctx, utils.Leaderboard(Egg, "battle_wins"), "battles", self._egg_name, None)
 
+    @leaderboard.command(name="leaderboard_battlers", description="leaderboard_battlers_description")
+    async def lb_battlers(self, ctx: discord.Interaction):
+        await self._send_leaderboard(ctx, utils.Leaderboard(User, "user_battle_wins"), "battlers", self._user_name, ctx.user.id)
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggstras(bot))

@@ -76,7 +76,7 @@ async def battle_side_embed(bot: commands.Bot, lines: dict, myloc: dict, egg, si
     )
     e.add_field(
         name=myloc["creator"],
-        value=f"**{creator.display_name}**" if creator is not None else myloc["unknown_creator"].format(egg.creator_id)
+        value=discord.utils.escape_markdown(f"**{creator.display_name}** ({creator.name})") if creator is not None else myloc["unknown_creator"].format(egg.creator_id)
     )
     embed.brand_embed(e, lines)
 
@@ -134,9 +134,14 @@ async def finalize_battle(bot: commands.Bot, battle):
     if winner_id is not None:
         winner = await Egg.get_or_none(id=winner_id)
 
+    winner_user_id = None
+    if winner_id == battle.egg_a_id: winner_user_id = battle.user_a_id
+    elif winner_id == battle.egg_b_id: winner_user_id = battle.user_b_id
+
     battle.winner_id = winner_id
+    battle.winner_user_id = winner_user_id
     battle.status = BattleStatus.FINISHED
-    await battle.save(update_fields=["winner_id", "status"])
+    await battle.save(update_fields=["winner_id", "winner_user_id", "status"])
 
     if battle.channel_id is None or battle.message_id is None:
         return

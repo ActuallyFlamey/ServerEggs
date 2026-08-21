@@ -68,13 +68,17 @@
             },
             "allowed-ratings": {
                 "already": "$common.already",
-                "no_changes": "Non hai specificato alcuna modifica.",
+                "no_changes": "You didn't specify any changes.",
                 "no_explicit_in_normal": "You may not allow **Explicit** **Egg**s in **SFW channels**.",
                 "success": "Applied your changes successfully."
             },
             "join-button": {
                 "already": "$common.already",
                 "success": "Successfully set viewability of the \"Join Origin Server\" button to `{0}`."
+            },
+            "battle-time": {
+                "already": "$common.already",
+                "success": "Successfully set the battle expiration time to `{0}` minutes."
             }
         },
         "eggs": {
@@ -209,7 +213,8 @@
                 "you": " **__[YOU]__**",
                 "collections": "Egg Collectors' Leaderboard",
                 "creations": "Egg Creators' Leaderboard",
-                "battles": "Most Winning Eggs' Leaderboard"
+                "battles": "Most Winning Eggs' Leaderboard",
+                "battlers": "Most Winning Battlers' Leaderboard"
             }
         },
         "error": {
@@ -260,11 +265,11 @@
             },
             "leaderboard": {
                 "title": "About Leaderboards",
-                "desc": "**Commands**: `/leaderboard collections`, `/leaderboard creations`\n\nThe leaderboard commands allow you to view the **Top 15** of a certain category.\nThese categories are:\n- **Collections**: Users who have collected the most **Egg**s.\n- **Creations**: Users who have created the most **Egg**s."
+                "desc": "**Commands**: `/leaderboard collections`, `/leaderboard creations`, `/leaderboard battles`, `/leaderboard battlers`\n\nThe leaderboard commands allow you to view the **Top 15** of a certain category.\nThese categories are:\n- **Collections**: Users who have collected the most **Egg**s.\n- **Creations**: Users who have created the most **Egg**s.\n- **Battles**: **Egg**s that have won the most battles.\n- **Battlers**: Users who have won the most battles."
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False.\n- `/config battle-time`: Change how **long battles** last before they expire.\n  - `minutes` parameter: How many minutes a battle should last."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -393,6 +398,11 @@
     "join-button_viewable": "viewable",
     "join-button_viewable_description": "You want the button to be viewable.",
 
+    "battle-time": "battle-time",
+    "battle-time_description": "Changes the expiration time for battles.",
+    "battle-time_minutes": "minutes",
+    "battle-time_minutes_description": "How many minutes should a battle last?",
+
     "create": "create",
     "create_description": "Create an Egg.",
     "create_text": "text",
@@ -488,6 +498,9 @@
 
     "leaderboard_battles": "battles",
     "leaderboard_battles_description": "See which Eggs have won the most battles.",
+
+    "leaderboard_battlers": "battlers",
+    "leaderboard_battlers_description": "See who has won the most battles.",
 
     "filter": "filter",
     "filter_description": "Prevent a specific Egg from appearing in this server.",

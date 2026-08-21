@@ -1,3 +1,4 @@
+from datetime import timedelta
 from enum import StrEnum
 
 from tortoise import fields, models
@@ -56,6 +57,8 @@ class Guild(models.Model):
 
     logch = fields.BigIntField(null=True)
 
+    battle_time = fields.TimeDeltaField(default=timedelta(minutes=10))
+
     filtered: fields.ManyToManyField["Egg"] = fields.ManyToManyField("eggs.Egg", related_name="filtered_in", through="guild_filtered_eggs")
 
     eggs = fields.ReverseRelation["Egg"]
@@ -88,6 +91,7 @@ class Battle(models.Model):
     ends_at = fields.DatetimeField(db_index=True)
     status = fields.CharEnumField(enum_type=BattleStatus, default=BattleStatus.OPEN, max_length=10)
     winner = fields.ForeignKeyField("eggs.Egg", "battle_wins", null=True)
+    winner_user = fields.ForeignKeyField("eggs.User", "user_battle_wins", null=True)
 
     class Meta:
         table = "battle"

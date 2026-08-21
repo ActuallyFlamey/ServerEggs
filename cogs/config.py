@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import discord
 from discord import app_commands as app
 from discord.ext import commands
@@ -8,6 +10,14 @@ from schema import Guild, Rating, User, default_ratings
 class Config(commands.GroupCog, group_name="config", group_description="config_description"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    async def _guild_setting(self, ctx: discord.Interaction, section: str):
+        await ctx.response.defer(ephemeral=True)
+
+        _, myloc = await self.bot.get_section(ctx, f"config/{section}")
+        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+
+        return myloc, guild
 
     @app.command(name="lang", description="lang_description")
     @app.rename(code="lang_language")
@@ -31,12 +41,13 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
             if not ctx.permissions.manage_guild:
                 await ctx.followup.send(myloc["no_permissions"], ephemeral=True)
                 return
-            else:
-                await Guild.update_or_create(defaults={ "lang": code }, id=ctx.guild.id)
-                self.bot.lang_cache[f"guild_{ctx.guild.id}"] = code
+
+            model, id_, cache_key = Guild, ctx.guild.id, f"guild_{ctx.guild.id}"
         else:
-            await User.update_or_create(defaults={ "lang": code }, id=ctx.user.id)
-            self.bot.lang_cache[f"user_{ctx.user.id}"] = code
+            model, id_, cache_key = User, ctx.user.id, f"user_{ctx.user.id}"
+
+        await model.update_or_create(defaults={ "lang": code }, id=id_)
+        self.bot.lang_cache[cache_key] = code
 
         _, myloc = await self.bot.get_section(ctx, "config/lang")
 
@@ -48,17 +59,17 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
-        await ctx.response.defer(ephemeral=True)
-
-        _, myloc = await self.bot.get_section(ctx, "config/allow-user-lang")
+        myloc, guild = await self._guild_setting(ctx, "allow-user-lang")
 
         cache_key = f"guild_{ctx.guild.id}_allowuserlang"
 
-        if self.bot.lang_cache[cache_key] == allow:
+        if guild.allow_user_lang == allow:
+            self.bot.lang_cache[cache_key] = allow
             await ctx.followup.send(myloc["already"], ephemeral=True)
             return
 
-        guild, _ = await Guild.update_or_create(defaults={ "allow_user_lang": allow }, id=ctx.guild.id)
+        guild.allow_user_lang = allow
+        await guild.save(update_fields=["allow_user_lang"])
         self.bot.lang_cache[cache_key] = guild.allow_user_lang
 
         await ctx.followup.send(myloc["success"].format(allow), ephemeral=True)
@@ -69,11 +80,10 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def server_description(self, ctx: discord.Interaction, desc: str):
-        await ctx.response.defer(ephemeral=True)
+        myloc, guild = await self._guild_setting(ctx, "server-description")
 
-        _, myloc = await self.bot.get_section(ctx, "config/server-description")
-
-        guild, _ = await Guild.update_or_create({ "description": desc }, id=ctx.guild.id)
+        guild.description = desc
+        await guild.save(update_fields=["description"])
 
         await ctx.followup.send(myloc["success"] + "\n" + guild.description, ephemeral=True)
 
@@ -83,11 +93,8 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def privacy(self, ctx: discord.Interaction, public: bool):
-        await ctx.response.defer(ephemeral=True)
+        myloc, guild = await self._guild_setting(ctx, "privacy")
 
-        _, myloc = await self.bot.get_section(ctx, "config/privacy")
-
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
         has_invite = bool(guild.invite)
 
         if (has_invite and public) or (not has_invite and not public):
@@ -96,8 +103,14 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
 
         invite = None
         if public:
+            base_channel = ctx.guild.rules_channel or (ctx.guild.text_channels[0] if ctx.guild.text_channels else None)
+
+            if base_channel is None:
+                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
+                return
+
             try:
-                inviteobj = await ctx.guild.rules_channel.create_invite() if ctx.guild.rules_channel else await ctx.guild.text_channels[0].create_invite()
+                inviteobj = await base_channel.create_invite()
                 invite = inviteobj.url
             except discord.errors.Forbidden:
                 await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
@@ -114,11 +127,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
     async def log(self, ctx: discord.Interaction, channel: discord.TextChannel):
-        await ctx.response.defer(ephemeral=True)
-
-        _, myloc = await self.bot.get_section(ctx, "config/log")
-
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+        myloc, guild = await self._guild_setting(ctx, "log")
 
         if channel.id == guild.logch:
             await ctx.followup.send(myloc["already"], ephemeral=True)
@@ -141,11 +150,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     )
 
     async def set_allowed_ratings(self, ctx: discord.Interaction, group: str, safe: bool | None, questionable: bool | None, explicit: bool | None):
-        await ctx.response.defer(ephemeral=True)
-
-        _, myloc = await self.bot.get_section(ctx, "config/allowed-ratings")
-
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+        myloc, guild = await self._guild_setting(ctx, "allowed-ratings")
 
         changes = {
             Rating.SAFE: safe,
@@ -205,11 +210,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.describe(viewable="join-button_viewable_description")
     @app.checks.has_permissions(manage_guild=True)
     async def join_button(self, ctx: discord.Interaction, viewable: bool):
-        await ctx.response.defer(ephemeral=True)
-
-        _, myloc = await self.bot.get_section(ctx, "config/join-button")
-
-        guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+        myloc, guild = await self._guild_setting(ctx, "join-button")
 
         if guild.view_join_button == viewable:
             await ctx.followup.send(myloc["already"], ephemeral=True)
@@ -219,6 +220,24 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await guild.save(update_fields=["view_join_button"])
 
         await ctx.followup.send(myloc["success"].format(viewable), ephemeral=True)
+    
+    @app.command(name="battle-time", description="battle-time_description")
+    @app.rename(minutes="battle-time_minutes")
+    @app.describe(minutes="battle-time_minutes_description")
+    @app.checks.has_permissions(manage_guild=True)
+    async def battle_time(self, ctx: discord.Interaction, minutes: app.Range[int, 1, None]):
+        myloc, guild = await self._guild_setting(ctx, "battle-time")
+
+        newdelta = timedelta(minutes=minutes)
+
+        if guild.battle_time == newdelta:
+            await ctx.followup.send(myloc["already"], ephemeral=True)
+            return
+        
+        guild.battle_time = newdelta
+        await guild.save(update_fields=["battle_time"])
+
+        await ctx.followup.send(myloc["success"].format(minutes), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Config(bot))

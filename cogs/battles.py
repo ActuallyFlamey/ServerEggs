@@ -8,7 +8,6 @@ import utils
 import views
 from schema import Battle, Egg, Guild, User
 
-BATTLE_DURATION = datetime.timedelta(seconds=30)
 
 class Battles(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -60,7 +59,7 @@ class Battles(commands.Cog):
             egg_b=egg_b,
             user_a=user_a,
             user_b=user_b,
-            ends_at=datetime.datetime.now(datetime.timezone.utc) + BATTLE_DURATION
+            ends_at=datetime.datetime.now(datetime.timezone.utc) + guild.battle_time
         )
 
         sides = await utils.build_battle_message(self.bot, lines, myloc, egg_a, egg_b)
@@ -148,7 +147,7 @@ class Battles(commands.Cog):
         challenge_view = views.ChallengeView(self.bot, lines, None, ctx.user, against, egg_a)
 
         prompt = await ctx.channel.send(
-            content=myloc["prompt"].format(against.mention, ctx.user.display_name),
+            content=myloc["prompt"].format(against.mention, ctx.user.mention),
             view=challenge_view
         )
 

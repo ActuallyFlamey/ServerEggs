@@ -75,6 +75,10 @@
             "join-button": {
                 "already": "$common.already",
                 "success": "Visibilità del tasto \"Unisciti al Server d'Origine\" impostata su `{0}` con successo."
+            },
+            "battle-time": {
+                "already": "$common.already",
+                "success": "Impostato il tempo di scadenza delle battaglie a `{0}` minuti con successo."
             }
         },
         "eggs": {
@@ -209,7 +213,8 @@
                 "you": " **__[TU]__**",
                 "collections": "Classifica dei Collezionisti d'Uova",
                 "creations": "Classifica dei Creatori d'Uova",
-                "battles": "Classifica delle Uova più Vincenti"
+                "battles": "Classifica delle Uova più Vincenti",
+                "battlers": "Classifica degli Utenti più Vincenti"
             }
         },
         "error": {
@@ -260,11 +265,11 @@
             },
             "leaderboard": {
                 "title": "Informazioni sulle Classifiche",
-                "desc": "**Comandi**: `/classifica collezioni`, `/classifica creazioni`\n\nI comandi delle classifiche ti mostrano la **Top 15** di una categoria.\nLe categorie sono:\n- **Collezioni**: Gli utenti che hanno collezionato più **Uova**.\n- **Creazioni**: Gli utenti che hanno creato più **Uova**."
+                "desc": "**Comandi**: `/classifica collezioni`, `/classifica creazioni`, `/classifica battaglie`, `/classifica combattenti`\n\nI comandi delle classifiche ti mostrano la **Top 15** di una categoria.\nLe categorie sono:\n- **Collezioni**: Gli utenti che hanno collezionato più **Uova**.\n- **Creazioni**: Gli utenti che hanno creato più **Uova**.\n- **Battaglie**: Le **Uova** che hanno vinto più battaglie.\n- **Combattenti**: Gli utenti che hanno vinto più battaglie."
             },
             "config": {
                 "title": "Informazioni sul Configurare Server Eggs",
-                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`, `/configura classificazioni-permesse`, `/configura tasto-unisciti`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Permetti l'uso delle **lingue specificate dagli utenti** in questo server.\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Permetti a **chiunque** di **unirsi a questo server** attraverso le **Uova** create in esso.\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare.\n- `/configura classificazioni-permesse per-tutte-le-età`: Cambia quali **classificazioni** sono permesse nei **canali per tutte le età**.\n  - Parametri `per-tutti`, `dubbiose`, `esplicite`: Se permettere ogni classificazione. Quelli omessi mantengono il valore attuale.\n- `/configura classificazioni-permesse per-maggiorenni`: Cambia quali **classificazioni** sono permesse nei **canali per maggiorenni**.\n  - Parametri `per-tutti`, `dubbiose`, `esplicite`: Se permettere ogni classificazione. Quelli omessi mantengono il valore attuale.\n- `/configura tasto-unisciti`: Cambia se il tasto **\"Unisciti al Server d'Origine\"** appare sulle **Uova** ottenute in questo server.\n  - Parametro `visibile`: Vero o Falso."
+                "desc": "**Comandi**: `/configura lingua`, `/configura permetti-lingua-personale`, `/configura privacy`, `/configura registro`, `/configura classificazioni-permesse`, `/configura tasto-unisciti`\n\nI comandi di configuarazione permettono ai Gestori dei Server di impostare **Server Eggs** come preferiscono.\n\n- `/configura lingua`: Imposta la **lingua delle risposte** in questo server (o per un utente, se usato nei DM).\n  - Parametro `lingua`: La lingua da impostare.\n- `/configura permetti-lingua-personale`: Permetti l'uso delle **lingue specificate dagli utenti** in questo server.\n  - Parametro `permetti`: Vero o Falso.\n- `/configura privacy`: Permetti a **chiunque** di **unirsi a questo server** attraverso le **Uova** create in esso.\n  - Parametro `privato`: Vero o Falso.\n- `/configura registro`: Imposta un **canale dove registrare** le **creazioni** e le **modifiche alle Uova** che accadono in questo server.\n  - Parametro `canale`: Il canale da usare.\n- `/configura classificazioni-permesse per-tutte-le-età`: Cambia quali **classificazioni** sono permesse nei **canali per tutte le età**.\n  - Parametri `per-tutti`, `dubbiose`, `esplicite`: Se permettere ogni classificazione. Quelli omessi mantengono il valore attuale.\n- `/configura classificazioni-permesse per-maggiorenni`: Cambia quali **classificazioni** sono permesse nei **canali per maggiorenni**.\n  - Parametri `per-tutti`, `dubbiose`, `esplicite`: Se permettere ogni classificazione. Quelli omessi mantengono il valore attuale.\n- `/configura tasto-unisciti`: Cambia se il tasto **\"Unisciti al Server d'Origine\"** appare sulle **Uova** ottenute in questo server.\n  - Parametro `visibile`: Vero o Falso.\n- `/configura scadenza-battaglie`: Cambia quanto tempo passa prima che le **battaglie** scadano.\n  - Parametro `minuti`: Quanti minuti dovrebbe durare una battaglia."
             },
             "filter": {
                 "title": "Informazioni sul Filtrare Uova",
@@ -325,7 +330,7 @@
     "donate_description": "Sostieni lo sviluppo di Server Eggs!",
 
     "battle": "battaglia",
-    "battle_description": "Fai iniziare una battaglia casuale tra Uova: il vincitore sarà scelto dopo un'ora.",
+    "battle_description": "Fai iniziare una battaglia casuale tra Uova.",
     "battle_a": "a",
     "battle_a_description": "L'ID del primo Uovo in battaglia.",
     "battle_b": "b",
@@ -348,7 +353,7 @@
     "lang_default": "Predefinita dal Server",
 
     "allow-user-lang": "permetti-lingua-personale",
-    "allow-user-lang_description": "Cambia l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
+    "allow-user-lang_description": "Modifica l'impostazione riguardante l'utilizzo delle lingue personali nel server.",
     "allow-user-lang_allow": "permetti",
     "allow-user-lang_allow_description": "Vuoi permettere l'utilizzo delle lingue personali in questo server.",
 
@@ -371,7 +376,7 @@
     "allowed-ratings_description": "Impostazioni per permettere certe classificazioni in certi canali.",
 
     "allowed-ratings_normal": "per-tutte-le-età",
-    "allowed-ratings_normal_description": "Cambia le classificazioni permesse nei canali per tutte le età.",
+    "allowed-ratings_normal_description": "Modifica le classificazioni permesse nei canali per tutte le età.",
     "allowed-ratings_normal_s": "per-tutti",
     "allowed-ratings_normal_s_description": "Vuoi permettere le Uova per tutti.",
     "allowed-ratings_normal_q": "dubbiose",
@@ -380,7 +385,7 @@
     "allowed-ratings_normal_e_description": "Vuoi permettere le Uova esplicite.",
 
     "allowed-ratings_nsfw": "per-maggiorenni",
-    "allowed-ratings_nsfw_description": "Cambia le classificazioni permesse nei canali per maggiorenni.",
+    "allowed-ratings_nsfw_description": "Modifica le classificazioni permesse nei canali per maggiorenni.",
     "allowed-ratings_nsfw_s": "per-tutti",
     "allowed-ratings_nsfw_s_description": "Vuoi permettere le Uova per tutti.",
     "allowed-ratings_nsfw_q": "dubbiose",
@@ -389,9 +394,14 @@
     "allowed-ratings_nsfw_e_description": "Vuoi permettere le Uova esplicite.",
 
     "join-button": "tasto-unisciti",
-    "join-button_description": "Cambia la visibilità del tasto \"Unisciti al Server d'Origine\" sulle Uova.",
+    "join-button_description": "Modifica la visibilità del tasto \"Unisciti al Server d'Origine\" sulle Uova.",
     "join-button_viewable": "visibile",
     "join-button_viewable_description": "Vuoi che il tasto sia visibile.",
+
+    "battle-time": "scadenza-battaglie",
+    "battle-time_description": "Modifica il tempo di scadenza delle battaglie.",
+    "battle-time_minutes": "minuti",
+    "battle-time_minutes_description": "Quanti minuti dovrebbe durare una battaglia?",
 
     "create": "crea",
     "create_description": "Crea un Uovo.",
@@ -488,6 +498,9 @@
 
     "leaderboard_battles": "battaglie",
     "leaderboard_battles_description": "Vedi quali Uova hanno vinto più battaglie.",
+
+    "leaderboard_battlers": "combattenti",
+    "leaderboard_battlers_description": "Vedi chi ha vinto più battaglie.",
 
     "filter": "filtra",
     "filter_description": "Vieta a un Uovo specifico di apparire in questo server.",
