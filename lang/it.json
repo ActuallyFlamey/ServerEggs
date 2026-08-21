@@ -360,6 +360,9 @@
     "nsfw": "vm18",
     "nsfw_description": "Ricevi un Uovo Esplicito casuale.",
 
+    "latest": "recente",
+    "latest_description": "Ricevi l'Uovo creato più recentemente (senza collezionarlo).",
+
     "edit": "modifica",
     "edit_description": "Modifica un Uovo che ti è permesso gestire.",
     "edit_id": "id",

@@ -361,6 +361,9 @@
     "nsfw": "nsfw",
     "nsfw_description": "Get a random Explicit Egg.",
 
+    "latest": "latest",
+    "latest_description": "Get the latest created Egg (does not collect it).",
+
     "edit": "edit",
     "edit_description": "Edit an Egg that you're allowed to manage.",
     "edit_id": "id",

@@ -233,7 +233,6 @@ class Eggs(commands.Cog):
         lines, myloc = await self.bot.get_section(ctx, "eggs/get")
 
         guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
-
         allowed = utils.channel_ratings(guild, ctx.channel)
 
         collected = False
@@ -313,6 +312,33 @@ class Eggs(commands.Cog):
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
     async def nsfw(self, ctx: discord.Interaction):
         await self._get(ctx, None, True)
+    
+    @app.command(name="latest", description="latest_description")
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def latest(self, ctx: discord.Interaction):
+        await ctx.response.defer()
+
+        lines = await self.bot.fetch_lines(ctx)
+
+        guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
+        allowed = utils.channel_ratings(guild, ctx.channel)
+
+        filtered = []
+        if ctx.guild:
+            filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
+
+        egg = await Egg.filter(rating__in=allowed, id__not_in=filtered, secret=False).order_by("-created_at").prefetch_related("creator", "origin").first()
+
+        creator = await utils.get_or_fetch_user(self.bot, egg.creator.id)
+
+        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator)
+        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+
+        await ctx.followup.send(
+            embed=e,
+            file=sfile,
+            view=views.GetEgg(self.bot, lines, egg, guild, creator, vfile, vlink)
+        )
 
     @app.command(name="edit", description="edit_description")
     @app.rename(id="edit_id", text="edit_text", file="edit_file", link="edit_link", rating="edit_rating", secret="edit_secret")
