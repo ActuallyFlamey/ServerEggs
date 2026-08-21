@@ -3,6 +3,9 @@
         "battles": {
             "battle": {
                 "no_egg": "There aren't enough **Egg**s to start a battle!",
+                "not_found": "$common.not_found",
+                "rating_not_allowed": "$eggstras.loop.rating_not_allowed",
+                "same_egg": "Both fighters can't be the same **Egg**!",
                 "begin_random": "## Battle started!\n**__A__**: **Egg #{0}**\n**__B__**: **Egg #{1}**",
                 "begin_challenge": "## Battle started!\n**__A__**: **Egg #{0}**, fighting for {2}!\n**__B__**: **Egg #{1}**, fighting for {3}!",
                 "eggn": "Egg #{0} ({1})",
@@ -317,7 +320,11 @@
     "help_about_description": "The command to get information about.",
 
     "battle": "battle",
-    "battle_description": "Start a random Egg battle and let everyone vote on the winner for one hour.",
+    "battle_description": "Start an Egg battle and let everyone vote on the winner.",
+    "battle_a": "a",
+    "battle_a_description": "The ID of the first Egg in the fight.",
+    "battle_b": "b",
+    "battle_b_description": "The ID of the second Egg in the fight.",
 
     "challenge": "challenge",
     "challenge_description": "Challenge another user to an Egg battle.",

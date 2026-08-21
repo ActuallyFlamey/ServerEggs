@@ -8,7 +8,7 @@ import utils
 import views
 from schema import Battle, Egg, Guild, User
 
-BATTLE_DURATION = datetime.timedelta(minutes=2)
+BATTLE_DURATION = datetime.timedelta(seconds=30)
 
 class Battles(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -18,9 +18,20 @@ class Battles(commands.Cog):
     async def cog_unload(self):
         self.finalize_battles.cancel()
 
-    async def owned_fighter_egg(self, ctx: discord.Interaction, myloc: dict, user: User, egg_id: int | None, *, guild: Guild | None = None, channel=None, exclude_ids=None):
-        allowed = utils.channel_ratings(guild, channel)
+    async def pool_fighter_egg(self, ctx: discord.Interaction, myloc: dict, egg_id: int, *, guild: Guild | None = None, channel=None):
+        egg = await Egg.get_or_none(id=egg_id)
 
+        if egg is None:
+            await ctx.followup.send(myloc["not_found"].format(egg_id), ephemeral=True)
+            return None
+
+        if egg.rating not in utils.channel_ratings(guild, channel):
+            await ctx.followup.send(myloc["rating_not_allowed"].format(egg_id), ephemeral=True)
+            return None
+
+        return egg
+
+    async def owned_fighter_egg(self, ctx: discord.Interaction, myloc: dict, user: User, egg_id: int | None, *, guild: Guild | None = None, channel=None, exclude_ids=None):
         if egg_id is not None:
             pool = await utils.fight_pool_ids(user)
 
@@ -28,17 +39,7 @@ class Battles(commands.Cog):
                 await ctx.followup.send(myloc["not_your_egg"].format(egg_id), ephemeral=True)
                 return None
 
-            egg = await Egg.get_or_none(id=egg_id)
-
-            if egg is None:
-                await ctx.followup.send(myloc["not_found"].format(egg_id), ephemeral=True)
-                return None
-
-            if egg.rating not in allowed:
-                await ctx.followup.send(myloc["rating_not_allowed"].format(egg_id), ephemeral=True)
-                return None
-
-            return egg
+            return await self.pool_fighter_egg(ctx, myloc, egg_id, guild=guild, channel=channel)
 
         egg = await utils.random_fight_egg(user, guild, channel, exclude_ids=exclude_ids)
 
@@ -82,22 +83,37 @@ class Battles(commands.Cog):
         await battle.save(update_fields=["channel_id", "message_id"])
 
     @app.command(name="battle", description="battle_description")
+    @app.rename(a="battle_a", b="battle_b")
+    @app.describe(a="battle_a_description", b="battle_b_description")
     @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    async def battle(self, ctx: discord.Interaction):
+    async def battle(self, ctx: discord.Interaction, a: int | None = None, b: int | None = None):
         await ctx.response.defer()
 
         _, myloc = await self.bot.get_section(ctx, "battles/battle")
 
         guild = await Guild.get_or_none(id=ctx.guild.id)
 
-        egg_a = await utils.random_egg(guild, ctx.channel)
-        if egg_a is None:
-            await ctx.followup.send(myloc["no_egg"])
+        if a is not None and b is not None and a == b:
+            await ctx.followup.send(myloc["same_egg"], ephemeral=True)
             return
 
-        egg_b = await utils.random_egg(guild, ctx.channel, exclude_ids={egg_a.id})
+        egg_a = await self.pool_fighter_egg(ctx, myloc, a, guild=guild, channel=ctx.channel) if a is not None else None
+        if a is not None and egg_a is None:
+            return
+
+        egg_b = await self.pool_fighter_egg(ctx, myloc, b, guild=guild, channel=ctx.channel) if b is not None else None
+        if b is not None and egg_b is None:
+            return
+
+        if egg_a is None:
+            egg_a = await utils.random_egg(guild, ctx.channel, exclude_ids={b} if b is not None else None)
+
         if egg_b is None:
+            excluded = {egg_a.id} if egg_a is not None else ({a} if a is not None else None)
+            egg_b = await utils.random_egg(guild, ctx.channel, exclude_ids=excluded)
+
+        if egg_a is None or egg_b is None:
             await ctx.followup.send(myloc["no_egg"])
             return
 

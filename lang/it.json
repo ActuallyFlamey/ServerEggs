@@ -3,6 +3,9 @@
         "battles": {
             "battle": {
                 "no_egg": "Non ci sono abbastanza **Uova** per iniziare una battaglia!",
+                "not_found": "$common.not_found",
+                "rating_not_allowed": "$eggstras.loop.rating_not_allowed",
+                "same_egg": "Non puoi usare lo stesso **Uovo** per entrambi i combattenti!",
                 "begin_random": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**\n**__B__**: **Uovo n. {1}**",
                 "begin_challenge": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**, che combatte per {2}!\n**__B__**: **Uovo n. {1}**, che combatte per {3}!",
                 "eggn": "Uovo n. {0} ({1})",
@@ -318,6 +321,10 @@
 
     "battle": "battaglia",
     "battle_description": "Fai iniziare una battaglia casuale tra Uova: il vincitore sarà scelto dopo un'ora.",
+    "battle_a": "a",
+    "battle_a_description": "L'ID del primo Uovo in battaglia.",
+    "battle_b": "b",
+    "battle_b_description": "L'ID del secondo Uovo in battaglia.",
 
     "challenge": "sfida",
     "challenge_description": "Sfida un altro utente a una battaglia tra Uova.",
