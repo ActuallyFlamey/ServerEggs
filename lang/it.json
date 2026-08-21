@@ -1,5 +1,45 @@
 {
     "lines": {
+        "battles": {
+            "battle": {
+                "no_egg": "Non ci sono abbastanza **Uova** per iniziare una battaglia!",
+                "begin_random": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**\n**__B__**: **Uovo n. {1}**",
+                "begin_challenge": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**, che combatte per {2}!\n**__B__**: **Uovo n. {1}**, che combatte per {3}!",
+                "eggn": "Uovo n. {0} ({1})",
+                "creator": "$eggs.get.creator",
+                "unknown_creator": "$eggs.get.unknown_creator",
+                "vote": "Vota {0}",
+                "voted": "Il tuo voto è stato registrato! Puoi cambiarlo fino alla fine della battaglia.",
+                "ended": "Questa battaglia è già finita.",
+                "show": "Mostra Allegato per {0}",
+                "result_win_title": "Vince l'Uovo n. {0}!",
+                "result_win": "L'**Uovo n. {0}** canta vittoria con **{1}** voti contro **{2}**!",
+                "result_tie_title": "Pari!",
+                "result_tie": "La battaglia è finita **{0} - {1}**. Nessun **Uovo** canta vittoria.",
+                "finished": "**Battaglia conclusa**!"
+            },
+            "challenge": {
+                "self": "Non puoi sfidarti da solo!",
+                "bot": "Non puoi sfidare un bot!",
+                "not_found": "$common.not_found",
+                "not_your_egg": "Non hai né creato né collezionato l'**Uovo n. {0}**, quindi non puoi usarlo per combattere.",
+                "rating_not_allowed": "$eggstras.loop.rating_not_allowed",
+                "empty_pool": "Non hai alcun **Uovo** che possa combattere! Creane o collezionane.",
+                "prompt": "{0}, sei statə sfidatə a una **battaglia tra Uova** da **{1}**!\nAccetta qui sotto, e scegli quale delle tue **Uova** (create o collezionate) combatterà, oppure lascialo al caso.",
+                "sent": "Sfida inviata con successo.",
+                "accept": "Accetta",
+                "decline": "Rifiuta",
+                "not_yours": "Solo l'**utente sfidato** può rispondere alla sfida.",
+                "declined": "La sfida è stata **rifiutata**.",
+                "expired": "La sfida è scaduta senza risposta.",
+                "modal_title": "Scegli il tuo Uovo combattente",
+                "modal_id": "ID Uovo",
+                "modal_id_placeholder": "Lascia questo spazio vuoto perché venga scelto casualmente.",
+                "invalid_egg": "\"**{0}**\" non è un **ID Uovo** valido.",
+                "same_egg": "È lo stesso **Uovo** che ha scelto il tuo avversario! Scegline un altro.",
+                "accepted": "La sfida è stata **accettata**: che la battaglia abbia inizio!"
+            }
+        },
         "config": {
             "lang": {
                 "no_permissions": "È necessario il permesso **Gestisci Server** per eseguire questo comando qui.\n\n-# Se intendevi impostare la **tua lingua di risposta personale**, esegui `/configura lingua` nei [miei DM](<https://discord.com/users/886686500845138041>).\n-# **Non tutti i server permettono** l'uso delle lingue personali, ma **nei DM funzionerà sempre**.",
@@ -163,7 +203,8 @@
             "leaderboard": {
                 "you": " **__[TU]__**",
                 "collections": "Classifica dei Collezionisti d'Uova",
-                "creations": "Classifica dei Creatori d'Uova"
+                "creations": "Classifica dei Creatori d'Uova",
+                "battles": "Classifica delle Uova più Vincenti"
             }
         },
         "error": {
@@ -269,10 +310,21 @@
             "not_yours": "Solo l'**utente che ha eseguito il comando** può navigare il loop delle **Uova**."
         }
     },
+
     "help": "aiuto",
     "help_description": "Ottieni informazioni riguardanti Server Eggs o un comando.",
     "help_about": "riguardo-a",
     "help_about_description": "Il comando di cui ricevere informazioni a riguardo.",
+
+    "battle": "battaglia",
+    "battle_description": "Fai iniziare una battaglia casuale tra Uova: il vincitore sarà scelto dopo un'ora.",
+
+    "challenge": "sfida",
+    "challenge_description": "Sfida un altro utente a una battaglia tra Uova.",
+    "challenge_against": "contro",
+    "challenge_against_description": "L'utente che vuoi sfidare.",
+    "challenge_using": "con",
+    "challenge_using_description": "L'ID di un Uovo che hai creato o collezionato da portare in battaglia.",
 
     "config": "configura",
     "config_description": "Comandi di configurazione.",
@@ -421,6 +473,9 @@
 
     "leaderboard_creations": "creazioni",
     "leaderboard_creations_description": "Vedi chi ha creato più Uova.",
+
+    "leaderboard_battles": "battaglie",
+    "leaderboard_battles_description": "Vedi quali Uova hanno vinto più battaglie.",
 
     "filter": "filtra",
     "filter_description": "Vieta a un Uovo specifico di apparire in questo server.",

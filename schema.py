@@ -8,6 +8,10 @@ class Rating(StrEnum):
     QUESTIONABLE = "QUESTIONABLE"
     EXPLICIT = "EXPLICIT"
 
+class BattleStatus(StrEnum):
+    OPEN = "OPEN"
+    FINISHED = "FINISHED"
+
 def default_ratings() -> dict:
     return {
         "normal": [Rating.SAFE, Rating.QUESTIONABLE],
@@ -66,6 +70,38 @@ class User(models.Model):
 
     eggs = fields.ReverseRelation["Egg"]
     reports = fields.ReverseRelation["Report"]
+
+class Battle(models.Model):
+    id = fields.BigIntField(primary_key=True)
+
+    guild = fields.ForeignKeyField("eggs.Guild", "battles")
+
+    egg_a = fields.ForeignKeyField("eggs.Egg", "battles_as_a")
+    egg_b = fields.ForeignKeyField("eggs.Egg", "battles_as_b")
+
+    user_a = fields.ForeignKeyField("eggs.User", "challenges_sent", null=True)
+    user_b = fields.ForeignKeyField("eggs.User", "challenges_received", null=True)
+
+    channel_id = fields.BigIntField(null=True)
+    message_id = fields.BigIntField(null=True)
+
+    ends_at = fields.DatetimeField(db_index=True)
+    status = fields.CharEnumField(enum_type=BattleStatus, default=BattleStatus.OPEN, max_length=10)
+    winner = fields.ForeignKeyField("eggs.Egg", "battle_wins", null=True)
+
+    class Meta:
+        table = "battle"
+
+class BattleVote(models.Model):
+    id = fields.BigIntField(primary_key=True)
+
+    battle = fields.ForeignKeyField("eggs.Battle", "votes")
+    voter = fields.ForeignKeyField("eggs.User", "battle_votes")
+    choice = fields.IntField()
+
+    class Meta:
+        table = "battle_vote"
+        unique_together = (("battle", "voter"),)
 
 class Report(models.Model):
     id = fields.BigIntField(primary_key=True)

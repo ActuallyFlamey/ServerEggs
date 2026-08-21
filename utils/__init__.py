@@ -1,4 +1,5 @@
 from .attach import *
+from .battles import *
 from .dictfind import *
 from .eggs import *
 from .embed import *

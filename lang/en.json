@@ -1,5 +1,45 @@
 {
     "lines": {
+        "battles": {
+            "battle": {
+                "no_egg": "There aren't enough **Egg**s to start a battle!",
+                "begin_random": "## Battle started!\n**__A__**: **Egg #{0}**\n**__B__**: **Egg #{1}**",
+                "begin_challenge": "## Battle started!\n**__A__**: **Egg #{0}**, fighting for {2}!\n**__B__**: **Egg #{1}**, fighting for {3}!",
+                "eggn": "Egg #{0} ({1})",
+                "creator": "$eggs.get.creator",
+                "unknown_creator": "$eggs.get.unknown_creator",
+                "vote": "Vote {0}",
+                "voted": "Your vote has been counted! You can switch sides until the battle ends.",
+                "ended": "This battle has already ended.",
+                "show": "Show Attachment for {0}",
+                "result_win_title": "Egg #{0} wins!",
+                "result_win": "**Egg #{0}** claims victory with **{1}** votes against **{2}**!",
+                "result_tie_title": "Tied!",
+                "result_tie": "The battle ended **{0} - {1}**. No **Egg** claims victory.",
+                "finished": "**Battle finished**!"
+            },
+            "challenge": {
+                "self": "You cannot challenge yourself to a battle!",
+                "bot": "You cannot challenge bots to a battle!",
+                "not_found": "$common.not_found",
+                "not_your_egg": "**Egg #{0}** was neither created nor collected by you, so it can't fight for you.",
+                "rating_not_allowed": "$eggstras.loop.rating_not_allowed",
+                "empty_pool": "You don't have any **Egg**s that can fight! Create or collect some first.",
+                "prompt": "{0}, you have been challenged to an **Egg battle** by **{1}**!\nAccept below, then choose which of your **Egg**s (created or collected) will fight, or leave it to chance.",
+                "sent": "Challenge sent successfully.",
+                "accept": "Accept",
+                "decline": "Decline",
+                "not_yours": "Only the **challenged user** can respond to this challenge.",
+                "declined": "The challenge was **declined**.",
+                "expired": "This challenge expired without a response.",
+                "modal_title": "Choose your fighter Egg",
+                "modal_id": "Egg ID",
+                "modal_id_placeholder": "Leave empty to pick a random Egg from your pool",
+                "invalid_egg": "**\"{0}\"** isn't a valid **Egg ID**.",
+                "same_egg": "That's the same **Egg** your opponent is bringing! Pick a different one.",
+                "accepted": "The challenge was **accepted**: let the battle begin!"
+            }
+        },
         "config": {
             "lang": {
                 "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](<https://discord.com/users/886686500845138041>).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
@@ -149,7 +189,7 @@
             "loop": {
                 "not_collected": "You haven't collected **Egg #{0}**.",
                 "not_created": "You aren't the creator of **Egg #{0}**.",
-                "rating_not_allowed": "You have **Egg #{0}**, but its **rating** isn't allowed in this channel.\nTry again **in a NSFW channel**.",
+                "rating_not_allowed": "You have **Egg #{0}**, but its **rating** isn't allowed in this channel.",
                 "rating_not_allowed_filter": "You can't filter by this **rating** in this channel.",
                 "empty": "No **Egg**s with this criteria!",
                 "show_extra_attachment": "$common.show_extra_attachment",
@@ -163,7 +203,8 @@
             "leaderboard": {
                 "you": " **__[YOU]__**",
                 "collections": "Egg Collectors' Leaderboard",
-                "creations": "Egg Creators' Leaderboard"
+                "creations": "Egg Creators' Leaderboard",
+                "battles": "Most Winning Eggs' Leaderboard"
             }
         },
         "error": {
@@ -274,6 +315,16 @@
     "help_description": "Get info about Server Eggs or a command.",
     "help_about": "about",
     "help_about_description": "The command to get information about.",
+
+    "battle": "battle",
+    "battle_description": "Start a random Egg battle and let everyone vote on the winner for one hour.",
+
+    "challenge": "challenge",
+    "challenge_description": "Challenge another user to an Egg battle.",
+    "challenge_against": "against",
+    "challenge_against_description": "The user you want to challenge.",
+    "challenge_using": "using",
+    "challenge_using_description": "The ID of an Egg you've created or collected to bring into battle.",
 
     "config": "config",
     "config_description": "Configuration commands.",
@@ -422,6 +473,9 @@
 
     "leaderboard_creations": "creations",
     "leaderboard_creations_description": "See who has created the most Eggs.",
+
+    "leaderboard_battles": "battles",
+    "leaderboard_battles_description": "See which Eggs have won the most battles.",
 
     "filter": "filter",
     "filter_description": "Prevent a specific Egg from appearing in this server.",

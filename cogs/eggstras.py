@@ -316,14 +316,6 @@ class Eggstras(commands.Cog):
         allowed_contexts=app.AppCommandContext(guild=True, dm_channel=True, private_channel=True)
     )
 
-    async def _user_name(self, bot, user_id: int) -> str:
-        user = await utils.get_or_fetch_user(bot, user_id)
-
-        if user is None:
-            return f"User `{user_id}`"
-
-        return f"**{user.display_name}** ({discord.utils.escape_markdown(user.name, as_needed=False)})"
-
     async def _send_leaderboard(self, ctx: discord.Interaction, leaderboard: utils.Leaderboard, title_key: str, name_resolver, self_id: int):
         await ctx.response.defer()
 
@@ -340,6 +332,14 @@ class Eggstras(commands.Cog):
 
         await ctx.followup.send(embed=e)
 
+    async def _user_name(self, bot, user_id: int) -> str:
+        user = await utils.get_or_fetch_user(bot, user_id)
+
+        if user is None:
+            return f"User `{user_id}`"
+
+        return f"**{user.display_name}** ({discord.utils.escape_markdown(user.name, as_needed=False)})"
+
     @leaderboard.command(name="leaderboard_collections", description="leaderboard_collections_description")
     async def lb_collections(self, ctx: discord.Interaction):
         await self._send_leaderboard(ctx, utils.Leaderboard(User, "collected"), "collections", self._user_name, ctx.user.id)
@@ -347,6 +347,22 @@ class Eggstras(commands.Cog):
     @leaderboard.command(name="leaderboard_creations", description="leaderboard_creations_description")
     async def lb_creations(self, ctx: discord.Interaction):
         await self._send_leaderboard(ctx, utils.Leaderboard(User, "eggs"), "creations", self._user_name, ctx.user.id)
+
+    async def _egg_name(self, bot, egg_id: int) -> str:
+        egg = await Egg.get_or_none(id=egg_id).prefetch_related("creator")
+
+        if egg is None:
+            return f"Egg `{egg_id}`"
+
+        creator = await utils.get_or_fetch_user(bot, egg.creator_id)
+
+        creator_name = f"**{creator.display_name}**" if creator is not None else f"`{egg.creator_id}`"
+
+        return f"**Egg #{egg.id}** by {creator_name}"
+
+    @leaderboard.command(name="leaderboard_battles", description="leaderboard_battles_description")
+    async def lb_battles(self, ctx: discord.Interaction):
+        await self._send_leaderboard(ctx, utils.Leaderboard(Egg, "battle_wins"), "battles", self._egg_name, None)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggstras(bot))

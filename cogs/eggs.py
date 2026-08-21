@@ -1,5 +1,3 @@
-import random
-
 import discord
 from discord import app_commands as app
 from discord.ext import commands
@@ -256,26 +254,11 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["filtered"].format(id, ctx.guild.name))
                 return
         else:
-            eggs = Egg.all()
+            egg = await utils.random_egg(guild, ctx.channel, explicit_only=only_nsfw)
 
-            if ctx.guild:
-                filtered = await Egg.filter(filtered_in__id=ctx.guild.id).values_list("id", flat=True)
-                if filtered:
-                    eggs = eggs.filter(id__not_in=filtered)
-
-            if only_nsfw:
-                eggs = eggs.filter(rating=Rating.EXPLICIT)
-            else:
-                eggs = eggs.filter(rating__in=allowed)
-
-            count = await eggs.count()
-
-            if count == 0:
+            if egg is None:
                 await ctx.followup.send(myloc["no_egg"])
                 return
-
-            randegg = random.randint(0, count - 1)
-            egg = await eggs.offset(randegg).prefetch_related("creator", "origin").first()
 
             user, _ = await User.get_or_create(id=ctx.user.id)
             if not await user.collected.filter(id=egg.id).exists():

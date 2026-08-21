@@ -23,9 +23,12 @@ class Leaderboard:
         higher = await self._base().filter(egg_count__gt=count).count()
         return higher + 1, count
 
-async def render_entries(bot, leaderboard: Leaderboard, self_id: int, name_resolver, self_suffix: str = "") -> list[str]:
+async def render_entries(bot, leaderboard: Leaderboard, self_id: int | None, name_resolver, self_suffix: str = "") -> list[str]:
     top = await leaderboard.top()
-    rank, count = await leaderboard.rank_of(self_id)
+    rank = count = None
+
+    if self_id is not None:
+        rank, count = await leaderboard.rank_of(self_id)
 
     async def row(index: int, entity_id: int, entity_count: int, *, self_row: bool) -> str:
         name = await name_resolver(bot, entity_id)
@@ -35,11 +38,11 @@ async def render_entries(bot, leaderboard: Leaderboard, self_id: int, name_resol
         return f"{marker}{prefix} — {name}{suffix} — {format_count(entity_count)}{marker}"
 
     entries = [
-        await row(index, entry["id"], entry["egg_count"], self_row=entry["id"] == self_id)
+        await row(index, entry["id"], entry["egg_count"], self_row=self_id is not None and entry["id"] == self_id)
         for index, entry in enumerate(top, start=1)
     ]
 
-    if not any(entry["id"] == self_id for entry in top):
+    if self_id is not None and not any(entry["id"] == self_id for entry in top):
         entries.append(await row(rank, self_id, count, self_row=True))
 
     return entries
