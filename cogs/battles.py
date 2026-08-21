@@ -71,7 +71,7 @@ class Battles(commands.Cog):
             fighters.append(await utils.get_or_fetch_user(self.bot, user_b.id))
 
         message = await ctx.followup.send(
-            content=myloc["begin_random"].format(egg_a.id, egg_b.id) if fighters == [] else myloc["begin_challenge"].format(egg_a.id, egg_b.id, f"**{fighters[0].display_name}** ({fighters[0].name})", f"**{fighters[1].display_name}** ({fighters[1].name})"),
+            content=myloc["begin_random"].format(egg_a.id, egg_b.id) if fighters == [] else myloc["begin_challenge"].format(egg_a.id, egg_b.id, f"**{discord.utils.escape_markdown(fighters[0].display_name)}** ({discord.utils.escape_markdown(fighters[0].name)})", f"**{discord.utils.escape_markdown(fighters[1].display_name)}** ({discord.utils.escape_markdown(fighters[1].name)})"),
             embeds=[sides[0]["embed"], sides[1]["embed"]],
             files=files,
             view=views.BattleView(self.bot, lines, battle, sides)

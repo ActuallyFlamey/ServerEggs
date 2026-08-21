@@ -61,12 +61,12 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
     )
     e.add_field(
         name=myloc["creator"],
-        value=discord.utils.escape_markdown(f"**{creator.display_name}** ({creator.name}{f", {creator.id}" if include_id else ""})") if creator is not None else myloc["unknown_creator"].format(egg.creator.id)
+        value=f"**{discord.utils.escape_markdown(creator.display_name)}** ({discord.utils.escape_markdown(creator.name)}{f", {creator.id}" if include_id else ""})" if creator is not None else myloc["unknown_creator"].format(egg.creator.id)
     )
     e.add_field(
         name=myloc["origin"],
         value=f"""
-            **{myloc["origin_name"]}**: {origin.name}
+            **{myloc["origin_name"]}**: {discord.utils.escape_markdown(origin.name)}
             {f"**{myloc["origin_desc"]}**: {egg.origin.description}" if egg.origin.description is not None else ""}
         """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id)
     )

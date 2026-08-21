@@ -76,7 +76,7 @@ async def battle_side_embed(bot: commands.Bot, lines: dict, myloc: dict, egg, si
     )
     e.add_field(
         name=myloc["creator"],
-        value=discord.utils.escape_markdown(f"**{creator.display_name}** ({creator.name})") if creator is not None else myloc["unknown_creator"].format(egg.creator_id)
+        value=f"**{discord.utils.escape_markdown(creator.display_name)}** ({discord.utils.escape_markdown(creator.name)})" if creator is not None else myloc["unknown_creator"].format(egg.creator_id)
     )
     embed.brand_embed(e, lines)
 
