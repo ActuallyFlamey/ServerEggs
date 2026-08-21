@@ -319,6 +319,9 @@
     "help_about": "riguardo-a",
     "help_about_description": "Il comando di cui ricevere informazioni a riguardo.",
 
+    "donate": "dona",
+    "donate_description": "Sostieni lo sviluppo di Server Eggs!",
+
     "battle": "battaglia",
     "battle_description": "Fai iniziare una battaglia casuale tra Uova: il vincitore sarà scelto dopo un'ora.",
     "battle_a": "a",

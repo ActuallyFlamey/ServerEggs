@@ -319,6 +319,9 @@
     "help_about": "about",
     "help_about_description": "The command to get information about.",
 
+    "donate": "donate",
+    "donate_description": "Support Server Eggs's development!",
+
     "battle": "battle",
     "battle_description": "Start an Egg battle and let everyone vote on the winner.",
     "battle_a": "a",

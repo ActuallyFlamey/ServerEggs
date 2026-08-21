@@ -233,6 +233,11 @@ async def help(ctx: discord.Interaction, about: str | None):
 
     await ctx.response.send_message(embed=e)
 
+@bot.tree.command(name="donate", description="donate_description")
+@app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+async def donate(ctx: discord.Interaction):
+    await ctx.response.send_message("https://ko-fi.com/hexablue")
+
 @bot.tree.context_menu(name="eggify")
 @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
 async def eggify(ctx: discord.Interaction, message: discord.Message):
