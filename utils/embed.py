@@ -71,17 +71,22 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
         """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id)
     )
 
+    # spacer
+    e.add_field(
+        name="\u200b",
+        value="\u200b"
+    )
+
     collections = await egg.collectors.all().count()
     wins = await egg.battle_wins.all().count()
 
     e.add_field(
         name=myloc["collection_status"],
         value=myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
-        inline=False
     )
     e.add_field(
         name=myloc["battle_wins"],
-        value=myloc["wins"].format(egg.id, wins)
+        value=myloc["wins"].format(egg.id, wins),
     )
 
     brand_embed(e, lines)
