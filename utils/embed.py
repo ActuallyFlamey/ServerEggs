@@ -5,6 +5,9 @@ from schema import Rating
 
 from . import attach, misc
 
+EGG_EMOJI = "<:egg:1535645170400370729>"
+
+CV2_TEXT_LIMIT = 4000
 
 def egg_title(egg, base: str) -> str:
     if egg.rating == Rating.EXPLICIT:
@@ -44,7 +47,76 @@ def get_egg_color(egg):
 
     return color
 
-async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.User = None, collected = False, include_id = False):
+def brand_header(lines: dict | None = None, title: str = "") -> str:
+    author = lines["embed"]["author"] if lines else "Server Eggs"
+
+    header = f"{EGG_EMOJI} **{author}**"
+    return f"{header}\n# {title}" if title else header
+
+def brand_footer(lines: dict | None = None) -> str:
+    footer = lines["embed"]["footer"] if lines else "Server Eggs by Flamey"
+    return f"-# {EGG_EMOJI} {footer}"
+
+def fit_text(description: str | None, *fixed: str) -> str | None:
+    """Truncates the description so every TextDisplay of a layout stays within the Components v2 limit."""
+    if not description:
+        return None
+
+    budget = max(CV2_TEXT_LIMIT - sum(len(text) for text in fixed) - len(fixed), 0)
+
+    if len(description) <= budget:
+        return description
+
+    return description[:budget] + "…"
+
+def egg_container(color: discord.Color, body: list[str], media=None, lines: dict | None = None) -> discord.ui.Container:
+    container = discord.ui.Container(accent_color=color)
+
+    for text in body:
+        container.add_item(discord.ui.TextDisplay(text))
+
+    if media is not None:
+        container.add_item(discord.ui.MediaGallery(media))
+
+    container.add_item(discord.ui.TextDisplay(brand_footer(lines)))
+
+    return container
+
+def egg_creator_block(myloc: dict, egg, creator, include_id=False) -> str:
+    if creator is not None:
+        detail = discord.utils.escape_markdown(creator.name)
+        if include_id:
+            detail += f", {creator.id}"
+
+        value = f"**{discord.utils.escape_markdown(creator.display_name)}** ({detail})"
+    else:
+        value = myloc["unknown_creator"].format(egg.creator.id)
+
+    return f"### {myloc["creator"]}\n{value}"
+
+def egg_origin_block(myloc: dict, egg, origin) -> str:
+    if origin is None:
+        value = myloc["unknown_origin"].format(egg.origin.id)
+    else:
+        parts = [f"**{myloc["origin_name"]}**: {discord.utils.escape_markdown(origin.name)}"]
+
+        if egg.origin.description is not None:
+            parts.append(f"**{myloc["origin_desc"]}**: {egg.origin.description}")
+
+        value = "\n".join(parts)
+
+    return f"### {myloc["origin"]}\n{value}"
+
+async def get_egg_layout(
+    bot: commands.Bot,
+    lines: dict,
+    egg,
+    creator: discord.User = None,
+    collected = False,
+    include_id = False,
+    *,
+    title: str | None = None
+) -> tuple[discord.ui.Container, discord.File | None, str | None, str | None]:
     myloc = bot.get_lines("eggs/get", lines)
 
     if creator is None:
@@ -52,45 +124,26 @@ async def get_egg_embed(bot: commands.Bot, lines: dict, egg, creator: discord.Us
 
     origin = bot.get_guild(egg.origin.id)
 
-    color = get_egg_color(egg)
-
-    e = discord.Embed(
-        title=egg_title(egg, myloc["eggn"].format(egg.id)),
-        color=color,
-        description=egg.text
-    )
-    e.add_field(
-        name=myloc["creator"],
-        value=f"**{discord.utils.escape_markdown(creator.display_name)}** ({discord.utils.escape_markdown(creator.name)}{f", {creator.id}" if include_id else ""})" if creator is not None else myloc["unknown_creator"].format(egg.creator.id)
-    )
-    e.add_field(
-        name=myloc["origin"],
-        value=f"""
-            **{myloc["origin_name"]}**: {discord.utils.escape_markdown(origin.name)}
-            {f"**{myloc["origin_desc"]}**: {egg.origin.description}" if egg.origin.description is not None else ""}
-        """ if origin is not None else myloc["unknown_origin"].format(egg.origin.id)
-    )
-
-    # spacer
-    e.add_field(
-        name="\u200b",
-        value="\u200b"
-    )
+    media, sfile, extrafile, extralink = attach.get_media(egg)
 
     collections = await egg.collectors.all().count()
     wins = await egg.battle_wins.all().count()
 
-    e.add_field(
-        name=myloc["collection_status"],
-        value=myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections),
-    )
-    e.add_field(
-        name=myloc["battle_wins"],
-        value=myloc["wins"].format(egg.id, wins),
-    )
+    fields = [
+        egg_creator_block(myloc, egg, creator, include_id),
+        egg_origin_block(myloc, egg, origin),
+        f"### {myloc["collection_status"]}\n{myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections)}",
+        f"### {myloc["battle_wins"]}\n{myloc["wins"].format(egg.id, wins)}",
+    ]
 
-    brand_embed(e, lines)
+    if title is None:
+        title = egg_title(egg, myloc["eggn"].format(egg.id))
 
-    file, link, inline = attach.show_attachment(egg, e)
+    header = brand_header(lines, title)
+    footer = brand_footer(lines)
 
-    return e, file, link, inline
+    description = fit_text(egg.text, header, footer, *fields)
+
+    body = [f"{header}\n\n{description}" if description else header, *fields]
+
+    return egg_container(get_egg_color(egg), body, media, lines=lines), sfile, extrafile, extralink

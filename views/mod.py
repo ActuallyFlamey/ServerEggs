@@ -4,19 +4,35 @@ from discord.ext import commands
 import utils
 from schema import Egg, Report
 
-from .base import AttachmentView, RatingModal
+from .base import ExtraAttachmentButton, RatingModal, action_button, text_view
 
 
-class ReportActions(AttachmentView):
-    def __init__(self, bot: commands.Bot, report, reporter, file=None, link=None, lines=None):
-        super().__init__(bot, file, link, timeout=None)
+class ReportActions(discord.ui.LayoutView):
+    def __init__(self, bot: commands.Bot, report, reporter, intro: str, container: discord.ui.Container, file=None, link=None, lines: dict | None = None):
+        super().__init__(timeout=None)
 
         self.bot = bot
         self.report = report
         self.reporter = reporter
         self.lines = lines
 
-        self.setup_extra("Show Extra Attachment", hide_if_missing=True)
+        self.add_item(discord.ui.TextDisplay(intro))
+        self.add_item(container)
+
+        if file or link:
+            self.add_item(discord.ui.ActionRow(ExtraAttachmentButton(
+                bot.get_lines("common", lines or {})["show_extra_attachment"] if lines else "Show Extra Attachment",
+                style=discord.ButtonStyle.primary,
+                file=file,
+                link=link
+            )))
+
+        self.add_item(discord.ui.ActionRow(
+            action_button("Ignore", discord.ButtonStyle.secondary, self.ignore),
+            action_button("Change Rating", discord.ButtonStyle.primary, self.change_rating),
+            action_button("Delete", discord.ButtonStyle.danger, self.delete),
+            action_button("Delete and Ban", discord.ButtonStyle.danger, self.delete_ban),
+        ))
 
     async def delete_reports(self, ctx: discord.Interaction, action: str, egg: Egg | int):
         all_reports = await egg.reports.all() if isinstance(egg, Egg) else await Report.filter(egg__id=egg).all()
@@ -24,12 +40,7 @@ class ReportActions(AttachmentView):
         for report in all_reports:
             try:
                 msg = ctx.channel.get_partial_message(report.log_message_id)
-                await msg.edit(
-                    content=self.resolved(action, egg),
-                    embed=None,
-                    attachments=[],
-                    view=None
-                )
+                await msg.edit(view=text_view(self.resolved(action, egg)))
             except discord.HTTPException:
                 pass
 
@@ -45,16 +56,14 @@ class ReportActions(AttachmentView):
 
         return True
 
-    @discord.ui.button(label="Ignore", style=discord.ButtonStyle.secondary, row=1)
-    async def ignore(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def ignore(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
         egg = await self.report.egg
 
         await self.delete_reports(ctx, "Ignore", egg.id)
 
-    @discord.ui.button(label="Change Rating", style=discord.ButtonStyle.primary, row=1)
-    async def change_rating(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def change_rating(self, ctx: discord.Interaction):
         egg = await self.report.egg
 
         await ctx.response.send_modal(RatingModal(self.bot.get_lines("rating", self.lines), egg, after_set=self._after_rating))
@@ -62,8 +71,7 @@ class ReportActions(AttachmentView):
     async def _after_rating(self, ctx: discord.Interaction, egg: Egg, rating):
         await self.delete_reports(ctx, f"Change Rating to {rating.value}", egg.id)
 
-    @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger, row=1)
-    async def delete(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def delete(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
         egg = await self.report.egg
@@ -71,8 +79,7 @@ class ReportActions(AttachmentView):
         await self.delete_reports(ctx, "Delete", egg.id)
         await utils.egg_delete(egg)
 
-    @discord.ui.button(label="Delete and Ban", style=discord.ButtonStyle.danger, row=1)
-    async def delete_ban(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def delete_ban(self, ctx: discord.Interaction):
         await ctx.response.defer()
 
         egg = await self.report.egg

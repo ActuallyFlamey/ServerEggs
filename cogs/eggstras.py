@@ -200,17 +200,13 @@ class Eggstras(commands.Cog):
         eggs = collections.deque(loop)
         eggs.rotate(random.randint(0, len(eggs)))
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, eggs[0])
-        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+        view = discord.utils.MISSING
+        sfile = discord.utils.MISSING
+        if not check:
+            view = await views.EggLoop.create(self.bot, lines, myloc, ctx.user, eggs)
+            sfile = view.sfile or discord.utils.MISSING
 
-        await ctx.followup.send(
-            embed=e,
-            file=sfile,
-            view=views.EggLoop(
-                self.bot, lines, myloc, ctx.user, eggs,
-                vfile, vlink
-            ) if not check else discord.utils.MISSING
-        )
+        await ctx.followup.send(file=sfile, view=view)
 
     @app.command(name="collected", description="collected_description")
     @app.rename(check="collected_check", rating="collected_rating", secret="collected_secret")
@@ -298,16 +294,11 @@ class Eggstras(commands.Cog):
 
         loop = collections.deque(eggs)
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, loop[0])
-        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+        view = await views.EggLoop.create(self.bot, lines, myloc, ctx.user, loop)
 
         await ctx.followup.send(
-            embed=e,
-            file=sfile,
-            view=views.EggLoop(
-                self.bot, lines, myloc, ctx.user, loop,
-                vfile, vlink
-            )
+            file=view.sfile or discord.utils.MISSING,
+            view=view
         )
 
     leaderboard = app.Group(

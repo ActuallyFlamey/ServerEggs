@@ -137,43 +137,34 @@ async def url_to_file(url: str) -> discord.File | None:
 
     return file
 
-def show_attachment(egg, embed: discord.Embed):
-    file = None
-    link = None
-    inline = True
-
+def get_media(egg):
     if egg.attach_path and os.path.exists(egg.attach_path):
         filename = os.path.basename(egg.attach_path)
+        kind = get_content_type(filename)
 
-        file = discord.File(egg.attach_path, filename=filename)
+        if kind in ("image", "video"):
+            item = discord.MediaGalleryItem(media=f"attachment://{filename}")
+            return item, discord.File(egg.attach_path, filename=filename), None, None
 
-        if get_content_type(filename) == "image":
-            embed.set_image(url=f"attachment://{filename}")
-        else:
-            inline = False
+        return None, None, egg.attach_path, None
     elif getattr(egg, "attach_link", None) and egg.attach_link.startswith(("http://", "https://")):
-        if get_content_type(egg.attach_link) == "image":
-            embed.set_image(url=egg.attach_link)
-        else:
-            link = egg.attach_link
-            inline = False
+        if get_content_type(egg.attach_link) in ("image", "video"):
+            return discord.MediaGalleryItem(media=egg.attach_link), None, None, None
 
-    return file, link, inline
+        return None, None, None, egg.attach_link
 
-def file_path(file: discord.File | None) -> str | None:
-    """Path on disk backing a File, or None if it was created from a buffer."""
+    return None, None, None, None
+
+def file_path(file: discord.File | str | None) -> str | None:
+    """Path on disk backing a File (or an already resolved path), or None."""
+    if isinstance(file, str):
+        return file
+
     if file is None:
         return None
 
     name = getattr(file.fp, "name", None)
     return name if isinstance(name, str) else None
-
-def attachment_kwargs(file, link, inline):
-    send_file = (file or discord.utils.MISSING) if inline else discord.utils.MISSING
-    view_file = file_path(file) if not inline else None
-    view_link = link if not inline else None
-
-    return send_file, view_file, view_link
 
 async def send_extra(ctx: discord.Interaction, file, link):
     if isinstance(file, discord.File):

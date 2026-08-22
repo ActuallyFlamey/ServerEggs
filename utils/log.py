@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import views
 
-from . import attach, embed
+from . import embed
 
 
 async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.User, actor: discord.User, edit: bool = False):
@@ -13,17 +13,18 @@ async def log_egg(bot: commands.Bot, lines: dict, guild, egg, creator: discord.U
 
     if not logch: return
 
-    e, file, link, inline = await embed.get_egg_embed(bot, lines, egg, creator)
-    sfile, vfile, vlink = attach.attachment_kwargs(file, link, inline)
+    container, sfile, vfile, vlink = await embed.get_egg_layout(bot, lines, egg, creator)
 
     await logch.send(
-        myloc["log"].format(
-            actor.display_name,
-            actor.name,
-            myloc["edited"] if edit else myloc["created"],
-            egg.id
-        ),
-        embed=e,
-        file=sfile,
-        view=views.ModLogActions(bot, lines, egg, vfile, vlink)
+        file=sfile or discord.utils.MISSING,
+        view=views.ModLogActions(
+            bot, lines, egg,
+            myloc["log"].format(
+                actor.display_name,
+                actor.name,
+                myloc["edited"] if edit else myloc["created"],
+                egg.id
+            ),
+            container, vfile, vlink
+        )
     )

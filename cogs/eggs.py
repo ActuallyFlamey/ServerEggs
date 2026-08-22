@@ -164,23 +164,15 @@ class Eggs(commands.Cog):
         creator = self.bot.get_user(egg.creator.id)
         if ctx.guild: await utils.log_egg(self.bot, lines, guild, egg, creator, ctx.user, bool(id))
 
-        e = discord.Embed(
-            title=utils.egg_title(egg, myloc["title"].format(egg.id, myloc["created"] if not id else myloc["edited"])),
-            color=utils.get_egg_color(egg),
-            description=egg.text
+        container, resfile, vfile, vlink = await utils.get_egg_layout(
+            self.bot, lines, egg,
+            title=utils.egg_title(egg, myloc["title"].format(egg.id, myloc["created"] if not id else myloc["edited"]))
         )
-        utils.brand_embed(e, lines)
-
-        resfile, reslink, inline = utils.show_attachment(egg, e)
-        _, vfile, vlink = utils.attachment_kwargs(resfile, reslink, inline)
-
-        attachments = [resfile] if inline and resfile else []
 
         await processing.edit(
             content=None,
-            embed=e,
-            attachments=attachments,
-            view=views.CreateEgg(self.bot, myloc, vfile, vlink)
+            attachments=[resfile] if resfile else [],
+            view=views.CreateEgg(myloc, container, vfile, vlink)
         )
 
     @app.command(name="create", description="create_description")
@@ -267,13 +259,11 @@ class Eggs(commands.Cog):
 
         creator = await utils.get_or_fetch_user(self.bot, egg.creator.id)
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator, collected)
-        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+        container, sfile, vfile, vlink = await utils.get_egg_layout(self.bot, lines, egg, creator, collected)
 
         await ctx.followup.send(
-            embed=e,
-            file=sfile,
-            view=views.GetEgg(self.bot, lines, egg, guild, creator, vfile, vlink)
+            file=sfile or discord.utils.MISSING,
+            view=views.GetEgg(self.bot, lines, egg, guild, creator, container, vfile, vlink)
         )
 
     @app.command(name="get", description="get_description")
@@ -312,13 +302,11 @@ class Eggs(commands.Cog):
 
         creator = await utils.get_or_fetch_user(self.bot, egg.creator.id)
 
-        e, file, link, inline = await utils.get_egg_embed(self.bot, lines, egg, creator)
-        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+        container, sfile, vfile, vlink = await utils.get_egg_layout(self.bot, lines, egg, creator)
 
         await ctx.followup.send(
-            embed=e,
-            file=sfile,
-            view=views.GetEgg(self.bot, lines, egg, guild, creator, vfile, vlink)
+            file=sfile or discord.utils.MISSING,
+            view=views.GetEgg(self.bot, lines, egg, guild, creator, container, vfile, vlink)
         )
 
     @app.command(name="edit", description="edit_description")
@@ -341,21 +329,7 @@ class Eggs(commands.Cog):
     ):
         await self.create_or_edit(ctx, id, text, file, link, rating, secret)
 
-    def _confirm_embed(self, lines: dict, myloc: dict, egg, color: discord.Color):
-        text = utils.truncate(egg.text, 1023)
-
-        e = discord.Embed(title=myloc["ready"]["title"].format(egg.id), color=color, description=myloc["ready"]["question"])
-        e.add_field(name=myloc["ready"]["content"], value=text if text is not None else myloc["ready"]["no_content"], inline=False)
-        utils.brand_embed(e, lines)
-
-        file, link, inline = utils.show_attachment(egg, e)
-
-        if link:
-            e.add_field(name=myloc["ready"]["link"], value=link)
-
-        return e, file, link, inline
-
-    async def _confirm_flow(self, ctx: discord.Interaction, path: str, id: int, color: discord.Color, view_class, *, check_manage: bool = False):
+    async def _confirm_flow(self, ctx: discord.Interaction, path: str, id: int, view_class, *, check_manage: bool = False):
         await ctx.response.defer(ephemeral=True)
 
         lines, myloc = await self.bot.get_section(ctx, path)
@@ -370,13 +344,11 @@ class Eggs(commands.Cog):
             await ctx.followup.send(myloc["cannot"], ephemeral=True)
             return
 
-        e, file, link, inline = self._confirm_embed(lines, myloc, egg, color)
-        sfile, vfile, vlink = utils.attachment_kwargs(file, link, inline)
+        container, sfile, vfile, vlink = await utils.get_egg_layout(self.bot, lines, egg)
 
         await ctx.followup.send(
-            embed=e,
-            file=sfile,
-            view=view_class(self.bot, lines, egg, vfile, vlink),
+            file=sfile or discord.utils.MISSING,
+            view=view_class(self.bot, lines, egg, container, vfile, vlink),
             ephemeral=True
         )
 
@@ -385,21 +357,21 @@ class Eggs(commands.Cog):
     @app.describe(id="report_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def report(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/report", id, discord.Color.red(), views.PreReportEgg)
+        await self._confirm_flow(ctx, "eggs/report", id, views.PreReportEgg)
 
     @app.command(name="delete", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def delete(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/delete", id, discord.Color.blurple(), views.DeleteEgg, check_manage=True)
+        await self._confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
     
     @app.command(name="crack", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def crack(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/delete", id, discord.Color.blurple(), views.DeleteEgg, check_manage=True)
+        await self._confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

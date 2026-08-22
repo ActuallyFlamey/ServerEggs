@@ -66,31 +66,36 @@ async def random_fight_egg(user: User, guild: Guild | None = None, channel=None,
 
     return await query.offset(random.randint(0, count - 1)).first()
 
-async def battle_side_embed(bot: commands.Bot, lines: dict, myloc: dict, egg, side: str) -> dict:
+async def battle_side(bot: commands.Bot, lines: dict, myloc: dict, egg, side: str) -> dict:
     creator = await misc.get_or_fetch_user(bot, egg.creator_id)
 
-    e = discord.Embed(
-        title=embed.egg_title(egg, myloc["eggn"].format(egg.id, side)),
-        color=embed.get_egg_color(egg),
-        description=egg.text
-    )
-    e.add_field(
-        name=myloc["creator"],
-        value=f"**{discord.utils.escape_markdown(creator.display_name)}** ({discord.utils.escape_markdown(creator.name)})" if creator is not None else myloc["unknown_creator"].format(egg.creator_id)
-    )
-    embed.brand_embed(e, lines)
+    media, sfile, extrafile, extralink = attach.get_media(egg)
 
-    file, link, inline = attach.show_attachment(egg, e)
+    header = embed.brand_header(lines, embed.egg_title(egg, myloc["eggn"].format(egg.id, side)))
+    footer = embed.brand_footer(lines)
+
+    description = embed.fit_text(egg.text, header, footer)
+
+    body = [f"{header}\n\n{description}" if description else header]
+
+    if creator is not None:
+        value = f"**{discord.utils.escape_markdown(creator.display_name)}** ({discord.utils.escape_markdown(creator.name)})"
+    else:
+        value = myloc["unknown_creator"].format(egg.creator_id)
+
+    body.append(f"### {myloc["creator"]}\n{value}")
+
+    container = embed.egg_container(embed.get_egg_color(egg), body, media, lines=lines)
 
     return {
-        "embed": e,
-        "file": file if inline else None,
-        "vfile": attach.file_path(file) if not inline else None,
-        "vlink": link if not inline else None
+        "container": container,
+        "sfile": sfile,
+        "vfile": extrafile,
+        "vlink": extralink
     }
 
 async def build_battle_message(bot: commands.Bot, lines: dict, myloc: dict, egg_a, egg_b) -> list[dict]:
-    return [await battle_side_embed(bot, lines, myloc, egg_a, "A"), await battle_side_embed(bot, lines, myloc, egg_b, "B")]
+    return [await battle_side(bot, lines, myloc, egg_a, "A"), await battle_side(bot, lines, myloc, egg_b, "B")]
 
 async def count_votes(battle) -> tuple[int, int]:
     rows = await BattleVote.filter(battle=battle).values("choice")
@@ -100,23 +105,22 @@ async def count_votes(battle) -> tuple[int, int]:
 
     return count_a, count_b
 
-def result_embed(lines: dict, myloc: dict, winner, count_a: int, count_b: int) -> discord.Embed:
+def result_layout(lines: dict, myloc: dict, winner, count_a: int, count_b: int) -> discord.ui.LayoutView:
     if winner is not None:
-        e = discord.Embed(
-            title=myloc["result_win_title"].format(winner.id),
-            color=discord.Color.gold(),
-            description=myloc["result_win"].format(winner.id, max(count_a, count_b), min(count_a, count_b))
-        )
+        color = discord.Color.gold()
+        title = myloc["result_win_title"].format(winner.id)
+        description = myloc["result_win"].format(winner.id, max(count_a, count_b), min(count_a, count_b))
     else:
-        e = discord.Embed(
-            title=myloc["result_tie_title"],
-            color=discord.Color.blurple(),
-            description=myloc["result_tie"].format(count_a, count_b)
-        )
+        color = discord.Color.blurple()
+        title = myloc["result_tie_title"]
+        description = myloc["result_tie"].format(count_a, count_b)
 
-    embed.brand_embed(e, lines)
+    body = [f"{embed.brand_header(lines, title)}\n\n{description}"]
 
-    return e
+    view = discord.ui.LayoutView(timeout=None)
+    view.add_item(embed.egg_container(color, body, lines=lines))
+
+    return view
 
 async def finalize_battle(bot: commands.Bot, battle):
     guild = await battle.guild
@@ -153,7 +157,7 @@ async def finalize_battle(bot: commands.Bot, battle):
     try: message = await channel.fetch_message(battle.message_id)
     except discord.HTTPException: return
 
-    try: await message.edit(content=None, embed=result_embed(lines, myloc, winner, count_a, count_b), attachments=[], view=None)
+    try: await message.edit(view=result_layout(lines, myloc, winner, count_a, count_b))
     except discord.HTTPException: pass
 
     try: await message.reply(content=myloc["finished"])

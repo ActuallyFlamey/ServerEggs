@@ -1,50 +1,31 @@
 import discord
-from discord.ext import commands
 
 import utils
 from schema import Rating
 
 
-class AttachmentView(discord.ui.View):
-    """View with a shared "show extra attachment" button for non-inline media."""
+class ExtraAttachmentButton(discord.ui.Button):
+    """Sends the Egg's non-gallery media (audios and unfurlable page links) in its own message."""
 
-    def __init__(self, bot: commands.Bot, file=None, link=None, *, timeout: float | None = None):
-        super().__init__(timeout=timeout)
+    def __init__(self, label: str, *, style=discord.ButtonStyle.primary, file=None, link=None):
+        super().__init__(label=label, style=style, custom_id="servereggs:extra_attachment")
 
-        self.bot = bot
         self.extrafile = file
         self.extralink = link
 
-    def setup_extra(self, label: str, *, style=None, hide_if_missing: bool = False, disable_if_missing: bool = False):
-        button = self.show_extra_attachment
-        button.label = label
-
-        if style is not None:
-            button.style = style
-
-        if not (self.extrafile or self.extralink):
-            if hide_if_missing:
-                self.remove_item(button)
-            elif disable_if_missing:
-                button.disabled = True
-
-    def reorder(self, order: list[str]):
-        present = {id(item) for item in self.children}
-
-        ordered = []
-        for name in order:
-            item = getattr(self, name)
-            if id(item) in present:
-                ordered.append(item)
-
-        for item in self.children:
-            self.remove_item(item)
-        for item in ordered:
-            self.add_item(item)
-
-    @discord.ui.button(style=discord.ButtonStyle.primary)
-    async def show_extra_attachment(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def callback(self, ctx: discord.Interaction):
         await utils.send_extra(ctx, self.extrafile, self.extralink)
+
+def action_button(label: str, style, callback) -> discord.ui.Button:
+    button = discord.ui.Button(label=label, style=style)
+    button.callback = callback
+    return button
+
+def text_view(content: str) -> discord.ui.LayoutView:
+    view = discord.ui.LayoutView(timeout=None)
+    view.add_item(discord.ui.TextDisplay(content))
+
+    return view
 
 class RatingModal(discord.ui.Modal):
     def __init__(self, myloc: dict, egg, *, after_set=None):

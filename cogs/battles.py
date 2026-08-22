@@ -63,18 +63,18 @@ class Battles(commands.Cog):
         )
 
         sides = await utils.build_battle_message(self.bot, lines, myloc, egg_a, egg_b)
-        files = [side["file"] for side in sides if side["file"]]
+        files = [side["sfile"] for side in sides if side["sfile"]]
 
         fighters = []
         if user_a and user_b:
             fighters.append(await utils.get_or_fetch_user(self.bot, user_a.id))
             fighters.append(await utils.get_or_fetch_user(self.bot, user_b.id))
 
+        intro = myloc["begin_random"].format(egg_a.id, egg_b.id) if not fighters else myloc["begin_challenge"].format(egg_a.id, egg_b.id, f"**{discord.utils.escape_markdown(fighters[0].display_name)}** ({discord.utils.escape_markdown(fighters[0].name)})", f"**{discord.utils.escape_markdown(fighters[1].display_name)}** ({discord.utils.escape_markdown(fighters[1].name)})")
+
         message = await ctx.followup.send(
-            content=myloc["begin_random"].format(egg_a.id, egg_b.id) if fighters == [] else myloc["begin_challenge"].format(egg_a.id, egg_b.id, f"**{discord.utils.escape_markdown(fighters[0].display_name)}** ({discord.utils.escape_markdown(fighters[0].name)})", f"**{discord.utils.escape_markdown(fighters[1].display_name)}** ({discord.utils.escape_markdown(fighters[1].name)})"),
-            embeds=[sides[0]["embed"], sides[1]["embed"]],
             files=files,
-            view=views.BattleView(self.bot, lines, battle, sides)
+            view=views.BattleView(self.bot, lines, battle, sides, intro)
         )
 
         battle.channel_id = ctx.channel.id

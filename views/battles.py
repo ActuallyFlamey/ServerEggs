@@ -4,9 +4,11 @@ from discord.ext import commands
 import utils
 from schema import BattleStatus, BattleVote, User
 
+from .base import ExtraAttachmentButton, action_button
 
-class BattleView(discord.ui.View):
-    def __init__(self, bot: commands.Bot, lines: dict, battle, sides: list[dict]):
+
+class BattleView(discord.ui.LayoutView):
+    def __init__(self, bot: commands.Bot, lines: dict, battle, sides: list[dict], intro: str):
         super().__init__(timeout=None)
 
         self.bot = bot
@@ -15,17 +17,29 @@ class BattleView(discord.ui.View):
         self.battle = battle
         self.sides = sides
 
-        self.vote_a.label = self.myloc["vote"].format("A")
-        self.vote_b.label = self.myloc["vote"].format("B")
-
-        for side_index, button_name in ((0, "show_a"), (1, "show_b")):
-            button = getattr(self, button_name)
+        extras = []
+        for side_index, side_name in ((0, "A"), (1, "B")):
             side = self.sides[side_index]
 
             if side["vfile"] or side["vlink"]:
-                button.label = self.myloc["show"].format(button_name.split("_")[-1].upper())
-            else:
-                self.remove_item(button)
+                extras.append(ExtraAttachmentButton(
+                    self.myloc["show"].format(side_name),
+                    style=discord.ButtonStyle.secondary,
+                    file=side["vfile"],
+                    link=side["vlink"]
+                ))
+
+        self.add_item(discord.ui.TextDisplay(intro))
+        self.add_item(sides[0]["container"])
+        self.add_item(sides[1]["container"])
+
+        self.vote_a_button = action_button(self.myloc["vote"].format("A"), discord.ButtonStyle.primary, self.vote_a)
+        self.vote_b_button = action_button(self.myloc["vote"].format("B"), discord.ButtonStyle.primary, self.vote_b)
+
+        self.add_item(discord.ui.ActionRow(self.vote_a_button, self.vote_b_button))
+
+        if extras:
+            self.add_item(discord.ui.ActionRow(*extras))
 
     async def interaction_check(self, ctx: discord.Interaction):
         if self.battle.status != BattleStatus.OPEN:
@@ -45,26 +59,16 @@ class BattleView(discord.ui.View):
 
         count_a, count_b = await utils.count_votes(self.battle)
 
-        self.vote_a.label = f"{self.myloc["vote"].format("A")} ({count_a})"
-        self.vote_b.label = f"{self.myloc["vote"].format("B")} ({count_b})"
+        self.vote_a_button.label = f"{self.myloc["vote"].format("A")} ({count_a})"
+        self.vote_b_button.label = f"{self.myloc["vote"].format("B")} ({count_b})"
 
         await ctx.response.edit_message(view=self)
 
-    @discord.ui.button(style=discord.ButtonStyle.primary)
-    async def vote_a(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def vote_a(self, ctx: discord.Interaction):
         await self.vote(ctx, 0)
 
-    @discord.ui.button(style=discord.ButtonStyle.primary)
-    async def vote_b(self, ctx: discord.Interaction, button: discord.ui.Button):
+    async def vote_b(self, ctx: discord.Interaction):
         await self.vote(ctx, 1)
-
-    @discord.ui.button(style=discord.ButtonStyle.secondary, row=1)
-    async def show_a(self, ctx: discord.Interaction, button: discord.ui.Button):
-        await utils.send_extra(ctx, self.sides[0]["vfile"], self.sides[0]["vlink"])
-
-    @discord.ui.button(style=discord.ButtonStyle.secondary, row=1)
-    async def show_b(self, ctx: discord.Interaction, button: discord.ui.Button):
-        await utils.send_extra(ctx, self.sides[1]["vfile"], self.sides[1]["vlink"])
 
 class ChallengeView(discord.ui.View):
     def __init__(self, bot: commands.Bot, lines: dict, prompt: discord.Message, challenger: discord.User, challenged: discord.User, egg):

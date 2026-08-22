@@ -1,4 +1,4 @@
-from .base import AttachmentView
+from .base import *
 from .battles import *
 from .eggs import *
 from .log import *
