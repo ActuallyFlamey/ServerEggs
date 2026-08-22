@@ -17,14 +17,19 @@ from PIL import Image
 
 dotenv.load_dotenv()
 
-SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp|mp4|webm|mov|mkv|mp3|ogg|wav|opus|m4a|flac)(?:[?#].*)?$'
+SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp|mp4|webm|mp3|ogg|wav|opus|m4a)(?:[?#].*)?$'
 
-DISCORD_UPLOAD_LIMIT = 10 * 1024 * 1024
-SIZE_BUDGET = 9 * 1024 * 1024
-MAX_AUDIO_KBPS = 64
-FFMPEG_TIMEOUT = 600
+UPLOAD_LIMIT = 10 * 1024 * 1024
 
-transcode_lock = asyncio.Lock()
+NATIVE_VIDEO_CODECS = {"h264", "vp8", "vp9", "av1"}
+NATIVE_AUDIO_CODECS = {"aac", "mp3", "opus", "vorbis"}
+SUPPORTED_MEDIA_EXTS = {
+    "video": {"mp4", "webm"},
+    "audio": {"mp3", "ogg", "m4a", "wav", "opus"},
+}
+
+class UnsupportedMedia(Exception):
+    pass
 
 def get_content_type(file: discord.Attachment | str) -> str | None:
     if isinstance(file, discord.Attachment):
@@ -39,7 +44,7 @@ def get_content_type(file: discord.Attachment | str) -> str | None:
 
     return content_type.split("/")[0]
 
-async def get_media_duration(filebytes: bytes) -> float | None:
+async def get_stream_info(filebytes: bytes) -> list[dict]:
     with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as tmp:
         tmp.write(filebytes)
         tmp_path = tmp.name
@@ -47,10 +52,8 @@ async def get_media_duration(filebytes: bytes) -> float | None:
     cmd = [
         "ffprobe",
         "-v", "error",
-        "-show_entries", "format=duration",
+        "-show_entries", "stream=codec_type,codec_name,disposition",
         "-of", "json",
-        "-probesize", "16M",
-        "-analyzeduration", "16M",
         tmp_path,
     ]
 
@@ -64,87 +67,39 @@ async def get_media_duration(filebytes: bytes) -> float | None:
 
         if proc.returncode == 0:
             data = json.loads(stdout.decode(errors="ignore"))
-            duration_str = data.get("format", {}).get("duration")
-            return float(duration_str) if duration_str else None
+            return data.get("streams", [])
         else:
             print(f"ERROR: ffprobe failed: {stderr.decode(errors='replace')}")
     except (FileNotFoundError, OSError, ValueError, TypeError) as e:
-        print(f"ERROR: Failed to probe media duration: {e}")
+        print(f"ERROR: Failed to probe media streams: {e}")
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
 
-    return None
+    return []
 
-async def transcode(inbytes: bytes, to: str):
-    duration = await get_media_duration(inbytes)
+def supported_media_ext(attach: discord.Attachment, content_type: str, streams: list[dict]) -> str | None:
+    ext_match = re.search(r"\.([a-zA-Z0-9]+)$", attach.filename or "")
+    if not ext_match:
+        return None
 
-    match to:
-        case "webm":
-            args = [
-                "-c:v", "libvpx-vp9",
-                "-row-mt", "1",
-                "-cpu-used", "4",
-                "-threads", "2",
-                "-vf", "scale=min(iw\\,1270):-2",
-                "-c:a", "libopus", "-b:a", f"{MAX_AUDIO_KBPS}k",
-            ]
+    ext = ext_match.group(1).lower()
+    if ext not in SUPPORTED_MEDIA_EXTS.get(content_type, set()):
+        return None
 
-            if duration:
-                video_kbps = max(int(SIZE_BUDGET * 8 / duration / 1000) - MAX_AUDIO_KBPS, 8)
-                args += ["-b:v", f"{video_kbps}k"]
-            else:
-                args += ["-crf", "32", "-b:v", "0"]
-        case "ogg":
-            args = ["-c:a", "libopus"]
+    for stream in streams:
+        codec = stream.get("codec_name", "")
+        match stream.get("codec_type"):
+            case "video":
+                if content_type == "audio" and stream.get("disposition", {}).get("attached_pic"):
+                    continue
+                if codec not in NATIVE_VIDEO_CODECS:
+                    return None
+            case "audio":
+                if codec not in NATIVE_AUDIO_CODECS and not codec.startswith("pcm"):
+                    return None
 
-            if duration:
-                audio_kbps = min(max(int(SIZE_BUDGET * 8 / duration / 1000), 8), MAX_AUDIO_KBPS)
-                args += ["-b:a", f"{audio_kbps}k"]
-            else:
-                args += ["-b:a", f"{MAX_AUDIO_KBPS}k"]
-
-    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as in_tmp:
-        in_tmp.write(inbytes)
-        in_path = in_tmp.name
-
-    out_path = f"{in_path}_out.{to}"
-
-    try:
-        async with transcode_lock:
-            cmd = ["ffmpeg", "-y", "-i", in_path] + args + [out_path]
-            proc = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE)
-
-            try:
-                _, stderr = await asyncio.wait_for(proc.communicate(), timeout=FFMPEG_TIMEOUT)
-            except asyncio.TimeoutError:
-                proc.kill()
-                await proc.communicate()
-                print(f"ERROR: FFmpeg timed out after {FFMPEG_TIMEOUT}s")
-                return None
-
-        if proc.returncode != 0:
-            print(f"ERROR: FFmpeg error: {stderr.decode(errors="replace")}")
-            return None
-
-        def read():
-            with open(out_path, "rb") as f:
-                return f.read()
-
-        converted = await asyncio.to_thread(read)
-
-        if len(converted) > DISCORD_UPLOAD_LIMIT:
-            print(f"ERROR: Converted media is {round(len(converted) / 1024 / 1024, 1)}MB, exceeding Discord's upload limit")
-            return None
-
-        return converted
-    except Exception as e:  # noqa: BLE001
-        print(f"ERROR: Transcode error: {e}")
-    finally:
-        if os.path.exists(in_path):
-            os.remove(in_path)
-        if os.path.exists(out_path):
-            os.remove(out_path)
+    return ext
 
 async def process_attachment(attach: discord.Attachment, prebytes: bytes | None):
     attach_bytes = prebytes if prebytes else await attach.read()
@@ -181,20 +136,24 @@ async def process_attachment(attach: discord.Attachment, prebytes: bytes | None)
 
             file_hash = await asyncio.to_thread(save)
         case "video" | "audio":
-            ext = "webm" if content_type == "video" else "ogg"
+            if len(attach_bytes) > UPLOAD_LIMIT:
+                raise UnsupportedMedia
 
-            file_path = f"{media_dir}/{attach.id}.{ext}"
-
-            converted_bytes = await transcode(attach_bytes, ext)
-            if converted_bytes is None:
-                print("ERROR: Failed to convert attachment, aborting")
+            streams = await get_stream_info(attach_bytes)
+            if not streams:
+                print("ERROR: Could not probe attachment, aborting")
                 return None, None
 
-            file_hash = hashlib.sha256(converted_bytes).hexdigest()
+            ext = supported_media_ext(attach, content_type, streams)
+            if not ext:
+                raise UnsupportedMedia
+
+            file_path = f"{media_dir}/{attach.id}.{ext}"
+            file_hash = hashlib.sha256(attach_bytes).hexdigest()
 
             def save():
                 with open(file_path, "wb") as file:
-                    file.write(converted_bytes)
+                    file.write(attach_bytes)
 
             await asyncio.to_thread(save)
 
@@ -236,7 +195,6 @@ def get_media(egg):
     return None, None, None, None
 
 def file_path(file: discord.File | str | None) -> str | None:
-    """Path on disk backing a File (or an already resolved path), or None."""
     if isinstance(file, str):
         return file
 

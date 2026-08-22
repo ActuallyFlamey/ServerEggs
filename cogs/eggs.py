@@ -89,6 +89,10 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["supported_only"])
                 return
 
+            if file.size and file.size > utils.UPLOAD_LIMIT:
+                await ctx.followup.send(myloc["too_big"])
+                return
+
             scanfile = await file.to_file()
         elif link:
             attach_link = await utils.resolve_media_url(link)
@@ -120,7 +124,12 @@ class Eggs(commands.Cog):
                 return
 
         if file:
-            attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
+            try:
+                attach_path, attach_hash = await utils.process_attachment(file, attach_bytes)
+            except utils.UnsupportedMedia:
+                await processing.edit(content=myloc["supported_only"])
+                return
+
             if not attach_path:
                 await processing.edit(content=myloc["convert_failed"])
                 return

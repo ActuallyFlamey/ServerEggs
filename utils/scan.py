@@ -10,9 +10,8 @@ import numpy
 import pdqhash
 from PIL import Image
 
-from .attach import get_content_type
+from .attach import UPLOAD_LIMIT, get_content_type
 
-MAX_MEDIA_SIZE = 20 * 1024 * 1024 # 20MB
 
 async def scan_csam(file: discord.File) -> (bool, bool, bytes):
     scanbytes = file.fp.read()
@@ -20,8 +19,8 @@ async def scan_csam(file: discord.File) -> (bool, bool, bytes):
 
     content_type = get_content_type(file.filename)
 
-    if content_type in {"audio", "video"} and len(scanbytes) > MAX_MEDIA_SIZE:
-            print(f"ERROR: Rejected upload: media size {round(len(scanbytes) / 1024 / 1024, 1)}MB exceeds limit of {MAX_MEDIA_SIZE // 1024 // 1024}MB")
+    if content_type in {"audio", "video"} and len(scanbytes) > UPLOAD_LIMIT:
+            print(f"ERROR: Rejected upload: media size {round(len(scanbytes) / 1024 / 1024, 1)}MB exceeds limit of {UPLOAD_LIMIT // 1024 // 1024}MB")
             return False, True, scanbytes
 
     if content_type in {"audio"}:
