@@ -107,7 +107,7 @@ class Eggs(commands.Cog):
             scan, too_long, attach_bytes = await utils.scan_csam(scanfile)
 
             if too_long:
-                await processing.edit(content=myloc["too_long"])
+                await processing.edit(content=myloc["too_big"])
                 return
 
             if scan:

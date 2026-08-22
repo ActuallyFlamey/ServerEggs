@@ -1,6 +1,5 @@
 import asyncio
 import base64
-import json
 import mimetypes
 import os
 import tempfile
@@ -13,21 +12,20 @@ from PIL import Image
 
 from .attach import get_content_type
 
+MAX_MEDIA_SIZE = 20 * 1024 * 1024 # 20MB
 
 async def scan_csam(file: discord.File) -> (bool, bool, bytes):
     scanbytes = file.fp.read()
     file.fp.seek(0)
 
     content_type = get_content_type(file.filename)
+
+    if content_type in {"audio", "video"} and len(scanbytes) > MAX_MEDIA_SIZE:
+            print(f"ERROR: Rejected upload: media size {round(len(scanbytes) / 1024 / 1024, 1)}MB exceeds limit of {MAX_MEDIA_SIZE // 1024 // 1024}MB")
+            return False, True, scanbytes
+
     if content_type in {"audio"}:
         return False, False, scanbytes
-
-    if content_type in {"video"}:
-        duration = await get_media_duration(scanbytes)
-
-        if duration is not None and duration > 60:
-            print(f"ERROR: Rejected upload: media duration {round(duration, 1)}s exceeds limit of 60s")
-            return False, True, scanbytes
 
     api_user = os.getenv("ARACHNID_USER")
     api_password = os.getenv("ARACHNID_PASSWORD")
@@ -90,43 +88,6 @@ async def scan_csam(file: discord.File) -> (bool, bool, bytes):
     except (aiohttp.ClientError, asyncio.TimeoutError) as e:
         print(f"ERROR: Arachnid Shield connection error: {e}")
         return False, False, scanbytes
-
-async def get_media_duration(filebytes: bytes) -> float | None:
-    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as tmp:
-        tmp.write(filebytes)
-        tmp_path = tmp.name
-
-    cmd = [
-        "ffprobe",
-        "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "json",
-        "-probesize", "16M",
-        "-analyzeduration", "16M",
-        tmp_path,
-    ]
-
-    try:
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await proc.communicate()
-
-        if proc.returncode == 0:
-            data = json.loads(stdout.decode(errors="ignore"))
-            duration_str = data.get("format", {}).get("duration")
-            return float(duration_str) if duration_str else None
-        else:
-            print(f"ERROR: ffprobe failed: {stderr.decode(errors='replace')}")
-    except (FileNotFoundError, OSError, ValueError, TypeError) as e:
-        print(f"ERROR: Failed to probe media duration: {e}")
-    finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-
-    return None
 
 async def extract_video_pdq_hashes(vidbytes: bytes) -> list[str]:
     with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as tmp:
