@@ -139,12 +139,12 @@ class Eggs(commands.Cog):
         check_link = attach_link if link else (None if file else (egg.attach_link if id else None))
 
         checks = []
-        if check_text is not None:
-            checks.append(Q(text=check_text))
         if check_hash:
             checks.append(Q(attach_hash=check_hash))
         if check_link:
             checks.append(Q(attach_link=check_link))
+        if not checks and check_text is not None:
+            checks.append(Q(text=check_text, attach_hash=None, attach_link=None))
 
         existing = None
         if checks:

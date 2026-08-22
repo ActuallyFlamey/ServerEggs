@@ -2,6 +2,7 @@ from datetime import timedelta
 from enum import StrEnum
 
 from tortoise import fields, models
+from tortoise.fields.base import OnDelete
 
 
 class Rating(StrEnum):
@@ -33,8 +34,8 @@ class Egg(models.Model):
 
     reports = fields.ReverseRelation["Report"]
 
-    creator = fields.ForeignKeyField("eggs.User", "eggs")
-    origin = fields.ForeignKeyField("eggs.Guild", "eggs")
+    creator = fields.ForeignKeyField("eggs.User", "eggs", null=True, on_delete=OnDelete.SET_NULL)
+    origin = fields.ForeignKeyField("eggs.Guild", "eggs", null=True, on_delete=OnDelete.SET_NULL)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     edited_at = fields.DatetimeField(auto_now=True)

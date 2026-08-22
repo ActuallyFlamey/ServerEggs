@@ -149,6 +149,8 @@ class EggLoop(discord.ui.LayoutView):
     async def refresh(self) -> discord.File | None:
         container, sfile, vfile, vlink = await utils.get_egg_layout(self.bot, self.lines, self.eggs[0])
 
+        self.sfile = sfile
+
         for child in list(self.children):
             self.remove_item(child)
 
