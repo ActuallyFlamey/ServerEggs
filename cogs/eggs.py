@@ -246,7 +246,7 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["filtered"].format(id, ctx.guild.name))
                 return
         else:
-            if rating not in allowed:
+            if rating and rating not in allowed:
                 await ctx.followup.send(myloc["rating_not_allowed"])
                 return
 
