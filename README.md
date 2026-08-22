@@ -3,7 +3,7 @@
 **Server Eggs** is a Discord bot relying on *User-Generated Content*, which is shared around for fun purposes.\
 The secondary purpose is to spread servers around through the **Egg**s.
 
-[![Version](https://img.shields.io/badge/Version-2.1.0-5865f2)]()
+[![Version](https://img.shields.io/badge/Version-2.1.1-5865f2)]()
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Donate-ff5f5f?logo=kofi)](https://ko-fi.com/hexablue)
 [![Support](https://img.shields.io/badge/Support%20Discord-Join-5865f2)](https://discord.gg/G9vfEZGZnT)
 
