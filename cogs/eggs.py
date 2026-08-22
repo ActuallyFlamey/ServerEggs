@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands as app
 from discord.ext import commands
+from tortoise.expressions import Q
 
 import utils
 import views
@@ -128,9 +129,24 @@ class Eggs(commands.Cog):
         check_hash = attach_hash if file else (None if link else (egg.attach_hash if id else None))
         check_link = attach_link if link else (None if file else (egg.attach_link if id else None))
 
-        existing = await Egg.filter(text=check_text, attach_hash=check_hash, attach_link=check_link).first()
+        checks = []
+        if check_text is not None:
+            checks.append(Q(text=check_text))
+        if check_hash:
+            checks.append(Q(attach_hash=check_hash))
+        if check_link:
+            checks.append(Q(attach_link=check_link))
 
-        if existing and (not id or existing.id != id):
+        existing = None
+        if checks:
+            combined = checks[0]
+            for cond in checks[1:]:
+                combined |= cond
+
+            query = Egg.exclude(id=id) if id else Egg.all()
+            existing = await query.filter(combined).first()
+
+        if existing:
             utils.safe_remove(attach_path)
 
             await processing.edit(content=myloc["duplicate"].format(existing.id))
