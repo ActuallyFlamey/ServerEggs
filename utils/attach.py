@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import html
 import io
+import json
 import mimetypes
 import os
 import re
@@ -18,6 +19,13 @@ dotenv.load_dotenv()
 
 SUPPORTED_FILETYPE_REGEX = r'\.(gif|png|jpg|jpeg|webp|mp4|webm|mov|mkv|mp3|ogg|wav|opus|m4a|flac)(?:[?#].*)?$'
 
+DISCORD_UPLOAD_LIMIT = 10 * 1024 * 1024
+SIZE_BUDGET = 9 * 1024 * 1024
+MAX_AUDIO_KBPS = 64
+FFMPEG_TIMEOUT = 600
+
+transcode_lock = asyncio.Lock()
+
 def get_content_type(file: discord.Attachment | str) -> str | None:
     if isinstance(file, discord.Attachment):
         content_type = file.content_type
@@ -31,23 +39,89 @@ def get_content_type(file: discord.Attachment | str) -> str | None:
 
     return content_type.split("/")[0]
 
+async def get_media_duration(filebytes: bytes) -> float | None:
+    with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as tmp:
+        tmp.write(filebytes)
+        tmp_path = tmp.name
+
+    cmd = [
+        "ffprobe",
+        "-v", "error",
+        "-show_entries", "format=duration",
+        "-of", "json",
+        "-probesize", "16M",
+        "-analyzeduration", "16M",
+        tmp_path,
+    ]
+
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await proc.communicate()
+
+        if proc.returncode == 0:
+            data = json.loads(stdout.decode(errors="ignore"))
+            duration_str = data.get("format", {}).get("duration")
+            return float(duration_str) if duration_str else None
+        else:
+            print(f"ERROR: ffprobe failed: {stderr.decode(errors='replace')}")
+    except (FileNotFoundError, OSError, ValueError, TypeError) as e:
+        print(f"ERROR: Failed to probe media duration: {e}")
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+    return None
+
 async def transcode(inbytes: bytes, to: str):
+    duration = await get_media_duration(inbytes)
+
+    match to:
+        case "webm":
+            args = [
+                "-c:v", "libvpx-vp9",
+                "-row-mt", "1",
+                "-cpu-used", "4",
+                "-threads", "2",
+                "-vf", "scale=min(iw\\,1270):-2",
+                "-c:a", "libopus", "-b:a", f"{MAX_AUDIO_KBPS}k",
+            ]
+
+            if duration:
+                video_kbps = max(int(SIZE_BUDGET * 8 / duration / 1000) - MAX_AUDIO_KBPS, 8)
+                args += ["-b:v", f"{video_kbps}k"]
+            else:
+                args += ["-crf", "32", "-b:v", "0"]
+        case "ogg":
+            args = ["-c:a", "libopus"]
+
+            if duration:
+                audio_kbps = min(max(int(SIZE_BUDGET * 8 / duration / 1000), 8), MAX_AUDIO_KBPS)
+                args += ["-b:a", f"{audio_kbps}k"]
+            else:
+                args += ["-b:a", f"{MAX_AUDIO_KBPS}k"]
+
     with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) as in_tmp:
         in_tmp.write(inbytes)
         in_path = in_tmp.name
 
     out_path = f"{in_path}_out.{to}"
 
-    match to:
-        case "webm":
-            args = ["-c:v", "libvpx-vp9", "-crf", "32", "-b:v", "0", "-c:a", "libopus", "-b:a", "64k"]
-        case "ogg":
-            args = ["-c:a", "libopus", "-b:a", "64k"]
-
     try:
-        cmd = ["ffmpeg", "-y", "-i", in_path] + args + [out_path]
-        proc = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE)
-        _, stderr = await proc.communicate()
+        async with transcode_lock:
+            cmd = ["ffmpeg", "-y", "-i", in_path] + args + [out_path]
+            proc = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE)
+
+            try:
+                _, stderr = await asyncio.wait_for(proc.communicate(), timeout=FFMPEG_TIMEOUT)
+            except asyncio.TimeoutError:
+                proc.kill()
+                await proc.communicate()
+                print(f"ERROR: FFmpeg timed out after {FFMPEG_TIMEOUT}s")
+                return None
 
         if proc.returncode != 0:
             print(f"ERROR: FFmpeg error: {stderr.decode(errors="replace")}")
@@ -57,7 +131,13 @@ async def transcode(inbytes: bytes, to: str):
             with open(out_path, "rb") as f:
                 return f.read()
 
-        return await asyncio.to_thread(read)
+        converted = await asyncio.to_thread(read)
+
+        if len(converted) > DISCORD_UPLOAD_LIMIT:
+            print(f"ERROR: Converted media is {round(len(converted) / 1024 / 1024, 1)}MB, exceeding Discord's upload limit")
+            return None
+
+        return converted
     except Exception as e:  # noqa: BLE001
         print(f"ERROR: Transcode error: {e}")
     finally:
