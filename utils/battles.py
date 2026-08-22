@@ -4,38 +4,10 @@ import random
 import discord
 from discord.ext import commands
 
-from schema import Battle, BattleStatus, BattleVote, Egg, Guild, Rating, User
+from schema import Battle, BattleStatus, BattleVote, Egg, Guild, User
 
 from . import attach, embed, misc
 
-
-async def random_egg(guild: Guild | None, channel, *, secret: bool | None = None, explicit_only: bool = False, exclude_ids=None):
-    query = Egg.all()
-
-    if guild:
-        filtered = await Egg.filter(filtered_in__id=guild.id).values_list("id", flat=True)
-        if filtered:
-            query = query.filter(id__not_in=filtered)
-
-    allowed = misc.channel_ratings(guild, channel)
-
-    if explicit_only:
-        query = query.filter(rating=Rating.EXPLICIT)
-    else:
-        query = query.filter(rating__in=allowed)
-
-    if secret is not None:
-        query = query.filter(secret=secret)
-
-    if exclude_ids:
-        query = query.exclude(id__in=list(exclude_ids))
-
-    count = await query.count()
-
-    if count == 0:
-        return None
-
-    return await query.offset(random.randint(0, count - 1)).prefetch_related("creator", "origin").first()
 
 async def fight_pool_ids(user: User) -> list[int]:
     created = await Egg.filter(creator=user).values_list("id", flat=True)

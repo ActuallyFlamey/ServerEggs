@@ -1,4 +1,9 @@
 import os
+import random
+
+from schema import Egg, Guild, Rating
+
+from . import misc
 
 
 def safe_remove(path: str | None) -> None:
@@ -20,3 +25,31 @@ async def egg_delete(egg):
     safe_remove(egg.attach_path)
 
     await egg.delete()
+
+async def random_egg(guild: Guild | None, channel, *, secret: bool | None = None, rating: Rating = None, exclude_ids = None):
+    query = Egg.all()
+
+    if guild:
+        filtered = await Egg.filter(filtered_in__id=guild.id).values_list("id", flat=True)
+        if filtered:
+            query = query.filter(id__not_in=filtered)
+
+    allowed = misc.channel_ratings(guild, channel)
+
+    if rating:
+        query = query.filter(rating=rating)
+    else:
+        query = query.filter(rating__in=allowed)
+
+    if secret is not None:
+        query = query.filter(secret=secret)
+
+    if exclude_ids:
+        query = query.exclude(id__in=list(exclude_ids))
+
+    count = await query.count()
+
+    if count == 0:
+        return None
+
+    return await query.offset(random.randint(0, count - 1)).prefetch_related("creator", "origin").first()

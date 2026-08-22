@@ -124,9 +124,10 @@
             },
             "get": {
                 "not_found": "**Egg #{0}** was not found.",
-                "rating_not_allowed": "**Egg #{0}** was found, but its **rating** isn't allowed in this channel.",
+                "id_rating_not_allowed": "**Egg #{0}** was found, but its **rating** isn't allowed in this channel.",
                 "secret": "**Egg #{0}** is secret!\nYou can only find it randomly...",
                 "filtered": "**Egg #{0}** exists, but **{1}**'s moderators have decided to **block it** from showing up here.\nTry again **somewhere else**, like a **different server** or **my DMs**.",
+                "rating_not_allowed": "You may not search for **Egg**s with this **content rating** in this channel.",
                 "no_egg": "Could not find any **Egg**s.",
                 "collection_status": "Collection Status",
                 "collected": "You have **collected** **Egg #{0}**!\nIt has now been collected **{1} times**.\n-# Check your collected **Egg**s with `/collected`!",
@@ -428,6 +429,8 @@
     "get_description": "Get an Egg.",
     "get_id": "id",
     "get_id_description": "The ID of a specific Egg you're searching for. If blank, get a random Egg.",
+    "get_rating": "rating",
+    "get_rating_description": "Filter by a certain content rating.",
 
     "egg": "egg",
 

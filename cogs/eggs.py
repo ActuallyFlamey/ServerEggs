@@ -217,7 +217,7 @@ class Eggs(commands.Cog):
     ):
         await self.create_or_edit(ctx, None, text, file, link, rating, secret)
 
-    async def _get(self, ctx: discord.Interaction, id: int | None, only_nsfw: bool = False):
+    async def _get(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggs/get")
@@ -235,7 +235,7 @@ class Eggs(commands.Cog):
                 return
 
             if egg.rating not in allowed:
-                await ctx.followup.send(myloc["rating_not_allowed"].format(id))
+                await ctx.followup.send(myloc["id_rating_not_allowed"].format(id))
                 return
 
             if egg.secret:
@@ -246,7 +246,11 @@ class Eggs(commands.Cog):
                 await ctx.followup.send(myloc["filtered"].format(id, ctx.guild.name))
                 return
         else:
-            egg = await utils.random_egg(guild, ctx.channel, explicit_only=only_nsfw)
+            if rating not in allowed:
+                await ctx.followup.send(myloc["rating_not_allowed"])
+                return
+
+            egg = await utils.random_egg(guild, ctx.channel, rating=rating)
 
             if egg is None:
                 await ctx.followup.send(myloc["no_egg"])
@@ -267,22 +271,32 @@ class Eggs(commands.Cog):
         )
 
     @app.command(name="get", description="get_description")
-    @app.rename(id="get_id")
-    @app.describe(id="get_id_description")
+    @app.rename(id="get_id", rating="get_rating")
+    @app.describe(id="get_id_description", rating="get_rating_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def get(self, ctx: discord.Interaction, id: int | None):
-        await self._get(ctx, id)
+    async def get(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
+        await self._get(ctx, id, rating)
 
     @app.command(name="egg", description="get_description")
-    @app.rename(id="get_id")
-    @app.describe(id="get_id_description")
+    @app.rename(id="get_id", rating="get_rating")
+    @app.describe(id="get_id_description", rating="get_rating_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def egg(self, ctx: discord.Interaction, id: int | None):
-        await self._get(ctx, id)
+    async def egg(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
+        await self._get(ctx, id, rating)
 
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
     async def nsfw(self, ctx: discord.Interaction):
-        await self._get(ctx, None, True)
+        await self._get(ctx, None, Rating.EXPLICIT)
     
     @app.command(name="latest", description="latest_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)

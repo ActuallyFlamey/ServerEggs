@@ -124,9 +124,10 @@
             },
             "get": {
                 "not_found": "**Uovo n. {0}** non trovato.",
-                "rating_not_allowed": "Ho trovato l'**Uovo n. {0}**, ma la sua **classificazione** non è permessa in questo canale.",
+                "id_rating_not_allowed": "Ho trovato l'**Uovo n. {0}**, ma la sua **classificazione** non è permessa in questo canale.",
                 "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
                 "filtered": "L'**Uovo n. {0}** esiste, ma i moderatori di **{1}** hanno deciso di **bloccarlo** dall'apparire qui.\nRiprova **altrove**, tipo un **server diverso** o **i miei DM**.",
+                "rating_not_allowed": "Non puoi cercare **Uova** con questa **classificazione** in questo canale.",
                 "no_egg": "Non è stato trovato nessun **Uovo**.",
                 "collection_status": "Stato Collezionamento",
                 "collected": "Hai **collezionato** l'**Uovo n. {0}**!\nOra è stato collezionato **{1} volte**.\n-# Guarda la tua collezione di **Uova** con `/collezione`!",
@@ -428,6 +429,8 @@
     "get_description": "Ricevi un Uovo.",
     "get_id": "id",
     "get_id_description": "L'ID di un Uovo specifico che stai cercando. Se lasciato vuoto, l'Uovo sarà random.",
+    "get_rating": "classificazione",
+    "get_rating_description": "Filtra per una classificazione dei contenuti specifica.",
 
     "egg": "uovo",
 
