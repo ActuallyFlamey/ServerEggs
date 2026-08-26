@@ -39,7 +39,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
                 return
 
             if not ctx.permissions.manage_guild:
-                await ctx.followup.send(myloc["no_permissions"], ephemeral=True)
+                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
                 return
 
             model, id_, cache_key = Guild, ctx.guild.id, f"guild_{ctx.guild.id}"
@@ -90,36 +90,53 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.command(name="privacy", description="privacy_description")
     @app.rename(public="privacy_public")
     @app.describe(public="privacy_public_description")
-    @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    @app.checks.has_permissions(manage_guild=True)
+    @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def privacy(self, ctx: discord.Interaction, public: bool):
-        myloc, guild = await self._guild_setting(ctx, "privacy")
+        await ctx.response.defer(ephemeral=True)
 
-        has_invite = bool(guild.invite)
+        _, myloc = await self.bot.get_section(ctx, "config/privacy")
 
-        if (has_invite and public) or (not has_invite and not public):
-            await ctx.followup.send(myloc["already"], ephemeral=True)
-            return
-
-        invite = None
-        if public:
-            base_channel = ctx.guild.rules_channel or (ctx.guild.text_channels[0] if ctx.guild.text_channels else None)
-
-            if base_channel is None:
-                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
+        if ctx.guild:
+            if not ctx.permissions.manage_guild:
+                await ctx.followup.send(myloc["no_permissions"], ephemeral=True)
                 return
 
-            try:
-                inviteobj = await base_channel.create_invite()
-                invite = inviteobj.url
-            except discord.errors.Forbidden:
-                await ctx.followup.send(myloc["missing_perms"], ephemeral=True)
+            guild, _ = await Guild.get_or_create(id=ctx.guild.id)
+
+            has_invite = bool(guild.invite)
+
+            if (has_invite and public) or (not has_invite and not public):
+                await ctx.followup.send(myloc["already"], ephemeral=True)
                 return
 
-        guild.invite = invite
-        await guild.save(update_fields=["invite"])
+            invite = None
+            if public:
+                base_channel = ctx.guild.rules_channel or (ctx.guild.text_channels[0] if ctx.guild.text_channels else None)
 
-        await ctx.followup.send(myloc["success"].format(public), ephemeral=True)
+                if base_channel is None:
+                    await ctx.followup.send(myloc["missing_guild_perms"], ephemeral=True)
+                    return
+
+                try:
+                    inviteobj = await base_channel.create_invite()
+                    invite = inviteobj.url
+                except discord.errors.Forbidden:
+                    await ctx.followup.send(myloc["missing_invite_perms"], ephemeral=True)
+                    return
+
+            guild.invite = invite
+            await guild.save(update_fields=["invite"])
+        else:
+            user, _ = await User.get_or_create(id=ctx.user.id)
+
+            if user.public and public:
+                await ctx.followup.send(myloc["already"], ephemeral=True)
+                return
+
+            user.public = public
+            await user.save(update_fields=["public"])
+
+        await ctx.followup.send(myloc["success"].format(myloc["public"] if public else myloc["private"]), ephemeral=True)
 
     @app.command(name="log", description="log_description")
     @app.rename(channel="log_channel")

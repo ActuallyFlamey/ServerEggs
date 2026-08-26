@@ -117,7 +117,7 @@ class GetEgg(discord.ui.LayoutView):
                 url=egg.origin.invite
             ))
 
-        if creator is not None:
+        if creator is not None and egg.creator.public:
             buttons.append(discord.ui.Button(
                 label=self.myloc["button"]["creator"],
                 url=f"https://discord.com/users/{creator.id}"

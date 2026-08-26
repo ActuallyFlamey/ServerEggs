@@ -45,7 +45,7 @@
         },
         "config": {
             "lang": {
-                "no_permissions": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](<https://discord.com/users/886686500845138041>).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
+                "missing_perms": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to set **your own response language**, run `/config lang` in [my DMs](<https://discord.com/users/886686500845138041>).\n-# **Not all servers allow** usage of user languages, but it will **always work in DMs**.",
                 "no_default": "The \"Server Default\" option is for users, not for servers.",
                 "success": "Successfully switched language to \"**English**\"!"
             },
@@ -58,8 +58,11 @@
             },
             "privacy": {
                 "already": "$common.already",
-                "missing_perms": "**Server Eggs** is missing the **Create Invite** permission, which is required for this operation.",
-                "success": "Server privacy successfully set to `{0}`."
+                "missing_guild_perms": "You need the **Manage Server** permission to run this command here.\n\n-# If you meant to change **your own privacy setting**, run `/config privacy` in [my DMs](<https://discord.com/users/886686500845138041>).",
+                "missing_invite_perms": "**Server Eggs** is missing the **Create Invite** permission, which is required for this operation.",
+                "success": "Privacy successfully set to {0}.",
+                "public": "public",
+                "private": "private"
             },
             "log": {
                 "already": "$common.already",
@@ -270,7 +273,7 @@
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Allow **anyone** to **join this server** through **Egg**s created in it.\n  - `public` parameter: True or False.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False.\n- `/config battle-time`: Change how **long battles** last before they expire.\n  - `minutes` parameter: How many minutes a battle should last."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Change the **privacy setting** for this server (or for a user, if ran in DMs).\n  - `public` parameter: True or False.\n    - **In servers**: Allow **anyone** to **join this server** through **Egg**s created in it.\n    - **In DMs**: Allow anyone who **views one of your Eggs** to see your **username** and **profile**.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False.\n- `/config battle-time`: Change how **long battles** last before they expire.\n  - `minutes` parameter: How many minutes a battle should last."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -364,9 +367,9 @@
     "server-description_desc_description": "The new description.",
 
     "privacy": "privacy",
-    "privacy_description": "Set the privacy of the server.",
+    "privacy_description": "Changes the privacy setting. In servers, you must have the Manage Server permission.",
     "privacy_public": "public",
-    "privacy_public_description": "This server should be accessible through Eggs created in it.",
+    "privacy_public_description": "You want to set the server or user to public.",
 
     "log": "log",
     "log_description": "Set a log channel for Eggs created here.",

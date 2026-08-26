@@ -191,7 +191,8 @@ class Eggs(commands.Cog):
 
         container, resfile, vfile, vlink = await utils.get_egg_layout(
             self.bot, lines, egg,
-            title=utils.egg_title(egg, myloc["title"].format(egg.id, myloc["created"] if not id else myloc["edited"]))
+            title=utils.egg_title(egg, myloc["title"].format(egg.id, myloc["created"] if not id else myloc["edited"])),
+            created=not id
         )
 
         await processing.edit(

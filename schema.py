@@ -69,6 +69,7 @@ class User(models.Model):
 
     lang = fields.CharField(5, default="")
     banned = fields.BooleanField(default=False)
+    public = fields.BooleanField(default=True)
 
     collected: fields.ManyToManyRelation["Egg"] = fields.ManyToManyField("eggs.Egg", related_name="collectors", through="user_collected_eggs")
 

@@ -82,13 +82,13 @@ def egg_container(color: discord.Color, body: list[str], media=None, lines: dict
 
     return container
 
-def egg_creator_block(myloc: dict, egg, creator, include_id=False) -> str:
+def egg_creator_block(myloc: dict, egg, creator, *, public = False, include_id = False) -> str:
     if creator is not None:
-        detail = discord.utils.escape_markdown(creator.name)
+        detail = discord.utils.escape_markdown(creator.name) if public or include_id else ""
         if include_id:
             detail += f", {creator.id}"
 
-        value = f"**{discord.utils.escape_markdown(creator.display_name)}** ({detail})"
+        value = f"**{discord.utils.escape_markdown(creator.display_name)}** {f"({detail})" if detail else ""}"
     else:
         value = myloc["unknown_creator"].format(egg.creator.id)
 
@@ -115,7 +115,8 @@ async def get_egg_layout(
     collected = False,
     include_id = False,
     *,
-    title: str | None = None
+    title: str | None = None,
+    created: bool = False
 ) -> tuple[discord.ui.Container, discord.File | None, str | None, str | None]:
     myloc = bot.get_lines("eggs/get", lines)
 
@@ -130,11 +131,13 @@ async def get_egg_layout(
     wins = await egg.battle_wins.all().count()
 
     fields = [
-        egg_creator_block(myloc, egg, creator, include_id),
-        egg_origin_block(myloc, egg, origin),
-        f"### {myloc["collection_status"]}\n{myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections)}",
-        f"### {myloc["battle_wins"]}\n{myloc["wins"].format(egg.id, wins)}",
+        egg_creator_block(myloc, egg, creator, public=egg.creator.public, include_id=include_id)
     ]
+
+    if not created:
+        fields.append(egg_origin_block(myloc, egg, origin))
+        fields.append(f"### {myloc["collection_status"]}\n{myloc["collected"].format(egg.id, collections) if collected else myloc["collections"].format(egg.id, collections)}")
+        fields.append(f"### {myloc["battle_wins"]}\n{myloc["wins"].format(egg.id, wins)}")
 
     if title is None:
         title = egg_title(egg, myloc["eggn"].format(egg.id))
