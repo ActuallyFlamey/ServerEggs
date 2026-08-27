@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 import re
+import sys
 import traceback
 
 import discord
@@ -18,6 +19,8 @@ from schema import Guild, User
 from tortoise_config import TORTOISE_ORM
 
 dotenv.load_dotenv()
+
+VERSION = "2.2.0"
 
 DEVELOPER_GUILD = discord.Object(id=int(os.getenv("DEVELOPER_GUILD_ID")))
 
@@ -225,7 +228,7 @@ async def help(ctx: discord.Interaction, about: str | None):
     e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
 
     if about is None:
-        e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
+        e.add_field(name=myloc["about"], value=myloc["about_desc"].format(VERSION, discord.__version__, ".".join(sys.version_info[:3])), inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
         e.add_field(name=myloc["donate"], value=myloc["donate_desc"], inline=False)
 
