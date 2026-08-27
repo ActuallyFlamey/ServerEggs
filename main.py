@@ -225,10 +225,10 @@ async def help(ctx: discord.Interaction, about: str | None):
 
     myloc = myloc["general"] if about is None else myloc[about]
 
-    e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
+    e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"].format(VERSION, discord.__version__, ".".join(map(str, sys.version_info[:3]))))
 
     if about is None:
-        e.add_field(name=myloc["about"], value=myloc["about_desc"].format(VERSION, discord.__version__, ".".join(sys.version_info[:3])), inline=False)
+        e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
         e.add_field(name=myloc["donate"], value=myloc["donate_desc"], inline=False)
 

@@ -234,7 +234,7 @@
         "help": {
             "general": {
                 "title": "About Server Eggs",
-                "desc": "**Server Eggs** is a Discord bot created by **Flamey** (actuallyflamey).\nIt is designed as a fun way to share content, from which someone may want to join its origin server.\n\n***Server Eggs* Version**: {0}\n***discord.py* Version**: {1}\n***Python* Version**: {2}",
+                "desc": "**Server Eggs** is a Discord bot created by **Flamey** (actuallyflamey).\nIt is designed as a fun way to share content, from which someone may want to join its origin server.\n\n**__Server Eggs__ Version**: {0}\n**__discord.py__ Version**: {1}\n**__Python__ Version**: {2}",
                 "about": "What are Eggs?",
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
