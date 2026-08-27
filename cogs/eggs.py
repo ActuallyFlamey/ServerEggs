@@ -51,6 +51,14 @@ class Eggs(commands.Cog):
         if ctx.guild:
             guild, _ = await Guild.get_or_create(id=ctx.guild.id)
 
+        if not id and rating is None:
+            for category, channels in guild.channel_ratings.items():
+                if ctx.channel.id in channels:
+                    rating = Rating(category.upper())
+                    break
+            if rating is None:
+                rating = Rating.SAFE
+
         if rating is not None and rating not in utils.channel_ratings(guild, ctx.channel):
             await ctx.followup.send(myloc["rating_not_allowed"])
             return
@@ -167,7 +175,7 @@ class Eggs(commands.Cog):
                 attach_path=attach_path,
                 attach_hash=attach_hash,
                 attach_link=attach_link,
-                rating=rating or Rating.SAFE,
+                rating=rating,
                 secret=secret or False,
                 creator=user,
                 origin=guild

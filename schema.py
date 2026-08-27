@@ -20,6 +20,13 @@ def default_ratings() -> dict:
         "nsfw": [Rating.SAFE, Rating.QUESTIONABLE, Rating.EXPLICIT]
     }
 
+def default_rated_channels() -> dict:
+    return {
+        "safe": [],
+        "questionable": [],
+        "explicit": []
+    }
+
 class Egg(models.Model):
     id = fields.IntField(primary_key=True)
 
@@ -55,6 +62,7 @@ class Guild(models.Model):
     view_join_button = fields.BooleanField(default=True)
 
     ratings = fields.JSONField(default=default_ratings)
+    channel_ratings = fields.JSONField(default=default_rated_channels)
 
     logch = fields.BigIntField(null=True)
 

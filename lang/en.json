@@ -82,6 +82,10 @@
             "battle-time": {
                 "already": "$common.already",
                 "success": "Successfully set the battle expiration time to `{0}` minutes."
+            },
+            "channel-rating": {
+                "already": "$common.already",
+                "success": "Successfully set the default rating for {0} to `{1}`."
             }
         },
         "eggs": {
@@ -101,7 +105,6 @@
                 "convert_failed": "Failed to convert your **attachment** to a supported format. It may be corrupted or use an unsupported codec.",
                 "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
-                "log": "**{0}** ({1}) {2} **Egg #{3}**",
                 "title": "Egg #{0} {1}!",
                 "created": "created",
                 "edited": "edited",
@@ -273,7 +276,7 @@
             },
             "config": {
                 "title": "About Configuring Server Eggs",
-                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Change the **privacy setting** for this server (or for a user, if ran in DMs).\n  - `public` parameter: True or False.\n    - **In servers**: Allow **anyone** to **join this server** through **Egg**s created in it.\n    - **In DMs**: Allow anyone who **views one of your Eggs** to see your **username** and **profile**.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False.\n- `/config battle-time`: Change how **long battles** last before they expire.\n  - `minutes` parameter: How many minutes a battle should last."
+                "desc": "**Commands**: `/config lang`, `/config allow-user-lang`, `/config privacy`, `/config log`, `/config allowed-ratings`, `/config join-button`\n\nThe configuration commands allow Server Managers to set up **Server Eggs** the way they see fit.\n\n- `/config lang`: Sets the bot's **response language** in this server (or for a user, if ran in DMs).\n  - `lang` parameter: The language to set.\n- `/config allow-user-lang`: Permit usage of **user-specified languages** in this server.\n  - `allow` parameter: True or False.\n- `/config privacy`: Change the **privacy setting** for this server (or for a user, if ran in DMs).\n  - `public` parameter: True or False.\n    - **In servers**: Allow **anyone** to **join this server** through **Egg**s created in it.\n    - **In DMs**: Allow anyone who **views one of your Eggs** to see your **username** and **profile**.\n- `/config log`: Set a **log channel** for **Egg creations and edits** that happen in this server.\n  - `channel` parameter: The log channel to use.\n- `/config allowed-ratings normal`: Change which **ratings** are allowed in **SFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config allowed-ratings nsfw`: Change which **ratings** are allowed in **NSFW channels**.\n  - `safe`, `questionable`, `explicit` parameters: Whether each rating is allowed. Omitted ones keep their current value.\n- `/config join-button`: Change whether the **\"Join Origin Server\"** button appears on **Egg**s gotten here.\n  - `viewable` parameter: True or False.\n- `/config battle-time`: Change how **long battles** last before they expire.\n  - `minutes` parameter: How many minutes a battle should last.\n- `/config channel-rating`: Set the **default rating** for **Egg**s created in a channel.\n  - `channel` parameter: The channel to set the rating for.\n  - `rating` parameter: The new default rating for that channel."
             },
             "filter": {
                 "title": "About Filtering Eggs",
@@ -281,6 +284,8 @@
             }
         },
         "log": {
+            "log": "**{0}** ({1}) {2} **Egg #{3}**",
+            "afterdel": "**{0}** ({1}) had {2} **Egg #{3}**, but it was deleted.",
             "show_extra_attachment": "$common.show_extra_attachment",
             "change_rating": "$rating.title",
             "delete": "Delete",
@@ -406,6 +411,13 @@
     "battle-time_description": "Changes the expiration time for battles.",
     "battle-time_minutes": "minutes",
     "battle-time_minutes_description": "How many minutes should a battle last?",
+
+    "channel-rating": "channel-rating",
+    "channel-rating_description": "Set the default rating for Eggs created in a channel.",
+    "channel-rating_channel": "channel",
+    "channel-rating_channel_description": "The channel to set the rating for.",
+    "channel-rating_rating": "rating",
+    "channel-rating_rating_description": "The new default rating for that channel.",
 
     "create": "create",
     "create_description": "Create an Egg.",

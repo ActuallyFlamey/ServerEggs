@@ -179,7 +179,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
             await ctx.followup.send(myloc["no_changes"], ephemeral=True)
             return
 
-        if group == "normal" and changes[Rating.EXPLICIT] is True:
+        if group == "normal" and changes[Rating.EXPLICIT]:
             await ctx.followup.send(myloc["no_explicit_in_normal"], ephemeral=True)
             return
 
@@ -255,6 +255,33 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         await guild.save(update_fields=["battle_time"])
 
         await ctx.followup.send(myloc["success"].format(minutes), ephemeral=True)
+    
+    @app.command(name="channel-rating", description="channel-rating_description")
+    @app.rename(channel="channel-rating_channel", rating="channel-rating_rating")
+    @app.describe(channel="channel-rating_channel_description", rating="channel-rating_rating_description")
+    @app.choices(rating=[
+        app.Choice(name=app.locale_str("rating_safe"), value=Rating.SAFE),
+        app.Choice(name=app.locale_str("rating_questionable"), value=Rating.QUESTIONABLE),
+        app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
+    ])
+    @app.checks.has_permissions(manage_guild=True)
+    async def channel_rating(self, ctx: discord.Interaction, channel: discord.TextChannel, rating: Rating):
+        myloc, guild = await self._guild_setting(ctx, "channel-rating")
+
+        category = rating.value.lower()
+
+        if channel.id in guild.channel_ratings[category]:
+            await ctx.followup.send(myloc["already"], ephemeral=True)
+            return
+        
+        for key in guild.channel_ratings:
+            if channel.id in guild.channel_ratings[key]:
+                guild.channel_ratings[key].remove(channel.id)
+        
+        guild.channel_ratings[category].append(channel.id)
+        await guild.save(update_fields=["channel_ratings"])
+
+        await ctx.followup.send(myloc["success"].format(channel.mention, rating), ephemeral=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Config(bot))
