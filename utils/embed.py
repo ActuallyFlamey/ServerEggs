@@ -6,6 +6,7 @@ from schema import Rating
 from . import attach, misc
 
 EGG_EMOJI = "<:egg:1535645170400370729>"
+HEXABLUE_EMOJI = "<:HexaBlue:1544850025375465512>"
 
 CV2_TEXT_LIMIT = 4000
 
@@ -24,14 +25,15 @@ def brand_embed(e: discord.Embed, lines: dict | None = None):
         lines = {
             "embed": {
                 "author": "Server Eggs",
-                "footer": "Server Eggs by Flamey"
+                "footer": "Server Eggs by HexaBlue"
             }
         }
 
-    icon = "https://github.com/ActuallyFlamey/ServerEggs/blob/main/icon.png?raw=true"
+    seggs = "https://github.com/ActuallyFlamey/ServerEggs/blob/main/icons/seggs.png?raw=true"
+    hexablue = "https://github.com/ActuallyFlamey/ServerEggs/blob/main/icons/hexablue.png?raw=true"
 
-    e.set_author(name=lines["embed"]["author"], icon_url=icon)
-    e.set_footer(text=lines["embed"]["footer"], icon_url=icon)
+    e.set_author(name=lines["embed"]["author"], icon_url=seggs)
+    e.set_footer(text=lines["embed"]["footer"], icon_url=hexablue)
 
 def get_egg_color(egg):
     color = discord.Color.blurple()
@@ -55,7 +57,7 @@ def brand_header(lines: dict | None = None, title: str = "") -> str:
 
 def brand_footer(lines: dict | None = None) -> str:
     footer = lines["embed"]["footer"] if lines else "Server Eggs by Flamey"
-    return f"-# {EGG_EMOJI} {footer}"
+    return f"-# {HEXABLUE_EMOJI} {footer}"
 
 def fit_text(description: str | None, *fixed: str) -> str | None:
     """Truncates the description so every TextDisplay of a layout stays within the Components v2 limit."""

@@ -225,12 +225,16 @@ async def help(ctx: discord.Interaction, about: str | None):
 
     myloc = myloc["general"] if about is None else myloc[about]
 
-    e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"].format(VERSION, discord.__version__, ".".join(map(str, sys.version_info[:3]))))
+    e = discord.Embed(title=myloc["title"], color=discord.Color.blurple(), description=myloc["desc"])
 
     if about is None:
+        e.set_thumbnail(url="https://github.com/ActuallyFlamey/ServerEggs/blob/main/icons/seggs_bg.png?raw=true")
+
         e.add_field(name=myloc["about"], value=myloc["about_desc"], inline=False)
         e.add_field(name=myloc["how"], value=myloc["how_desc"], inline=False)
         e.add_field(name=myloc["donate"], value=myloc["donate_desc"], inline=False)
+        e.add_field(name=myloc["credits"], value=myloc["credits_desc"], inline=False)
+        e.add_field(name=myloc["versions"], value=myloc["versions_desc"].format(VERSION, discord.__version__, ".".join(map(str, sys.version_info[:3]))), inline=False)
 
     utils.brand_embed(e, lines)
 

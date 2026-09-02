@@ -229,18 +229,22 @@
         },
         "embed": {
             "author": "Server Eggs",
-            "footer": "Server Eggs by Flamey"
+            "footer": "Server Eggs by HexaBlue"
         },
         "help": {
             "general": {
                 "title": "About Server Eggs",
-                "desc": "**Server Eggs** is a Discord bot created by **Flamey** (actuallyflamey).\nIt is designed as a fun way to share content, from which someone may want to join its origin server.\n\n**__Server Eggs__ Version**: {0}\n**__discord.py__ Version**: {1}\n**__Python__ Version**: {2}",
+                "desc": "**Server Eggs** is a Discord bot created by **HexaBlue**.\nIt is designed as a fun way to share content, from which someone may want to join its origin server.",
                 "about": "What are Eggs?",
                 "about_desc": "An **Egg** is some text, an attachment (through file or URL), or both.\nWhen an **Egg** is created, it is accessible from any server with **Server Eggs**.",
                 "how": "How to use Server Eggs",
                 "how_desc": "- To **create an Egg**, use `/create` in a server.\n- To **receive** an Egg, use `/get`.",
                 "donate": "Support Server Eggs",
-                "donate_desc": "You can **support the development** of **Server Eggs** by donating to **[HexaBlue's Ko-fi](https://ko-fi.com/hexablue)**"
+                "donate_desc": "You can **support the development** of **Server Eggs** by donating to **[HexaBlue's Ko-fi](https://ko-fi.com/hexablue)**",
+                "credits": "Credits",
+                "credits_desc": "**__Programming__**:\n- **Flamey** (actuallyflamey)\n**__Localization__**:\n- **Flamey** (actuallyflamey): *English*, *Italian*.",
+                "versions": "Versions",
+                "versions_desc": "**__Server Eggs__**: {0}\n**__discord.py__**: {1}\n**__Python__**: {2}"
             },
             "create": {
                 "title": "About Creating Eggs",

@@ -229,18 +229,22 @@
         },
         "embed": {
             "author": "Server Eggs",
-            "footer": "Server Eggs di Flamey"
+            "footer": "Server Eggs di **HexaBlue"
         },
         "help": {
             "general": {
                 "title": "Informazioni su Server Eggs",
-                "desc": "**Server Eggs** è un bot di Discord creato da **Flamey** (actuallyflamey).\nÈ un modo creativo di condividere contenuti attraverso i quali uno potrebbe decidere di unirsi al suo server d'origine.\n\n**Versione di __Server Eggs__**: {0}\n**Versione di __discord.py__**: {1}\n**Versione di __Python__**: {2}",
+                "desc": "**Server Eggs** è un bot di Discord creato da **HexaBlue**.\nÈ un modo creativo di condividere contenuti attraverso i quali uno potrebbe decidere di unirsi al suo server d'origine.",
                 "about": "Cosa sono le Uova?",
                 "about_desc": "Un **Uovo** è un testo, un allegato (sotto forma di file o URL), or both.\nQuando viene creato un **Uovo**, è accessibile da qualunque server che abbia **Server Eggs**.",
                 "how": "Come usare Server Eggs",
                 "how_desc": "- Per **creare un Uovo**, usa `/crea` in un server.\n- Per **ricevere** un Uovo, usa `/ricevi`.",
                 "donate": "Sostieni Server Eggs",
-                "donate_desc": "Puoi **sostenere lo sviluppo** di **Server Eggs** donando al **[Ko-fi di HexaBlue](https://ko-fi.com/hexablue)**"
+                "donate_desc": "Puoi **sostenere lo sviluppo** di **Server Eggs** donando al **[Ko-fi di HexaBlue](https://ko-fi.com/hexablue)**",
+                "credits": "Riconoscimenti",
+                "credits_desc": "**__Programmazione__**\n- **Flamey** (actuallyflamey)\n**__Localizzazione__**:\n- **Flamey** (actuallyflamey): *Inglese*, *Italiano*.",
+                "versions": "Versioni",
+                "versions_desc": "**__Server Eggs__**: {0}\n**__discord.py__**: {1}\n**__Python__**: {2}"
             },
             "create": {
                 "title": "Informazioni sul Creare Uova",
