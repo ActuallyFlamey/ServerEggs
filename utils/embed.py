@@ -57,7 +57,7 @@ def brand_header(lines: dict | None = None, title: str = "") -> str:
 
 def brand_footer(lines: dict | None = None) -> str:
     footer = lines["embed"]["footer"] if lines else "Server Eggs by Flamey"
-    return f"-# {HEXABLUE_EMOJI} {footer}"
+    return f"-# {HEXABLUE_EMOJI}  {footer}"
 
 def fit_text(description: str | None, *fixed: str) -> str | None:
     """Truncates the description so every TextDisplay of a layout stays within the Components v2 limit."""
