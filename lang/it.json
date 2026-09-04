@@ -111,6 +111,7 @@
                 "show_extra_attachment": "$common.show_extra_attachment"
             },
             "eggify": {
+                "no_attach": "Non puoi **Uovizzare** un messaggio che non contiene né un **allegato** né un **link**.",
                 "ready": "Creare un **Uovo** a partire da questo messaggio?",
                 "confirm": "Sì",
                 "cancel": "No",
@@ -126,7 +127,7 @@
                 "rating_safe": "$rating.safe",
                 "rating_questionable": "$rating.questionable",
                 "rating_explicit": "$rating.explicit",
-                "success": "Created an **Egg** from this message."
+                "continued": "Passato alla creazione dell'**Uovo** da questo messaggio."
             },
             "get": {
                 "not_found": "**Uovo n. {0}** non trovato.",

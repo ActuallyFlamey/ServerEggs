@@ -90,7 +90,7 @@ class Eggify(discord.ui.Modal):
         self.add_item(self.rating)
 
     async def on_submit(self, ctx: discord.Interaction):
-        await ctx.response.edit_message(content=self.myloc["success"], view=None)
+        await ctx.response.edit_message(content=self.myloc["continued"], view=None)
 
         cog = self.bot.get_cog("Eggs")
         await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, Rating(self.rating.component.values[0]), self.secret.component.value)

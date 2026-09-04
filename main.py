@@ -262,6 +262,10 @@ async def eggify(ctx: discord.Interaction, message: discord.Message):
     if url_match and not file:
         link = url_match.group(1)
         content = content[:url_match.start()].strip()
+    
+    if not (file or link):
+        await ctx.followup.send(content=myloc["no_attach"], ephemeral=True)
+        return
 
     content = utils.truncate(content, 4000)
 

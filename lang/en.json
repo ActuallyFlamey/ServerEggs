@@ -111,6 +111,7 @@
                 "show_extra_attachment": "$common.show_extra_attachment"
             },
             "eggify": {
+                "no_attach": "You may not **Eggify** a message without an **attachment** or **link**.",
                 "ready": "Create an **Egg** from this message?",
                 "confirm": "Yes",
                 "cancel": "No",
@@ -126,7 +127,7 @@
                 "rating_safe": "$rating.safe",
                 "rating_questionable": "$rating.questionable",
                 "rating_explicit": "$rating.explicit",
-                "success": "Created an **Egg** from this message."
+                "continued": "Continued to **Egg** creation from this message."
             },
             "get": {
                 "not_found": "**Egg #{0}** was not found.",
