@@ -1,3 +1,4 @@
+import collections
 import os
 
 import discord
@@ -5,7 +6,8 @@ import dotenv
 from discord import app_commands as app
 from discord.ext import commands
 
-from schema import Report, User
+import views
+from schema import Guild, Report, User
 
 dotenv.load_dotenv()
 
@@ -20,17 +22,55 @@ class Dev(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app.command(name="list-guilds", description="List Guilds the bot is in.")
+    @app.command(name="guilds", description="Check the Guilds that the bot is in.")
+    @app.describe(search="Search for a name or ID.")
     @app.check(is_dev)
-    async def list_guilds(self, ctx: discord.Interaction):
+    async def guilds(self, ctx: discord.Interaction, search: str | None = None):
         await ctx.response.defer()
 
-        entries = []
-        for guild in self.bot.guilds:
-            owner = await self.bot.fetch_user(guild.owner_id)
-            entries.append(f"- {guild.id}:\n  - **Name**: {guild.name}\n  - **Owner**: {owner.name} ({owner.id})")
+        if search and (query := search.strip()):
+            guild = None
+            dbguild = None
 
-        await ctx.followup.send(content="\n".join(entries))
+            if query.isdigit():
+                gid = int(query)
+                guild = self.bot.get_guild(gid)
+                dbguild = await Guild.get_or_none(id=gid)
+            else:
+                lowered = query.lower()
+                exact = [g for g in self.bot.guilds if g.name.lower() == lowered]
+                matches = exact or [g for g in self.bot.guilds if lowered in g.name.lower()]
+
+                if matches:
+                    guild = min(matches, key=lambda g: g.name.lower())
+                    dbguild = await Guild.get_or_none(id=guild.id)
+                else:
+                    dbguild = await Guild.filter(description__icontains=query).first()
+
+            if guild is None and dbguild is None:
+                await ctx.followup.send(content=f"No guild found for `{query}`.")
+                return
+
+            if dbguild is None and guild is not None:
+                dbguild = await Guild.get_or_none(id=guild.id)
+
+            view = discord.ui.LayoutView(timeout=None)
+            view.add_item(await views.guild_container(self.bot, guild, dbguild))
+
+            if dbguild and dbguild.invite:
+                view.add_item(discord.ui.ActionRow(discord.ui.Button(label="Invite", url=dbguild.invite)))
+
+            await ctx.followup.send(view=view)
+            return
+
+        guilds = sorted(self.bot.guilds, key=lambda g: g.name.lower())
+
+        if not guilds:
+            await ctx.followup.send(content="Bot is in no guilds.")
+            return
+
+        view = await views.GuildLoop.create(self.bot, ctx.user, collections.deque(guilds))
+        await ctx.followup.send(view=view)
 
     @app.command(name="unban", description="Unban a User from creating Eggs.")
     @app.describe(user="The User to unban.")
