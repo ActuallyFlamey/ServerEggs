@@ -105,6 +105,7 @@
                 "convert_failed": "Non è stato possibile convertire il tuo **allegato** in un formato supportato. Potrebbe essere danneggiato o usare un codec non supportato.",
                 "illegal": "**RILEVATI CONTENUTI ILLEGALI**. Ti è appena stato **tolto il permesso** di creare o modificare **Uova**.",
                 "duplicate": "Un **Uovo** con queste specifiche **esiste già**.\nOsservalo con: `/ricevi id:{0}`",
+                "beg": "Ehi **{0}**! Se ti piace **Server Eggs** e vorresti che venga sviluppato continuamente e che non si spengano i server, considera l'idea di [donare](https://ko-fi.com/hexablue)!\nRicordati che **Server Eggs** è un *software open-source*, e perciò è sviluppato da *volontari*. Senza il supporto di gente come *te*, non esisterebbe.\n\n-# Stai ricevendo questo messaggio perché hai creato diverse **Uova**.",
                 "title": "Uovo n. {0} {1}!",
                 "created": "creato",
                 "edited": "modificato",

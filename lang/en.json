@@ -105,6 +105,7 @@
                 "convert_failed": "Failed to convert your **attachment** to a supported format. It may be corrupted or use an unsupported codec.",
                 "illegal": "**ILLEGAL CONTENT DETECTED**. You have now been **banned** from creating **Egg**s.",
                 "duplicate": "An **Egg** with these specifics **already exists**.\nView it with: `/get id:{0}`",
+                "beg": "Hey **{0}**! If you enjoy **Server Eggs** and would like to see its development continue and its servers to stay up, consider [donating](https://ko-fi.com/hexablue)!\nRemember that **Server Eggs** is *open-source software*, and therefore developed by *volunteers*. Without help from people like *you*, it couldn't exist.\n\n-# You are receiving this message because you've created several **Egg**s.",
                 "title": "Egg #{0} {1}!",
                 "created": "created",
                 "edited": "edited",

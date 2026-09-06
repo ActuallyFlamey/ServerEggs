@@ -180,6 +180,9 @@ class Eggs(commands.Cog):
                 creator=user,
                 origin=guild
             )
+
+            if await user.eggs.all().count() % 30 == 0:
+                await utils.beg(myloc, ctx.user)
         else:
             if (file or link):
                 utils.safe_remove(egg.attach_path)

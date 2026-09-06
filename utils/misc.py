@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 
 from schema import Rating, default_ratings
 
@@ -24,7 +25,7 @@ def channel_ratings(guild, channel) -> list[Rating]:
 
     return stored.get(key, default[key])
 
-async def get_or_fetch_user(bot, user_id: int):
+async def get_or_fetch_user(bot: commands.Bot, user_id: int):
     user = bot.get_user(user_id)
 
     if user is not None:
@@ -34,3 +35,9 @@ async def get_or_fetch_user(bot, user_id: int):
         return await bot.fetch_user(user_id)
     except (discord.NotFound, discord.HTTPException):
         return None
+
+async def beg(myloc: dict, user: discord.User):
+    try:
+        await user.send(myloc["beg"].format(user.display_name))
+    except discord.HTTPException:
+        pass
