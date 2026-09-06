@@ -86,7 +86,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     async def server_description(self, ctx: discord.Interaction, desc: str):
         myloc, guild = await self.guild_setting(ctx, "server-description")
 
-        guild.description = desc
+        guild.description = utils.truncate(desc, 300)
         await guild.save(update_fields=["description"])
 
         await ctx.followup.send(myloc["success"] + "\n" + guild.description, ephemeral=True)
