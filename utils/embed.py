@@ -120,7 +120,7 @@ async def get_egg_layout(
     title: str | None = None,
     created: bool = False
 ) -> tuple[discord.ui.Container, discord.File | None, str | None, str | None]:
-    myloc = bot.get_lines("eggs/get", lines)
+    myloc = bot.get_lines("eggs/send", lines)
 
     if creator is None:
         creator = await misc.get_or_fetch_user(bot, egg.creator.id)

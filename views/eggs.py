@@ -107,7 +107,7 @@ class GetEgg(discord.ui.LayoutView):
 
         self.bot = bot
         self.lines = lines
-        self.myloc = bot.get_lines("eggs/get", lines)
+        self.myloc = bot.get_lines("eggs/send", lines)
         self.egg = egg
 
         buttons = []
@@ -196,12 +196,14 @@ class EggLoop(discord.ui.LayoutView):
         return True
 
     async def respond(self, ctx: discord.Interaction):
+        await ctx.response.defer()
+
         if not await utils.ensure_not_ratelimited(ctx, "interact"):
             return
 
         sfile = await self.refresh()
 
-        await ctx.response.edit_message(view=self, attachments=[sfile] if sfile else [])
+        await ctx.edit_original_response(view=self, attachments=[sfile] if sfile else [])
 
     async def prev_page(self, ctx: discord.Interaction):
         self.eggs.rotate(1)

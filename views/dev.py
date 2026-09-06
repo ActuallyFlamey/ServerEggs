@@ -32,7 +32,7 @@ async def guild_container(bot: commands.Bot, guild: discord.Guild | None, dbguil
         body.append(f"**Invite**: {dbguild.invite or "None"}")
         body.append(f"**Language**: `{dbguild.lang}`")
         body.append(f"**User Languages**: {"Allowed" if dbguild.allow_user_lang else "Not allowed"}")
-        body.append(f"**Public**: {dbguild.view_join_button}")
+        body.append(f"**Allows Joining Others**: {dbguild.view_join_button}")
         body.append(f"**Has log channel**: {f"Yes (`{dbguild.logch}`)" if dbguild.logch else "None"}")
         body.append(f"**Battle time:** {dbguild.battle_time}")
 
@@ -95,8 +95,10 @@ class GuildLoop(discord.ui.LayoutView):
         return True
 
     async def respond(self, ctx: discord.Interaction):
+        await ctx.response.defer()
+
         await self.refresh()
-        await ctx.response.edit_message(view=self)
+        await ctx.edit_original_response(view=self)
 
     async def prev_page(self, ctx: discord.Interaction):
         self.guilds.rotate(1)
