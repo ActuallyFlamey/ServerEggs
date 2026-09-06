@@ -14,9 +14,7 @@ class Eggs(commands.Cog):
 
     async def manage_check(self, ctx: discord.Interaction, egg):
         creatorchk = ctx.user.id == egg.creator.id
-
         modchk = ctx.guild and ctx.permissions.manage_guild and egg.origin.id == ctx.guild.id
-
         globalmodchk = await utils.is_global_mod(self.bot, ctx.user.id)
 
         return creatorchk or modchk or globalmodchk
@@ -29,9 +27,13 @@ class Eggs(commands.Cog):
         file: discord.Attachment | None = None,
         link: str | None = None,
         rating: Rating | None = None,
-        secret: bool | None = None
+        secret: bool | None = None,
+        skip_ratelimit: bool = False
     ):
         rating = utils.coerce_rating(rating)
+
+        if not skip_ratelimit and not await utils.ensure_not_ratelimited(ctx, "create"):
+            return
 
         if not ctx.response.is_done():
             await ctx.response.defer()
@@ -254,10 +256,13 @@ class Eggs(commands.Cog):
     ):
         await self.create_or_edit(ctx, None, text, file, link, rating, secret)
 
-    async def _get(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
+    async def send(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
+        if not await utils.ensure_not_ratelimited(ctx, "read"):
+            return
+
         await ctx.response.defer()
 
-        lines, myloc = await self.bot.get_section(ctx, "eggs/get")
+        lines, myloc = await self.bot.get_section(ctx, "eggs/send")
 
         guild = await Guild.get_or_none(id=ctx.guild.id) if ctx.guild else None
         allowed = utils.channel_ratings(guild, ctx.channel)
@@ -317,7 +322,7 @@ class Eggs(commands.Cog):
     ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def get(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
-        await self._get(ctx, id, rating)
+        await self.send(ctx, id, rating)
 
     @app.command(name="egg", description="get_description")
     @app.rename(id="get_id", rating="get_rating")
@@ -329,15 +334,18 @@ class Eggs(commands.Cog):
     ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def egg(self, ctx: discord.Interaction, id: int | None, rating: Rating | None):
-        await self._get(ctx, id, rating)
+        await self.send(ctx, id, rating)
 
     @app.command(name="nsfw", description="nsfw_description", nsfw=True)
     async def nsfw(self, ctx: discord.Interaction):
-        await self._get(ctx, None, Rating.EXPLICIT)
+        await self.send(ctx, None, Rating.EXPLICIT)
     
     @app.command(name="latest", description="latest_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def latest(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "read"):
+            return
+
         await ctx.response.defer()
 
         lines = await self.bot.fetch_lines(ctx)
@@ -380,7 +388,10 @@ class Eggs(commands.Cog):
     ):
         await self.create_or_edit(ctx, id, text, file, link, rating, secret)
 
-    async def _confirm_flow(self, ctx: discord.Interaction, path: str, id: int, view_class, *, check_manage: bool = False):
+    async def confirm_flow(self, ctx: discord.Interaction, path: str, id: int, view_class, *, check_manage: bool = False):
+        if not await utils.ensure_not_ratelimited(ctx, "report"):
+            return
+
         await ctx.response.defer(ephemeral=True)
 
         lines, myloc = await self.bot.get_section(ctx, path)
@@ -408,21 +419,21 @@ class Eggs(commands.Cog):
     @app.describe(id="report_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def report(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/report", id, views.PreReportEgg)
+        await self.confirm_flow(ctx, "eggs/report", id, views.PreReportEgg)
 
     @app.command(name="delete", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def delete(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
+        await self.confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
     
     @app.command(name="crack", description="delete_description")
     @app.rename(id="delete_id")
     @app.describe(id="delete_id_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def crack(self, ctx: discord.Interaction, id: int):
-        await self._confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
+        await self.confirm_flow(ctx, "eggs/delete", id, views.DeleteEgg, check_manage=True)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggs(bot))

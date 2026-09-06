@@ -135,8 +135,14 @@ async def finalize_battle(bot: commands.Bot, battle):
     try: await message.reply(content=myloc["finished"])
     except discord.HTTPException: pass
 
+FINALIZE_BATCH_LIMIT = 10
+
 async def finalize_due_battles(bot: commands.Bot):
-    due = await Battle.filter(status=BattleStatus.OPEN, ends_at__lte=datetime.datetime.now(datetime.timezone.utc))
+    due = await Battle.filter(status=BattleStatus.OPEN, ends_at__lte=datetime.datetime.now(datetime.timezone.utc)).limit(FINALIZE_BATCH_LIMIT + 1)
+
+    if len(due) > FINALIZE_BATCH_LIMIT:
+        print(f"WARN: {len(due)}+ battles due; finalizing first {FINALIZE_BATCH_LIMIT}, remainder next tick.")
+        due = due[:FINALIZE_BATCH_LIMIT]
 
     for battle in due:
         await finalize_battle(bot, battle)

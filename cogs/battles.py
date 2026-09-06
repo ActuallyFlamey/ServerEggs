@@ -87,6 +87,9 @@ class Battles(commands.Cog):
     @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def battle(self, ctx: discord.Interaction, a: int | None = None, b: int | None = None):
+        if not await utils.ensure_not_ratelimited(ctx, "battle"):
+            return
+
         await ctx.response.defer()
 
         _, myloc = await self.bot.get_section(ctx, "battles/battle")
@@ -124,6 +127,9 @@ class Battles(commands.Cog):
     @app.allowed_installs(guilds=True, users=False)
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def challenge(self, ctx: discord.Interaction, against: discord.User, using: int | None = None):
+        if not await utils.ensure_not_ratelimited(ctx, "battle"):
+            return
+
         await ctx.response.defer(ephemeral=True)
 
         lines, myloc = await self.bot.get_section(ctx, "battles/challenge")
@@ -156,6 +162,9 @@ class Battles(commands.Cog):
         await ctx.followup.send(myloc["sent"], ephemeral=True)
 
     async def accept_challenge(self, ctx: discord.Interaction, prompt: discord.Message, challenger: discord.User, challenged: discord.User, egg_a, egg_id_text: str | None):
+        if not await utils.ensure_not_ratelimited(ctx, "battle"):
+            return
+
         _, myloc = await self.bot.get_section(ctx, "battles/challenge")
 
         target, _ = await User.get_or_create(id=challenged.id)

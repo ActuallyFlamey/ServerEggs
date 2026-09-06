@@ -4,6 +4,7 @@ import discord
 from discord import app_commands as app
 from discord.ext import commands
 
+import utils
 from schema import Guild, Rating, User, default_ratings
 
 
@@ -11,7 +12,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def _guild_setting(self, ctx: discord.Interaction, section: str):
+    async def guild_setting(self, ctx: discord.Interaction, section: str):
         await ctx.response.defer(ephemeral=True)
 
         _, myloc = await self.bot.get_section(ctx, f"config/{section}")
@@ -28,6 +29,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         app.Choice(name="Italiano", value="it"),
     ])
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @utils.ratelimit("read")
     async def lang(self, ctx: discord.Interaction, code: str):
         await ctx.response.defer(ephemeral=True)
 
@@ -58,8 +60,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.describe(allow="allow-user-lang_allow_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def allow_user_lang(self, ctx: discord.Interaction, allow: bool):
-        myloc, guild = await self._guild_setting(ctx, "allow-user-lang")
+        myloc, guild = await self.guild_setting(ctx, "allow-user-lang")
 
         cache_key = f"guild_{ctx.guild.id}_allowuserlang"
 
@@ -79,8 +82,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.describe(desc="server-description_desc_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def server_description(self, ctx: discord.Interaction, desc: str):
-        myloc, guild = await self._guild_setting(ctx, "server-description")
+        myloc, guild = await self.guild_setting(ctx, "server-description")
 
         guild.description = desc
         await guild.save(update_fields=["description"])
@@ -91,6 +95,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(public="privacy_public")
     @app.describe(public="privacy_public_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @utils.ratelimit("read")
     async def privacy(self, ctx: discord.Interaction, public: bool):
         await ctx.response.defer(ephemeral=True)
 
@@ -143,8 +148,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.describe(channel="log_channel_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def log(self, ctx: discord.Interaction, channel: discord.TextChannel):
-        myloc, guild = await self._guild_setting(ctx, "log")
+        myloc, guild = await self.guild_setting(ctx, "log")
 
         if channel.id == guild.logch:
             await ctx.followup.send(myloc["already"], ephemeral=True)
@@ -167,7 +173,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     )
 
     async def set_allowed_ratings(self, ctx: discord.Interaction, group: str, safe: bool | None, questionable: bool | None, explicit: bool | None):
-        myloc, guild = await self._guild_setting(ctx, "allowed-ratings")
+        myloc, guild = await self.guild_setting(ctx, "allowed-ratings")
 
         changes = {
             Rating.SAFE: safe,
@@ -212,6 +218,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(safe="allowed-ratings_normal_s", questionable="allowed-ratings_normal_q", explicit="allowed-ratings_normal_e")
     @app.describe(safe="allowed-ratings_normal_s_description", questionable="allowed-ratings_normal_q_description", explicit="allowed-ratings_normal_e_description")
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def allowed_ratings_normal(self, ctx: discord.Interaction, safe: bool | None, questionable: bool | None, explicit: bool | None):
         await self.set_allowed_ratings(ctx, "normal", safe, questionable, explicit)
 
@@ -219,6 +226,7 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(safe="allowed-ratings_nsfw_s", questionable="allowed-ratings_nsfw_q", explicit="allowed-ratings_nsfw_e")
     @app.describe(safe="allowed-ratings_nsfw_s_description", questionable="allowed-ratings_nsfw_q_description", explicit="allowed-ratings_nsfw_e_description")
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def allowed_ratings_nsfw(self, ctx: discord.Interaction, safe: bool | None, questionable: bool | None, explicit: bool | None):
         await self.set_allowed_ratings(ctx, "nsfw", safe, questionable, explicit)
     
@@ -226,8 +234,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(viewable="join-button_viewable")
     @app.describe(viewable="join-button_viewable_description")
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def join_button(self, ctx: discord.Interaction, viewable: bool):
-        myloc, guild = await self._guild_setting(ctx, "join-button")
+        myloc, guild = await self.guild_setting(ctx, "join-button")
 
         if guild.view_join_button == viewable:
             await ctx.followup.send(myloc["already"], ephemeral=True)
@@ -242,8 +251,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
     @app.rename(minutes="battle-time_minutes")
     @app.describe(minutes="battle-time_minutes_description")
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def battle_time(self, ctx: discord.Interaction, minutes: app.Range[int, 1, None]):
-        myloc, guild = await self._guild_setting(ctx, "battle-time")
+        myloc, guild = await self.guild_setting(ctx, "battle-time")
 
         newdelta = timedelta(minutes=minutes)
 
@@ -265,8 +275,9 @@ class Config(commands.GroupCog, group_name="config", group_description="config_d
         app.Choice(name=app.locale_str("rating_explicit"), value=Rating.EXPLICIT),
     ])
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def channel_rating(self, ctx: discord.Interaction, channel: discord.TextChannel, rating: Rating):
-        myloc, guild = await self._guild_setting(ctx, "channel-rating")
+        myloc, guild = await self.guild_setting(ctx, "channel-rating")
 
         category = rating.value.lower()
 

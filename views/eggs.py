@@ -41,6 +41,9 @@ class PreEggify(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.primary)
     async def confirm(self, ctx: discord.Interaction, button: discord.ui.Button):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         await ctx.response.send_modal(Eggify(self.bot, self.lines, self.text, self.file, self.link))
 
     @discord.ui.button(style=discord.ButtonStyle.secondary)
@@ -90,10 +93,13 @@ class Eggify(discord.ui.Modal):
         self.add_item(self.rating)
 
     async def on_submit(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "create"):
+            return
+
         await ctx.response.edit_message(content=self.myloc["continued"], view=None)
 
         cog = self.bot.get_cog("Eggs")
-        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, Rating(self.rating.component.values[0]), self.secret.component.value)
+        await cog.create_or_edit(ctx, None, self.eggtext.value, self.file, self.link, Rating(self.rating.component.values[0]), self.secret.component.value, skip_ratelimit=True)
 
 class GetEgg(discord.ui.LayoutView):
     def __init__(self, bot: commands.Bot, lines: dict, egg, guild, creator: discord.User, container: discord.ui.Container, file=None, link=None):
@@ -127,6 +133,9 @@ class GetEgg(discord.ui.LayoutView):
         self.add_item(discord.ui.ActionRow(*buttons))
 
     async def report(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg, False))
 
 class EggLoop(discord.ui.LayoutView):
@@ -187,6 +196,9 @@ class EggLoop(discord.ui.LayoutView):
         return True
 
     async def respond(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         sfile = await self.refresh()
 
         await ctx.response.edit_message(view=self, attachments=[sfile] if sfile else [])
@@ -222,6 +234,9 @@ class DeleteEgg(discord.ui.LayoutView):
         self.add_item(discord.ui.ActionRow(*buttons))
 
     async def confirm(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "report"):
+            return
+
         eggid = self.egg.id
 
         await utils.egg_delete(self.egg)
@@ -256,13 +271,16 @@ class PreReportEgg(discord.ui.LayoutView):
         self.add_item(discord.ui.ActionRow(*buttons))
 
     async def confirm(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         await ctx.response.send_modal(ReportEgg(self.bot, self.lines, self.egg))
 
     async def cancel(self, ctx: discord.Interaction):
         await ctx.response.edit_message(view=text_view(self.myloc["cancelled"]))
 
 class ReportEgg(discord.ui.Modal):
-    def __init__(self, bot: commands.Bot, lines: dict, egg, from_report_command = True):
+    def __init__(self, bot: commands.Bot, lines: dict, egg, from_report_command=True):
         self.bot = bot
         self.lines = lines
         self.myloc = bot.get_lines("eggs/report", lines)
@@ -294,7 +312,7 @@ class ReportEgg(discord.ui.Modal):
         self.add_item(self.reason)
         self.add_item(self.specify)
 
-    async def _finish(self, ctx: discord.Interaction, key: str):
+    async def finish(self, ctx: discord.Interaction, key: str):
         content = self.myloc[key].format(self.egg.id)
 
         if self.from_report_command:
@@ -303,6 +321,9 @@ class ReportEgg(discord.ui.Modal):
             await ctx.followup.send(content=content, ephemeral=True)
 
     async def on_submit(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "report"):
+            return
+
         await ctx.response.defer(ephemeral=True)
 
         reporter, _ = await User.get_or_create(id=ctx.user.id)
@@ -334,6 +355,6 @@ class ReportEgg(discord.ui.Modal):
             report.log_message_id = msg.id
             await report.save(update_fields=["log_message_id"])
 
-            await self._finish(ctx, "success")
+            await self.finish(ctx, "success")
         except IntegrityError:
-            await self._finish(ctx, "already")
+            await self.finish(ctx, "already")

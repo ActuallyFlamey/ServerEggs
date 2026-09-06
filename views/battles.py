@@ -49,6 +49,9 @@ class BattleView(discord.ui.LayoutView):
         return True
 
     async def vote(self, ctx: discord.Interaction, choice: int):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         voter, _ = await User.get_or_create(id=ctx.user.id)
 
         if voter.banned:
@@ -104,12 +107,18 @@ class ChallengeView(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.primary)
     async def accept(self, ctx: discord.Interaction, button: discord.ui.Button):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         self.done = True
 
         await ctx.response.send_modal(ChallengeModal(self.bot, self.lines, self.prompt, self.challenger, self.challenged, self.egg))
 
     @discord.ui.button(style=discord.ButtonStyle.secondary)
     async def decline(self, ctx: discord.Interaction, button: discord.ui.Button):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         self.done = True
 
         await ctx.response.edit_message(content=self.myloc["declined"], view=None)

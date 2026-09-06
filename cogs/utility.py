@@ -2,6 +2,8 @@ import discord
 from discord import app_commands as app
 from discord.ext import commands
 
+import utils
+
 
 class Utility(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -9,6 +11,7 @@ class Utility(commands.Cog):
 
     @app.command(name="ping", description="ping_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @utils.ratelimit("read")
     async def ping(self, ctx: discord.Interaction):
         _, myloc = await self.bot.get_section(ctx, "utility/ping")
 

@@ -9,8 +9,8 @@
                 "begin_random": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**\n**__B__**: **Uovo n. {1}**",
                 "begin_challenge": "## Inizia la battaglia!\n**__A__**: **Uovo n. {0}**, che combatte per {2}!\n**__B__**: **Uovo n. {1}**, che combatte per {3}!",
                 "eggn": "Uovo n. {0} ({1})",
-                "creator": "$eggs.get.creator",
-                "unknown_creator": "$eggs.get.unknown_creator",
+                "creator": "$eggs.send.creator",
+                "unknown_creator": "$eggs.send.unknown_creator",
                 "vote": "Vota {0}",
                 "voted": "Il tuo voto è stato registrato! Puoi cambiarlo fino alla fine della battaglia.",
                 "ended": "Questa battaglia è già finita.",
@@ -130,7 +130,7 @@
                 "rating_explicit": "$rating.explicit",
                 "continued": "Passato alla creazione dell'**Uovo** da questo messaggio."
             },
-            "get": {
+            "send": {
                 "not_found": "**Uovo n. {0}** non trovato.",
                 "id_rating_not_allowed": "Ho trovato l'**Uovo n. {0}**, ma la sua **classificazione** non è permessa in questo canale.",
                 "secret": "L'**Uovo n. {0}** è segreto!\nPuoi trovarlo solo casualmente...",
@@ -227,7 +227,8 @@
             }
         },
         "error": {
-            "title": "Si è verificato un errore"
+            "title": "Si è verificato un errore",
+            "ratelimited": "Sei **troppo veloce**! Riprova tra **{0}s**."
         },
         "embed": {
             "author": "Server Eggs",

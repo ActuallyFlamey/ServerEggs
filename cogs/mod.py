@@ -2,6 +2,7 @@ import discord
 from discord import app_commands as app
 from discord.ext import commands
 
+import utils
 from schema import Egg, Guild
 
 
@@ -14,6 +15,7 @@ class Mod(commands.Cog):
     @app.describe(id="filter_id_description")
     @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
     @app.checks.has_permissions(manage_guild=True)
+    @utils.ratelimit("read")
     async def filter_egg(self, ctx: discord.Interaction, id: int):
         await ctx.response.defer(ephemeral=True)
 

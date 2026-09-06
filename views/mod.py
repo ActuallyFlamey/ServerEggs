@@ -66,9 +66,9 @@ class ReportActions(discord.ui.LayoutView):
     async def change_rating(self, ctx: discord.Interaction):
         egg = await self.report.egg
 
-        await ctx.response.send_modal(RatingModal(self.bot.get_lines("rating", self.lines), egg, after_set=self._after_rating))
+        await ctx.response.send_modal(RatingModal(self.bot.get_lines("rating", self.lines), egg, after_set=self.after_rating))
 
-    async def _after_rating(self, ctx: discord.Interaction, egg: Egg, rating):
+    async def after_rating(self, ctx: discord.Interaction, egg: Egg, rating):
         await self.delete_reports(ctx, f"Change Rating to {rating.value}", egg.id)
 
     async def delete(self, ctx: discord.Interaction):

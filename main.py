@@ -24,7 +24,7 @@ VERSION = "2.2.1"
 
 DEVELOPER_GUILD = discord.Object(id=int(os.getenv("DEVELOPER_GUILD_ID")))
 
-def _resolve_lang_ref(value, root, seen):
+def resolve_lang_ref(value, root, seen):
     if not isinstance(value, str) or not value.startswith("$"):
         return value
 
@@ -39,21 +39,21 @@ def _resolve_lang_ref(value, root, seen):
             raise KeyError(f"Unresolved language reference: {value}")
         node = node[part]
 
-    return _resolve_lang_ref(node, root, seen)
+    return resolve_lang_ref(node, root, seen)
 
-def _resolve_lang_refs(obj, root):
+def resolve_lang_refs(obj, root):
     if isinstance(obj, dict):
-        return {key: _resolve_lang_refs(val, root) for key, val in obj.items()}
+        return {key: resolve_lang_refs(val, root) for key, val in obj.items()}
     if isinstance(obj, list):
-        return [_resolve_lang_refs(val, root) for val in obj]
+        return [resolve_lang_refs(val, root) for val in obj]
 
-    return _resolve_lang_ref(obj, root, set())
+    return resolve_lang_ref(obj, root, set())
 
 def load_lines_sync(file):
     with open(f"./lang/{file}", "r", encoding="utf-8") as lines:
         data = json.load(lines)
 
-    data["lines"] = _resolve_lang_refs(data["lines"], data["lines"])
+    data["lines"] = resolve_lang_refs(data["lines"], data["lines"])
 
     return data
 
@@ -192,6 +192,11 @@ async def on_guild_remove(guild: discord.Guild):
 async def app_command_error(ctx: discord.Interaction, error):
     lines, myloc = await bot.get_section(ctx, "error")
 
+    ratelimited = error if isinstance(error, utils.RateLimited) else getattr(error, "__cause__", None)
+    if isinstance(ratelimited, utils.RateLimited):
+        await utils.send_ratelimited(ctx, ratelimited.retry_after)
+        return
+
     e = discord.Embed(title=myloc["title"], color=0xd62450, description=str(error))
     utils.brand_embed(e, lines)
 
@@ -220,6 +225,7 @@ async def app_command_error(ctx: discord.Interaction, error):
     app.Choice(name=app.locale_str("filter"), value="filter")
 ])
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@utils.ratelimit("read")
 async def help(ctx: discord.Interaction, about: str | None):
     lines, myloc = await bot.get_section(ctx, "help")
 
@@ -242,11 +248,13 @@ async def help(ctx: discord.Interaction, about: str | None):
 
 @bot.tree.command(name="donate", description="donate_description")
 @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@utils.ratelimit("read")
 async def donate(ctx: discord.Interaction):
     await ctx.response.send_message("https://ko-fi.com/hexablue")
 
 @bot.tree.context_menu(name="eggify")
 @app.allowed_contexts(guilds=True, dms=False, private_channels=False)
+@utils.ratelimit("create")
 async def eggify(ctx: discord.Interaction, message: discord.Message):
     await ctx.response.defer(ephemeral=True)
 
@@ -262,7 +270,7 @@ async def eggify(ctx: discord.Interaction, message: discord.Message):
     if url_match and not file:
         link = url_match.group(1)
         content = content[:url_match.start()].strip()
-    
+
     if not (file or link):
         await ctx.followup.send(content=myloc["no_attach"], ephemeral=True)
         return

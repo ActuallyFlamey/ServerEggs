@@ -148,6 +148,9 @@ class Eggstras(commands.Cog):
         self.bot = bot
 
     async def egg_loop(self, ctx: discord.Interaction, mode: str, check: int | None, rating: Rating | None, secret: bool | None):
+        if not await utils.ensure_not_ratelimited(ctx, "read"):
+            return
+
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggstras/loop")
@@ -237,6 +240,9 @@ class Eggstras(commands.Cog):
     @app.describe(text="search_text_description")
     @app.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def search(self, ctx: discord.Interaction, text: str):
+        if not await utils.ensure_not_ratelimited(ctx, "search"):
+            return
+
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggstras/search")
@@ -307,7 +313,10 @@ class Eggstras(commands.Cog):
         allowed_contexts=app.AppCommandContext(guild=True, dm_channel=True, private_channel=True)
     )
 
-    async def _send_leaderboard(self, ctx: discord.Interaction, leaderboard: utils.Leaderboard, title_key: str, name_resolver, self_id: int):
+    async def send_leaderboard(self, ctx: discord.Interaction, leaderboard: utils.Leaderboard, title_key: str, name_resolver, self_id: int):
+        if not await utils.ensure_not_ratelimited(ctx, "read"):
+            return
+
         await ctx.response.defer()
 
         lines, myloc = await self.bot.get_section(ctx, "eggstras/leaderboard")
@@ -323,7 +332,7 @@ class Eggstras(commands.Cog):
 
         await ctx.followup.send(embed=e)
 
-    async def _user_name(self, bot, user_id: int) -> str:
+    async def resolve_user_name(self, bot, user_id: int) -> str:
         user = await utils.get_or_fetch_user(bot, user_id)
 
         if user is None:
@@ -333,13 +342,13 @@ class Eggstras(commands.Cog):
 
     @leaderboard.command(name="leaderboard_collections", description="leaderboard_collections_description")
     async def lb_collections(self, ctx: discord.Interaction):
-        await self._send_leaderboard(ctx, utils.Leaderboard(User, "collected"), "collections", self._user_name, ctx.user.id)
+        await self.send_leaderboard(ctx, utils.Leaderboard(User, "collected"), "collections", self.resolve_user_name, ctx.user.id)
 
     @leaderboard.command(name="leaderboard_creations", description="leaderboard_creations_description")
     async def lb_creations(self, ctx: discord.Interaction):
-        await self._send_leaderboard(ctx, utils.Leaderboard(User, "eggs"), "creations", self._user_name, ctx.user.id)
+        await self.send_leaderboard(ctx, utils.Leaderboard(User, "eggs"), "creations", self.resolve_user_name, ctx.user.id)
 
-    async def _egg_name(self, bot, egg_id: int) -> str:
+    async def resolve_egg_name(self, bot, egg_id: int) -> str:
         egg = await Egg.get_or_none(id=egg_id).prefetch_related("creator")
 
         if egg is None:
@@ -353,11 +362,11 @@ class Eggstras(commands.Cog):
 
     @leaderboard.command(name="leaderboard_battles", description="leaderboard_battles_description")
     async def lb_battles(self, ctx: discord.Interaction):
-        await self._send_leaderboard(ctx, utils.Leaderboard(Egg, "battle_wins"), "battles", self._egg_name, None)
+        await self.send_leaderboard(ctx, utils.Leaderboard(Egg, "battle_wins"), "battles", self.resolve_egg_name, None)
 
     @leaderboard.command(name="leaderboard_battlers", description="leaderboard_battlers_description")
     async def lb_battlers(self, ctx: discord.Interaction):
-        await self._send_leaderboard(ctx, utils.Leaderboard(User, "user_battle_wins"), "battlers", self._user_name, ctx.user.id)
+        await self.send_leaderboard(ctx, utils.Leaderboard(User, "user_battle_wins"), "battlers", self.resolve_user_name, ctx.user.id)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eggstras(bot))

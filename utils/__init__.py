@@ -7,5 +7,6 @@ from .leaderboard import *
 from .log import *
 from .misc import *
 from .mod import *
+from .ratelimit import *
 from .scan import *
 from .translator import *

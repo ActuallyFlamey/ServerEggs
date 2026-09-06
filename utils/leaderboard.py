@@ -11,16 +11,16 @@ class Leaderboard:
         self.field = field
         self.limit = limit
 
-    def _base(self):
+    def base(self):
         return self.model.annotate(egg_count=Count(self.field))
 
     async def top(self):
-        return await self._base().order_by("-egg_count").limit(self.limit).values("id", "egg_count")
+        return await self.base().order_by("-egg_count").limit(self.limit).values("id", "egg_count")
 
     async def rank_of(self, entity_id: int) -> tuple[int, int]:
-        rows = await self._base().filter(id=entity_id).values("egg_count")
+        rows = await self.base().filter(id=entity_id).values("egg_count")
         count = rows[0]["egg_count"] if rows else 0
-        higher = await self._base().filter(egg_count__gt=count).count()
+        higher = await self.base().filter(egg_count__gt=count).count()
         return higher + 1, count
 
 async def render_entries(bot, leaderboard: Leaderboard, self_id: int | None, name_resolver, self_suffix: str = "") -> list[str]:

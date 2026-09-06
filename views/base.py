@@ -14,6 +14,9 @@ class ExtraAttachmentButton(discord.ui.Button):
         self.extralink = link
 
     async def callback(self, ctx: discord.Interaction):
+        if not await utils.ensure_not_ratelimited(ctx, "interact"):
+            return
+
         await utils.send_extra(ctx, self.extrafile, self.extralink)
 
 def action_button(label: str, style, callback) -> discord.ui.Button:
