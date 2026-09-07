@@ -6,13 +6,17 @@ anyio==4.14.2
 asyncpg==0.31.0
 attrs==26.1.0
 audioop-lts==0.2.2
+braceexpand==0.1.7
 cachetools==7.1.7
+click==8.5.0
 discord.py==2.7.1
 ffmpeg==1.4
 frozenlist==1.8.0
 idna==3.18
 ImageHash==4.3.2
+import_expression==2.2.1.post1
 iso8601==2.1.0
+jishaku==2.7.5
 multidict==6.7.1
 numpy==2.5.2
 pdqhash==0.2.8
@@ -22,5 +26,7 @@ pypika-tortoise==0.6.5
 python-dotenv==1.2.3
 PyWavelets==1.9.0
 scipy==1.18.0
+tabulate==0.10.0
 tortoise-orm==1.1.8
+typing_extensions==4.16.0
 yarl==1.24.5

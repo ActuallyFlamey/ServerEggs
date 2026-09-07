@@ -59,7 +59,7 @@ def load_lines_sync(file):
 
 class ServerEggs(commands.Bot):
     def __init__(self, *, intents: discord.Intents):
-        super().__init__("", intents=discord.Intents.default())
+        super().__init__(commands.when_mentioned, intents=discord.Intents.default())
 
         self.locales = {}
         self.lang_cache = TTLCache(10000, ttl=3600)
@@ -76,6 +76,7 @@ class ServerEggs(commands.Bot):
         for file in os.listdir("./cogs"):
             if file.endswith(".py") and not file.startswith("__"):
                 await self.load_extension(f"cogs.{file[:-3]}")
+        await self.load_extension("jishaku")
 
         await self.tree.sync()
         await self.tree.sync(guild=DEVELOPER_GUILD)
