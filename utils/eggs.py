@@ -26,7 +26,7 @@ async def egg_delete(egg):
 
     await egg.delete()
 
-async def random_egg(guild: Guild | None, channel, *, secret: bool | None = None, rating: Rating = None, exclude_ids = None):
+async def random_egg(guild: Guild | None, channel, *, rating: Rating = None, exclude_ids = None):
     query = Egg.all()
 
     if guild:
@@ -40,9 +40,6 @@ async def random_egg(guild: Guild | None, channel, *, secret: bool | None = None
         query = query.filter(rating=rating)
     else:
         query = query.filter(rating__in=allowed)
-
-    if secret is not None:
-        query = query.filter(secret=secret)
 
     if exclude_ids:
         query = query.exclude(id__in=list(exclude_ids))
